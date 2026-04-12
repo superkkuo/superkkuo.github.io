@@ -42,110 +42,6 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .layout{display:grid;grid-template-columns:370px 1fr;min-height:calc(100vh - 78px);}
 @media(max-width:960px){.layout{grid-template-columns:1fr;}}
 
-/* ── MOBILE RESPONSIVE ─────────────────────────────────────── */
-@media(max-width:700px){
-  /* Header */
-  .hdr{padding:13px 15px 11px;}
-  .hdr-in{flex-wrap:wrap;gap:8px;}
-  .hdr h1{font-size:1.05rem;}
-  .hdr-tags{display:none;}
-  .hdr-actions{margin-top:0;gap:6px;}
-  .nav-btn{font-size:.67rem;padding:5px 9px;}
-
-  /* Layout — stack sidebar above main */
-  .layout{grid-template-columns:1fr;min-height:unset;}
-
-  /* Sidebar — not sticky on mobile, natural scroll */
-  .sb{position:static;height:auto;max-height:none;padding:15px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
-
-  /* Inputs — force 16px to prevent iOS auto-zoom */
-  input[type="number"]{font-size:1rem !important;padding:10px 10px;}
-  .has-pre input[type="number"]{padding-left:22px;}
-  .has-suf input[type="number"]{padding-right:24px;}
-  .rval input[type="number"]{font-size:.95rem !important;width:50px;padding:0;}
-  .iw .pre{left:8px;font-size:.8rem;}
-  .iw .suf{right:8px;font-size:.8rem;}
-
-  /* Labels larger for readability */
-  .ig label{font-size:.78rem;}
-  .sbh{font-size:.68rem;margin:16px 0 9px;}
-  .combined-pill{font-size:.76rem;padding:8px 12px;}
-
-  /* Slider — bigger thumb for fat fingers */
-  input[type="range"]{height:5px;margin:9px 0 5px;}
-  input[type="range"]::-webkit-slider-thumb{width:20px;height:20px;}
-
-  /* Term selector */
-  .term-btn{padding:10px 6px;font-size:.8rem;min-height:40px;}
-  .r2{grid-template-columns:1fr 1fr;}
-
-  /* Main area */
-  .main{padding:13px 12px 30px;}
-
-  /* Tabs — horizontally scrollable, no wrapping */
-  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 5px;}
-  .tabs::-webkit-scrollbar{display:none;}
-  .tab{flex:0 0 auto;padding:9px 14px;font-size:.75rem;min-height:38px;}
-
-  /* Hero cards — 2 col */
-  .heroes,.heroes3{grid-template-columns:1fr 1fr;gap:8px;}
-  .hero{padding:12px 11px;}
-  .hero .hv{font-size:1.1rem;}
-  .hero .hs{font-size:.66rem;}
-
-  /* Stat cards — 2 col */
-  .stats{grid-template-columns:1fr 1fr;gap:7px;}
-  .stat .sv{font-size:.85rem;}
-
-  /* Charts shorter on phone */
-  .cw{height:170px;}
-
-  /* Affordability grid — hide DTI cols, keep price + bar + status */
-  .afford-row{grid-template-columns:95px 1fr 80px;gap:5px;}
-  .afford-row>span:nth-child(3),.afford-row>span:nth-child(4){display:none;}
-
-  /* Payment breakdown — hide % col */
-  .pay-pct{display:none;}
-
-  /* Rent vs buy grid */
-  .rvb-grid{grid-template-columns:1fr 1fr;}
-
-  /* Banner / info box */
-  .bn{font-size:.76rem;}
-  .ib{font-size:.74rem;}
-  .sh{font-size:.63rem;}
-
-  /* Math Inspector panel — slides up from bottom on mobile */
-  .mp{width:100vw;max-width:100vw;height:90vh;top:auto;bottom:0;right:0;border-left:none;border-top:1px solid var(--n700);border-radius:var(--rlg) var(--rlg) 0 0;transform:translateY(100%);}
-  .mp.open{transform:translateY(0);}
-  .mp-hdr{padding:14px 16px;border-radius:var(--rlg) var(--rlg) 0 0;}
-  .mp-hdr h2{font-size:.9rem;}
-  .mp-body{padding:13px 13px;}
-  /* Formula rows stack vertically */
-  .mf-row{flex-direction:column;gap:2px;padding:2px 0;}
-  .mf-lbl{min-width:unset;font-size:.72rem;}
-  .mf-val,.mf-eq{font-size:.72rem;word-break:break-word;}
-  .math-formula-box{padding:11px 11px;}
-  .milestone-row{flex-direction:column;gap:3px;align-items:flex-start;padding:8px 10px;}
-  .milestone-val{font-size:.72rem;}
-  .milestone-label{font-size:.75rem;}
-
-  /* Amortization table — horizontal scroll */
-  .amort-wrap,.math-amort-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  table{min-width:580px;}
-  th{font-size:.6rem;padding:6px 7px;}
-  td{padding:6px 7px;font-size:.7rem;}
-}
-
-/* Extra-small phones (< 400px) */
-@media(max-width:399px){
-  .heroes,.heroes3{grid-template-columns:1fr;}
-  .hero .hv{font-size:1.3rem;}
-  .r2{grid-template-columns:1fr;}
-  .rvb-grid{grid-template-columns:1fr;}
-  .stats{grid-template-columns:1fr 1fr;}
-}
-
 /* SIDEBAR */
 .sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 78px);}
 .sb::-webkit-scrollbar{width:3px;}
@@ -359,6 +255,111 @@ tr.highlight td{background:rgba(16,185,129,.06);}
 .math-amort-wrap table td{font-size:.7rem;padding:5px 9px;}
 tr.ms-row td{background:rgba(16,185,129,.07)!important;color:var(--em6);}
 tr.ms-row td:first-child{font-weight:700;}
+
+/* ── MOBILE RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:700px){
+  /* Header */
+  .hdr{padding:13px 15px 11px;}
+  .hdr-in{flex-wrap:wrap;gap:8px;}
+  .hdr h1{font-size:1.05rem;}
+  .hdr-tags{display:none;}
+  .hdr-actions{margin-top:0;gap:6px;}
+  .nav-btn{font-size:.67rem;padding:5px 9px;}
+
+  /* Layout — stack sidebar above main */
+  .layout{grid-template-columns:1fr;min-height:unset;}
+
+  /* Sidebar — not sticky on mobile, natural scroll */
+  .sb{position:static;height:auto;max-height:none;padding:15px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
+
+  /* Inputs — force 16px to prevent iOS auto-zoom */
+  input[type="number"]{font-size:1rem !important;padding:10px 10px;}
+  .has-pre input[type="number"]{padding-left:22px;}
+  .has-suf input[type="number"]{padding-right:24px;}
+  .rval input[type="number"]{font-size:.95rem !important;width:50px;padding:0;}
+  .iw .pre{left:8px;font-size:.8rem;}
+  .iw .suf{right:8px;font-size:.8rem;}
+
+  /* Labels larger for readability */
+  .ig label{font-size:.78rem;}
+  .sbh{font-size:.68rem;margin:16px 0 9px;}
+  .combined-pill{font-size:.76rem;padding:8px 12px;}
+
+  /* Slider — bigger thumb for fat fingers */
+  input[type="range"]{height:5px;margin:9px 0 5px;}
+  input[type="range"]::-webkit-slider-thumb{width:20px;height:20px;}
+
+  /* Term selector */
+  .term-btn{padding:10px 6px;font-size:.8rem;min-height:40px;}
+  .r2{grid-template-columns:1fr 1fr;}
+
+  /* Main area */
+  .main{padding:13px 12px 30px;}
+
+  /* Tabs — horizontally scrollable, no wrapping */
+  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 5px;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex:0 0 auto;padding:9px 14px;font-size:.75rem;min-height:38px;}
+
+  /* Hero cards — 2 col */
+  .heroes,.heroes3{grid-template-columns:1fr 1fr;gap:8px;}
+  .hero{padding:12px 11px;}
+  .hero .hv{font-size:1.1rem;}
+  .hero .hs{font-size:.66rem;}
+
+  /* Stat cards — 2 col */
+  .stats{grid-template-columns:1fr 1fr;gap:7px;}
+  .stat .sv{font-size:.85rem;}
+
+  /* Charts shorter on phone */
+  .cw{height:170px;}
+
+  /* Affordability grid — hide DTI cols, keep price + bar + status */
+  .afford-row{grid-template-columns:95px 1fr 80px;gap:5px;}
+  .afford-row>span:nth-child(3),.afford-row>span:nth-child(4){display:none;}
+
+  /* Payment breakdown — hide % col */
+  .pay-pct{display:none;}
+
+  /* Rent vs buy grid */
+  .rvb-grid{grid-template-columns:1fr 1fr;}
+
+  /* Banner / info box */
+  .bn{font-size:.76rem;}
+  .ib{font-size:.74rem;}
+  .sh{font-size:.63rem;}
+
+  /* Math Inspector panel — slides up from bottom on mobile */
+  .mp{width:100vw;max-width:100vw;height:90vh;top:auto;bottom:0;right:0;border-left:none;border-top:1px solid var(--n700);border-radius:var(--rlg) var(--rlg) 0 0;transform:translateY(100%);}
+  .mp.open{transform:translateY(0);}
+  .mp-hdr{padding:14px 16px;border-radius:var(--rlg) var(--rlg) 0 0;}
+  .mp-hdr h2{font-size:.9rem;}
+  .mp-body{padding:13px 13px;}
+  /* Formula rows stack vertically */
+  .mf-row{flex-direction:column;gap:2px;padding:2px 0;}
+  .mf-lbl{min-width:unset;font-size:.72rem;}
+  .mf-val,.mf-eq{font-size:.72rem;word-break:break-word;}
+  .math-formula-box{padding:11px 11px;}
+  .milestone-row{flex-direction:column;gap:3px;align-items:flex-start;padding:8px 10px;}
+  .milestone-val{font-size:.72rem;}
+  .milestone-label{font-size:.75rem;}
+
+  /* Amortization table — horizontal scroll */
+  .amort-wrap,.math-amort-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{min-width:580px;}
+  th{font-size:.6rem;padding:6px 7px;}
+  td{padding:6px 7px;font-size:.7rem;}
+}
+
+/* Extra-small phones (< 400px) */
+@media(max-width:399px){
+  .heroes,.heroes3{grid-template-columns:1fr;}
+  .hero .hv{font-size:1.3rem;}
+  .r2{grid-template-columns:1fr;}
+  .rvb-grid{grid-template-columns:1fr;}
+  .stats{grid-template-columns:1fr 1fr;}
+}
+
 </style>
 </head>
 <body>
@@ -376,7 +377,7 @@ tr.ms-row td:first-child{font-weight:700;}
       </div>
     </div>
     <div class="hdr-actions">
-      <a href="index.html" class="nav-btn">🔥 Retirement Calculator →</a>
+      <a href="retirement_calculator.html" class="nav-btn">🔥 Retirement Calculator →</a>
       <button class="math-btn" onclick="toggleMath()" title="Show step-by-step mortgage math">🔍 Show Math</button>
     </div>
   </div>
