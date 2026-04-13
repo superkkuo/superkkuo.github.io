@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compound & Simple Interest — Investment Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --n950:#060d1e;--n900:#0f172a;--n800:#1e293b;--n700:#334155;--n600:#475569;
+  --s400:#94a3b8;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc;
+  --white:#ffffff;
+  --bl6:#2563eb;--bl5:#3b82f6;--bl1:#dbeafe;--bl0:#eff6ff;
+  --pr6:#7c3aed;--pr5:#8b5cf6;--pr1:#ede9fe;--pr0:#faf5ff;
+  --em6:#059669;--em5:#10b981;--em1:#d1fae5;--em0:#ecfdf5;
+  --am6:#d97706;--am5:#f59e0b;--am1:#fef3c7;--am0:#fffbeb;
+  --ro6:#e11d48;--ro5:#f43f5e;--ro1:#ffe4e6;
+  --in6:#4f46e5;--in5:#6366f1;--in1:#e0e7ff;--in0:#eef2ff;
+  --cy6:#0891b2;--cy5:#06b6d4;--cy1:#cffafe;--cy0:#ecfeff;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --rsm:8px;--rmd:12px;--rlg:16px;--rfl:9999px;
+  --sh1:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --sh2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 20% 50%,rgba(59,130,246,.14),transparent),radial-gradient(ellipse 40% 60% at 80% 30%,rgba(99,102,241,.1),transparent);pointer-events:none;}
+.hdr-in{max-width:1300px;margin:0 auto;position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.hdr h1{font-size:1.4rem;font-weight:700;color:var(--white);letter-spacing:-.02em;}
+.hdr h1 span{color:var(--bl5);}
+.hdr-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.htag{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:var(--rfl);border:1px solid rgba(255,255,255,.1);color:var(--s300);background:rgba(255,255,255,.05);letter-spacing:.03em;}
+.nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:var(--rsm);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white);}
+.hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
+.math-btn{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:#93c5fd;font-size:.74rem;font-weight:600;padding:6px 14px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;letter-spacing:.01em;white-space:nowrap;}
+.math-btn:hover{background:rgba(59,130,246,.3);color:var(--white);}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:350px 1fr;min-height:calc(100vh - 78px);}
+
+/* SIDEBAR */
+.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;}
+.sb::-webkit-scrollbar{width:3px;}
+.sb::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.sbh{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
+.sbh::after{content:'';flex:1;height:1px;background:var(--n800);}
+.ig{margin-bottom:9px;}
+.ig label{display:block;font-size:.71rem;font-weight:500;color:var(--s400);margin-bottom:3px;}
+.iw{position:relative;}
+.iw .pre,.iw .suf{position:absolute;top:50%;transform:translateY(-50%);font-size:.75rem;font-weight:600;color:var(--n600);pointer-events:none;z-index:1;}
+.iw .pre{left:9px;} .iw .suf{right:9px;}
+input[type="number"],select{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+input[type="number"]:focus,select:focus{outline:none;border-color:var(--bl5);box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+.has-pre input[type="number"]{padding-left:19px;}
+.has-suf input[type="number"]{padding-right:21px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+select{cursor:pointer;padding-right:26px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23475569'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:8px;}
+input[type="range"]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--n700);border:none;cursor:pointer;padding:0;margin:5px 0 3px;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--bl5);cursor:pointer;box-shadow:0 0 0 3px rgba(59,130,246,.2);}
+.rrow{display:flex;justify-content:space-between;align-items:center;}
+.rlbl{font-size:.65rem;color:var(--n600);}
+.rval{display:flex;align-items:center;gap:1px;}
+.rval input[type="number"]{width:46px;text-align:center;border:none;background:transparent;font-size:.8rem;font-weight:700;color:var(--bl5);padding:0;box-shadow:none!important;}
+.rval span{font-size:.8rem;font-weight:700;color:var(--bl5);}
+.cb{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:var(--rsm);padding:9px 11px;margin-top:8px;}
+.cb-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.71rem;}
+.cb-lbl{color:var(--s400);}
+.cb-val{color:var(--white);font-weight:600;font-family:var(--mono);font-size:.72rem;}
+.cb-div{height:1px;background:rgba(59,130,246,.2);margin:4px 0;}
+.cb-tot{color:#93c5fd;font-weight:700;}
+
+/* MAIN */
+.main{padding:18px 22px 40px;overflow-y:auto;}
+.tabs{display:flex;gap:3px;background:var(--white);border:1px solid var(--s200);border-radius:var(--rfl);padding:4px;margin-bottom:18px;box-shadow:var(--sh1);}
+.tab{flex:1;padding:7px 12px;border:none;border-radius:var(--rfl);font-size:.76rem;font-weight:600;cursor:pointer;background:transparent;color:var(--n600);transition:all .16s;text-align:center;white-space:nowrap;}
+.tab:hover{color:var(--n900);}
+.tab.active{background:var(--n900);color:var(--white);box-shadow:var(--sh1);}
+.tab-panel{display:none;animation:fi .18s ease;}
+.tab-panel.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+.heroes{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px;}
+.heroes3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:14px;}
+.hero{border-radius:var(--rlg);padding:16px 14px;border:1px solid transparent;position:relative;overflow:hidden;}
+.hbl{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;}
+.hgr{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#a7f3d0;}
+.ham{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;}
+.hpu{background:linear-gradient(135deg,#faf5ff,#ede9fe);border-color:#ddd6fe;}
+.hin{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe;}
+.hro{background:linear-gradient(135deg,#fff1f2,#ffe4e6);border-color:#fda4af;}
+.hero .hl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:4px;}
+.hero .hv{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-bottom:3px;}
+.hbl .hv{color:var(--bl6);}
+.hgr .hv{color:var(--em6);}
+.ham .hv{color:var(--am6);}
+.hpu .hv{color:var(--pr6);}
+.hin .hv{color:var(--in6);}
+.hro .hv{color:var(--ro6);}
+.hero .hs{font-size:.7rem;color:var(--n600);}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px;margin-bottom:13px;}
+.stat{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:10px 12px;box-shadow:var(--sh1);cursor:default;}
+.stat .sl{font-size:.66rem;color:var(--n600);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.stat .sv{font-size:.95rem;font-weight:700;color:var(--n900);font-family:var(--mono);}
+.stat .sv.pos{color:var(--em6);}
+.stat .sv.neg{color:var(--ro6);}
+.stat .sv.warn{color:var(--am6);}
+.stat .sv.blu{color:var(--bl6);}
+.stat .sv.pur{color:var(--pr6);}
+.bn{padding:9px 13px;border-radius:var(--rmd);font-size:.8rem;font-weight:500;margin-bottom:12px;line-height:1.5;border:1px solid;}
+.bn strong{font-weight:700;}
+.bn.ok{background:var(--em0);border-color:var(--em1);color:#065f46;}
+.bn.warn{background:var(--am0);border-color:var(--am1);color:#78350f;}
+.bn.info{background:var(--bl0);border-color:var(--bl1);color:#1e3a8a;}
+.bn.pur{background:var(--pr0);border-color:var(--pr1);color:#4c1d95;}
+.sh{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--n600);margin:16px 0 9px;display:flex;align-items:center;gap:8px;}
+.sh::after{content:'';flex:1;height:1px;background:var(--s200);}
+.ib{background:var(--s50);border-left:3px solid var(--bl5);border-radius:0 var(--rsm) var(--rsm) 0;padding:9px 12px;font-size:.76rem;color:var(--n600);margin-bottom:12px;line-height:1.6;}
+.ib strong{color:var(--n900);}
+.cw{position:relative;height:220px;margin-bottom:6px;}
+
+/* Comparison cards */
+.cmp-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.cmp-card{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:14px 16px;box-shadow:var(--sh1);}
+.cmp-card.cc{border-top:3px solid var(--bl5);}
+.cmp-card.cs{border-top:3px solid var(--am5);}
+.cmp-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.cmp-card.cc .cmp-title{color:var(--bl6);}
+.cmp-card.cs .cmp-title{color:var(--am6);}
+.cmp-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:.76rem;border-bottom:1px solid var(--s100);}
+.cmp-row:last-child{border-bottom:none;font-weight:700;}
+.cmp-lbl{color:var(--n600);}
+.cmp-val{font-family:var(--mono);font-weight:600;color:var(--n900);}
+.cmp-card.cc .cmp-row:last-child .cmp-val{color:var(--bl6);}
+.cmp-card.cs .cmp-row:last-child .cmp-val{color:var(--am6);}
+
+/* Milestone rows */
+.ms-list{display:flex;flex-direction:column;gap:6px;margin-bottom:13px;}
+.ms-row{display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:9px 13px;font-size:.77rem;box-shadow:var(--sh1);}
+.ms-icon{font-size:.95rem;flex-shrink:0;width:20px;text-align:center;}
+.ms-body{flex:1;}
+.ms-lbl{font-weight:600;color:var(--n800);}
+.ms-sub{font-size:.69rem;color:var(--n600);margin-top:1px;}
+.ms-val{font-weight:700;font-family:var(--mono);color:var(--bl6);}
+
+/* Scenarios */
+.scen-header,.scen-row-item{display:grid;grid-template-columns:80px 1fr 130px 130px 100px;gap:8px;align-items:center;padding:8px 12px;font-size:.75rem;border-radius:var(--rsm);}
+.scen-header{background:var(--s50);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--n600);margin-bottom:4px;}
+.scen-row-item{background:var(--white);border:1px solid var(--s200);box-shadow:var(--sh1);margin-bottom:5px;}
+.scen-rate-lbl{font-weight:800;font-family:var(--mono);}
+.scen-bar-wrap{height:8px;background:var(--s200);border-radius:4px;overflow:hidden;}
+.scen-bar{height:100%;border-radius:4px;}
+.scen-cval{font-weight:700;font-family:var(--mono);color:var(--bl6);}
+.scen-sval{font-family:var(--mono);color:var(--am6);}
+.scen-diff{font-family:var(--mono);font-size:.72rem;color:var(--em6);font-weight:600;}
+
+/* Schedule */
+.sched-wrap{overflow-x:auto;margin-bottom:13px;}
+table{width:100%;border-collapse:collapse;font-size:.76rem;}
+th{background:var(--s50);padding:7px 10px;text-align:right;font-weight:700;color:var(--n600);font-size:.63rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--s200);}
+th:first-child{text-align:center;}
+td{padding:7px 10px;border-bottom:1px solid var(--s100);font-family:var(--mono);font-size:.73rem;text-align:right;}
+td:first-child{text-align:center;font-family:var(--font);font-weight:600;color:var(--n700);}
+tr:last-child td{border-bottom:none;font-weight:700;background:var(--s50);}
+tr:hover td{background:var(--s50);}
+tr.hi td{background:rgba(59,130,246,.04);}
+.td-c{color:var(--bl6);font-weight:600;}
+.td-s{color:var(--am6);}
+.td-adv{color:var(--em6);font-size:.7rem;}
+
+/* Math Inspector */
+.mp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+.mp-overlay.open{opacity:1;pointer-events:auto;}
+.mp{position:fixed;top:0;right:0;height:100vh;width:580px;max-width:100vw;background:var(--n950);border-left:1px solid var(--n700);z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,.4);}
+.mp.open{transform:translateX(0);}
+.mp-hdr{padding:16px 20px;border-bottom:1px solid var(--n700);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--n900);}
+.mp-hdr h2{font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-.01em;}
+.mp-hdr h2 span{color:var(--bl5);}
+.mp-close{background:var(--n800);border:1px solid var(--n700);color:var(--s400);font-size:.76rem;font-weight:600;padding:5px 12px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;}
+.mp-close:hover{color:var(--white);border-color:var(--s400);}
+.mp-body{overflow-y:auto;flex:1;padding:16px 18px;}
+.mp-body::-webkit-scrollbar{width:4px;}
+.mp-body::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.ms2{margin-bottom:20px;}
+.ms2-hdr{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--bl5);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--n800);}
+.mfb{background:var(--n900);border:1px solid var(--n800);border-radius:var(--rmd);padding:12px 15px;margin-bottom:8px;}
+.mfb .ft{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:7px;}
+.mf{display:flex;align-items:flex-start;gap:10px;margin-bottom:5px;font-size:.76rem;line-height:1.6;}
+.mf:last-child{margin-bottom:0;}
+.ml{color:var(--s400);white-space:nowrap;min-width:160px;flex-shrink:0;font-size:.73rem;}
+.mv{color:var(--white);font-family:var(--mono);font-size:.73rem;}
+.mv.hi{color:var(--bl5);}
+.mv.pos{color:var(--em5);}
+.mv.warn{color:var(--am5);}
+.mf-div{height:1px;background:var(--n800);margin:7px 0;}
+.fbig{font-family:var(--mono);font-size:.78rem;color:var(--white);background:var(--n900);border:1px solid var(--n700);border-radius:var(--rmd);padding:11px 15px;margin:8px 0;text-align:center;letter-spacing:.01em;line-height:2;}
+.fbig span{color:var(--bl5);}
+.fbig .sub{color:var(--am5);}
+
+/* Tooltip */
+[data-tip]{position:relative;cursor:help;}
+[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--n900);color:var(--s300);font-size:.72rem;padding:7px 11px;border-radius:var(--rsm);width:220px;line-height:1.5;text-align:center;pointer-events:none;opacity:0;transition:opacity .15s;z-index:99;border:1px solid var(--n700);font-family:var(--font);}
+[data-tip]:hover::after{opacity:1;}
+
+/* Mobile */
+@media(max-width:960px){
+  .layout{grid-template-columns:1fr;}
+  .sb{position:static;height:auto;border-right:none;border-bottom:1px solid var(--n800);}
+  .heroes3{grid-template-columns:1fr 1fr;}
+  .cmp-cards{grid-template-columns:1fr 1fr;}
+  .scen-header,.scen-row-item{grid-template-columns:70px 1fr 110px 100px 80px;}
+}
+@media(max-width:600px){
+  .hdr{padding:14px 14px 12px;}
+  .hdr h1{font-size:1.15rem;}
+  .hdr-actions{gap:5px;}
+  .nav-btn{font-size:.68rem;padding:5px 9px;}
+  .math-btn{font-size:.69rem;padding:5px 10px;}
+  .main{padding:13px 13px 30px;}
+  .tabs{gap:2px;}
+  .tab{font-size:.69rem;padding:6px 7px;}
+  .heroes,.heroes3,.cmp-cards{grid-template-columns:1fr 1fr;}
+  .scen-header,.scen-row-item{grid-template-columns:60px 1fr 100px;}
+  .scen-header span:nth-child(4),.scen-header span:nth-child(5),
+  .scen-row-item span:nth-child(4),.scen-row-item span:nth-child(5){display:none;}
+  .mp{width:100vw;height:90vh;top:auto;bottom:0;border-left:none;border-top:1px solid var(--n700);border-radius:var(--rlg) var(--rlg) 0 0;transform:translateY(100%);}
+  .mp.open{transform:translateY(0);}
+  .mp-hdr{border-radius:var(--rlg) var(--rlg) 0 0;}
+  input[type="number"],select{font-size:1rem!important;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div>
+      <h1>💰 <span>Compound</span> & Simple Interest</h1>
+      <div class="hdr-tags">
+        <span class="htag">Investment Growth</span>
+        <span class="htag">Power of Compounding</span>
+        <span class="htag">Rate Scenarios</span>
+        <span class="htag">APR vs APY</span>
+      </div>
+    </div>
+    <div class="hdr-actions">
+      <a href="mortgage_calculator.html" class="nav-btn">🏡 Mortgage →</a>
+      <a href="retirement_calculator.html" class="nav-btn">🔥 Retirement →</a>
+      <a href="college_calculator.html" class="nav-btn">🎓 529 →</a>
+      <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="sb">
+
+  <div class="sbh">Investment</div>
+  <div class="ig">
+    <label>Initial Principal</label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="principal" value="10000" min="0" step="1000" oninput="calc()"></div>
+  </div>
+  <div class="r2">
+    <div class="ig">
+      <label>Monthly Contribution</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="monthly" value="500" min="0" step="50" oninput="calc()"></div>
+    </div>
+    <div class="ig">
+      <label>Contrib Increase/yr</label>
+      <div class="iw has-suf">
+        <input type="number" id="contribInc" value="0" min="0" max="15" step="0.5" oninput="calc()">
+        <span class="suf">%</span></div>
+    </div>
+  </div>
+  <div class="ig">
+    <div class="rrow">
+      <span class="rlbl">1 yr</span>
+      <div class="rval">
+        <input type="number" id="yearsNum" value="30" min="1" max="50" step="1" oninput="syncYearSlider()">
+        <span>yrs</span>
+      </div>
+      <span class="rlbl">50 yrs</span>
+    </div>
+    <input type="range" id="yearsSlider" min="1" max="50" value="30" oninput="syncYearNum()">
+  </div>
+
+  <div class="sbh">Returns</div>
+  <div class="ig">
+    <label>Annual Interest Rate (APR)</label>
+    <div class="rrow">
+      <span class="rlbl">0%</span>
+      <div class="rval">
+        <input type="number" id="rateNum" value="8" min="0.1" max="30" step="0.1" oninput="syncRateSlider()">
+        <span>%</span>
+      </div>
+      <span class="rlbl">30%</span>
+    </div>
+    <input type="range" id="rateSlider" min="0.1" max="30" step="0.1" value="8" oninput="syncRateNum()">
+  </div>
+  <div class="ig">
+    <label>Compounding Frequency</label>
+    <select id="compFreq" onchange="calc()">
+      <option value="365">Daily (365×/yr)</option>
+      <option value="12" selected>Monthly (12×/yr)</option>
+      <option value="4">Quarterly (4×/yr)</option>
+      <option value="2">Semi-Annual (2×/yr)</option>
+      <option value="1">Annual (1×/yr)</option>
+    </select>
+  </div>
+
+  <div class="sbh">Adjustments</div>
+  <div class="r2">
+    <div class="ig">
+      <label>Tax Rate (on gains)</label>
+      <div class="iw has-suf">
+        <input type="number" id="taxRate" value="22" min="0" max="55" step="1" oninput="calc()">
+        <span class="suf">%</span></div>
+    </div>
+    <div class="ig">
+      <label>Inflation Rate</label>
+      <div class="iw has-suf">
+        <input type="number" id="inflRate" value="3" min="0" max="10" step="0.25" oninput="calc()">
+        <span class="suf">%</span></div>
+    </div>
+  </div>
+
+  <div class="cb" id="summaryBox"></div>
+
+</aside>
+
+<main class="main">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this,'growth')">📈 Growth</button>
+    <button class="tab" onclick="switchTab(this,'compare')">⚖️ vs Simple</button>
+    <button class="tab" onclick="switchTab(this,'scenarios')">🎯 Scenarios</button>
+    <button class="tab" onclick="switchTab(this,'schedule')">📅 Schedule</button>
+  </div>
+
+  <!-- GROWTH TAB -->
+  <div id="tab-growth" class="tab-panel active">
+    <div class="bn info" id="growthBanner"></div>
+    <div class="heroes3" id="growthHeroes"></div>
+    <div class="sh">Balance Over Time</div>
+    <div class="cw" style="height:240px"><canvas id="growthChart"></canvas></div>
+    <div class="sh">Key Metrics</div>
+    <div class="stats" id="growthStats"></div>
+    <div class="sh">Milestones</div>
+    <div class="ms-list" id="growthMilestones"></div>
+  </div>
+
+  <!-- COMPARE TAB -->
+  <div id="tab-compare" class="tab-panel">
+    <div class="ib"><strong>Compound vs. Simple Interest:</strong> Simple interest earns only on the original principal. Compound interest earns on the principal <em>and</em> on accumulated interest — creating a snowball effect. The gap grows exponentially with time and rate.</div>
+    <div class="cmp-cards" id="cmpCards"></div>
+    <div class="sh">Compound Breakdown — Where the Money Comes From</div>
+    <div class="cw" style="height:220px"><canvas id="cmpChart"></canvas></div>
+    <div class="sh">Compounding Advantage at Key Years</div>
+    <div class="ms-list" id="cmpMilestones"></div>
+    <div class="stats" id="cmpStats"></div>
+  </div>
+
+  <!-- SCENARIOS TAB -->
+  <div id="tab-scenarios" class="tab-panel">
+    <div class="ib"><strong>Rate Scenarios:</strong> Compounded annual return makes an enormous difference over time. Each row shows what your investment grows to under different assumed return rates — for both compound and simple interest.</div>
+    <div class="scen-header">
+      <span>Rate</span><span>Progress</span><span>Compound</span><span>Simple</span><span>Advantage</span>
+    </div>
+    <div id="scenGrid"></div>
+    <div class="sh">Growth Curves by Rate</div>
+    <div class="cw" style="height:230px"><canvas id="scenChart"></canvas></div>
+    <div class="sh">After Tax &amp; Inflation (Compound)</div>
+    <div class="stats" id="scenStats"></div>
+  </div>
+
+  <!-- SCHEDULE TAB -->
+  <div id="tab-schedule" class="tab-panel">
+    <div class="ib"><strong>Year-by-Year Schedule:</strong> Watch how compound interest accelerates in later years while simple interest grows at a constant rate. Contributions, interest, and total balance shown for both methods.</div>
+    <div class="sched-wrap">
+      <table id="schedTable"></table>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- Math Inspector -->
+<div class="mp-overlay" id="mpOverlay" onclick="toggleMath()"></div>
+<div class="mp" id="mathPanel">
+  <div class="mp-hdr">
+    <h2>🔍 Math <span>Inspector</span></h2>
+    <button class="mp-close" onclick="toggleMath()">✕ Close</button>
+  </div>
+  <div class="mp-body">
+    <div id="mathContent"><p style="color:var(--n600);font-size:.8rem;padding:8px 0;">Adjust inputs to populate the math.</p></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const CH = {};
+function dc(id){ if(CH[id]){CH[id].destroy();delete CH[id];} }
+const fmt  = v => isNaN(v)||!isFinite(v)?'—':'$'+Math.round(v).toLocaleString();
+const fmtD = v => isNaN(v)||!isFinite(v)?'—':'$'+v.toFixed(2);
+const pct  = (v,d=2) => isNaN(v)?'—':(v*100).toFixed(d)+'%';
+const fd   = v => '$'+Math.round(v).toLocaleString();
+const f4   = v => v.toFixed(4);
+const f6   = v => v.toFixed(6);
+
+// ── Sliders ──────────────────────────────────────────────────
+function syncYearNum()  { document.getElementById('yearsNum').value  = document.getElementById('yearsSlider').value; calc(); }
+function syncYearSlider(){ const v=+document.getElementById('yearsNum').value; document.getElementById('yearsSlider').value=Math.min(50,Math.max(1,v)); calc(); }
+function syncRateNum()  { document.getElementById('rateNum').value   = document.getElementById('rateSlider').value;  calc(); }
+function syncRateSlider(){ const v=+document.getElementById('rateNum').value; document.getElementById('rateSlider').value=Math.min(30,Math.max(0.1,v)); calc(); }
+
+function switchTab(btn,id){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+// ── Core math ────────────────────────────────────────────────
+function getInputs(){
+  const P        = +document.getElementById('principal').value  || 0;
+  const PMT      = +document.getElementById('monthly').value    || 0;
+  const cInc     = +document.getElementById('contribInc').value / 100 || 0;
+  const tYrs     = Math.max(1, Math.min(50, +document.getElementById('yearsNum').value || 30));
+  const apr      = +document.getElementById('rateNum').value    / 100 || 0.08;
+  const n        = +document.getElementById('compFreq').value   || 12;
+  const taxRate  = +document.getElementById('taxRate').value    / 100 || 0.22;
+  const inflRate = +document.getElementById('inflRate').value   / 100 || 0.03;
+  // Effective monthly rate and APY
+  const rM  = Math.pow(1 + apr/n, n/12) - 1;
+  const apy = Math.pow(1 + apr/n, n)    - 1;
+  return { P, PMT, cInc, tYrs, apr, n, taxRate, inflRate, rM, apy };
+}
+
+// Compound interest — monthly loop
+function calcCompound(P, PMT, rM, tYrs, cInc){
+  const months = Math.round(tYrs * 12);
+  let bal = P, pmt = PMT, totalContribs = 0;
+  const snaps = [{ yr:0, bal:P, contribs:0, interest:0 }];
+  for(let m=1; m<=months; m++){
+    if(m>1 && (m-1)%12===0 && cInc>0) pmt *= (1+cInc);
+    bal = bal*(1+rM) + pmt;
+    totalContribs += pmt;
+    if(m%12===0){
+      snaps.push({ yr:m/12, bal, contribs:totalContribs, interest:bal-P-totalContribs });
+    }
+  }
+  return { finalBal:bal, totalContribs, totalInterest:bal-P-totalContribs, snaps };
+}
+
+// Simple interest — each contribution earns r × time_remaining (no compounding)
+function calcSimple(P, PMT, apr, tYrs, cInc){
+  const snaps = [{ yr:0, bal:P, contribs:0, interest:0 }];
+  for(let yr=1; yr<=Math.round(tYrs); yr++){
+    let bal = P*(1 + apr*yr);
+    let contribs = 0, pmt = PMT;
+    for(let m=1; m<=yr*12; m++){
+      if(m>1 && (m-1)%12===0 && cInc>0) pmt *= (1+cInc);
+      bal     += pmt * (1 + apr*(yr*12-m)/12);
+      contribs += pmt;
+    }
+    snaps.push({ yr, bal, contribs, interest:bal-P-contribs });
+  }
+  const last = snaps[snaps.length-1];
+  return { finalBal:last.bal, totalContribs:last.contribs, totalInterest:last.interest, snaps };
+}
+
+// Rule of 72
+function rule72(rate){ return rate>0 ? 72/(rate*100) : Infinity; }
+
+// Find year when balance first crosses threshold
+function crossYear(snaps, thresh){
+  for(const s of snaps) if(s.bal>=thresh) return s.yr;
+  return null;
+}
+
+// ── Main calc ────────────────────────────────────────────────
+function calc(){
+  const i = getInputs();
+  const C = calcCompound(i.P, i.PMT, i.rM, i.tYrs, i.cInc);
+  const S = calcSimple  (i.P, i.PMT, i.apr, i.tYrs, i.cInc);
+
+  // After-tax and inflation-adjusted values (compound)
+  const gainTax     = C.totalInterest * i.taxRate;
+  const afterTax    = C.finalBal - gainTax;
+  const realFactor  = Math.pow(1 + i.inflRate, i.tYrs);
+  const realValue   = C.finalBal / realFactor;
+  const realAfterTax= afterTax   / realFactor;
+
+  // Interest-on-interest (compound bonus over simple)
+  const ioi = C.totalInterest - S.totalInterest;
+
+  updateSummary(C, S, i);
+  doGrowth(C, S, i, ioi, realValue);
+  doCompare(C, S, i, ioi);
+  doScenarios(i);
+  doSchedule(C, S, i);
+  doMath(C, S, i, ioi, afterTax, realValue);
+}
+
+// ── Sidebar summary ──────────────────────────────────────────
+function updateSummary(C, S, i){
+  const box = document.getElementById('summaryBox');
+  box.innerHTML = `
+    <div class="cb-row"><span class="cb-lbl">Compound Final</span><span class="cb-val cb-tot">${fd(C.finalBal)}</span></div>
+    <div class="cb-row"><span class="cb-lbl">Simple Final</span><span class="cb-val">${fd(S.finalBal)}</span></div>
+    <div class="cb-div"></div>
+    <div class="cb-row"><span class="cb-lbl">Total Invested</span><span class="cb-val">${fd(i.P + C.totalContribs)}</span></div>
+    <div class="cb-row"><span class="cb-lbl">Compound Interest</span><span class="cb-val">${fd(C.totalInterest)}</span></div>
+    <div class="cb-row"><span class="cb-lbl">APY</span><span class="cb-val">${pct(i.apy)}</span></div>`;
+}
+
+// ── Growth tab ───────────────────────────────────────────────
+function doGrowth(C, S, i, ioi, realValue){
+  const totalInvested = i.P + C.totalContribs;
+
+  // Banner
+  const ratio = totalInvested > 0 ? C.finalBal / totalInvested : 1;
+  const bn = document.getElementById('growthBanner');
+  bn.className = 'bn info';
+  bn.innerHTML = `📈 Over <strong>${i.tYrs} years</strong> at <strong>${pct(i.apr,1)} APR</strong> (APY: <strong>${pct(i.apy,2)}</strong>), your <strong>${fd(totalInvested)}</strong> invested grows to <strong>${fd(C.finalBal)}</strong> — a <strong>${ratio.toFixed(1)}× multiple</strong>. Compounding adds <strong>${fd(ioi)}</strong> more than simple interest.`;
+
+  // Heroes
+  document.getElementById('growthHeroes').innerHTML = `
+    <div class="hero hbl" data-tip="Final balance after ${i.tYrs} years of compound interest at ${pct(i.apr,1)} APR, including all monthly contributions and compounding gains.">
+      <div class="hl">Final Balance</div>
+      <div class="hv">${fd(C.finalBal)}</div>
+      <div class="hs">${pct(i.apy)} APY · ${i.tYrs} yrs</div>
+    </div>
+    <div class="hero hgr" data-tip="Total interest earned through compound growth — this includes interest on your interest, not just on the principal.">
+      <div class="hl">Total Interest Earned</div>
+      <div class="hv">${fd(C.totalInterest)}</div>
+      <div class="hs">${pct(totalInvested>0?C.totalInterest/totalInvested:0,1)} of total invested</div>
+    </div>
+    <div class="hero hpu" data-tip="The extra interest you earn because of compounding — interest earned on previously earned interest. This is the mathematical 'magic' that simple interest cannot produce.">
+      <div class="hl">Interest on Interest</div>
+      <div class="hv">${fd(ioi)}</div>
+      <div class="hs">Compound bonus over simple</div>
+    </div>`;
+
+  // Chart
+  dc('growthChart');
+  const labels   = C.snaps.map(s=>`Yr ${s.yr}`);
+  const cBals    = C.snaps.map(s=>+s.bal.toFixed(0));
+  const sBals    = S.snaps.map(s=>+s.bal.toFixed(0));
+  const contribLine = C.snaps.map(s=>+(i.P + s.contribs).toFixed(0));
+  CH['growthChart'] = new Chart(document.getElementById('growthChart').getContext('2d'),{
+    type:'line',
+    data:{labels, datasets:[
+      {label:'Compound Interest',data:cBals,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',fill:true,tension:.4,pointRadius:0,borderWidth:2.5},
+      {label:'Simple Interest',  data:sBals,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.06)', fill:true,tension:.4,pointRadius:0,borderWidth:1.5,borderDash:[5,3]},
+      {label:'Principal + Contributions',data:contribLine,borderColor:'#94a3b8',backgroundColor:'transparent',fill:false,tension:.4,pointRadius:0,borderWidth:1,borderDash:[3,4]},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
+              y:{ticks:{callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+v,font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // Stats
+  const r72 = rule72(i.apr);
+  const monthlyIntEnd = C.snaps[C.snaps.length-1]?.bal * i.rM || 0;
+  const realRate = (1+i.apr)/(1+i.inflRate) - 1;
+  document.getElementById('growthStats').innerHTML = `
+    <div class="stat" data-tip="Annual Percentage Yield — the effective annual return after accounting for compounding frequency. Always higher than the APR.">
+      <div class="sl">APY (effective)</div><div class="sv blu">${pct(i.apy)}</div></div>
+    <div class="stat" data-tip="Rule of 72: divide 72 by the annual rate to estimate how many years it takes to double your money. At ${pct(i.apr,1)}, roughly ${r72.toFixed(1)} years.">
+      <div class="sl">Years to Double</div><div class="sv">${r72.toFixed(1)} yrs</div></div>
+    <div class="stat" data-tip="Monthly interest earned on your final balance — your money is earning this much per month near the end of the period.">
+      <div class="sl">Monthly Interest (end)</div><div class="sv pos">${fd(monthlyIntEnd)}/mo</div></div>
+    <div class="stat" data-tip="Real return = nominal rate minus inflation. Your ${pct(i.apr,1)} nominal return less ${pct(i.inflRate,1)} inflation.">
+      <div class="sl">Real Return Rate</div><div class="sv ${realRate>=0?'pos':'neg'}">${pct(realRate,2)}</div></div>
+    <div class="stat" data-tip="Your final balance adjusted for ${pct(i.inflRate,1)}/yr inflation over ${i.tYrs} years — what today's dollars can buy.">
+      <div class="sl">Inflation-Adjusted</div><div class="sv warn">${fd(realValue)}</div></div>
+    <div class="stat" data-tip="Total amount you personally put in — initial principal plus all monthly contributions.">
+      <div class="sl">Total Invested</div><div class="sv">${fd(totalInvested)}</div></div>
+    <div class="stat" data-tip="How many times over your invested capital your final balance represents.">
+      <div class="sl">Growth Multiple</div><div class="sv pos">${ratio.toFixed(2)}×</div></div>
+    <div class="stat" data-tip="Your average effective monthly contribution rate to reach this outcome.">
+      <div class="sl">Avg Monthly Contrib</div><div class="sv">${fd(C.totalContribs/(i.tYrs*12))}/mo</div></div>`;
+
+  // Milestones
+  const thresholds = [25000,50000,100000,250000,500000,1000000,2000000,5000000];
+  const icons = ['🌱','💵','💰','🏆','🚀','💎','🌟','🔱'];
+  let mlHTML = '';
+  for(let t=0;t<thresholds.length;t++){
+    const th = thresholds[t];
+    if(th <= i.P) continue;
+    const yr = crossYear(C.snaps, th);
+    if(!yr) break;
+    const sYr = crossYear(S.snaps, th);
+    mlHTML += `<div class="ms-row">
+      <span class="ms-icon">${icons[t]}</span>
+      <div class="ms-body">
+        <div class="ms-lbl">Reach ${fd(th)}</div>
+        <div class="ms-sub">Simple: ${sYr?`Year ${sYr}`:'Never in range'}</div>
+      </div>
+      <span class="ms-val">Year ${yr}</span>
+    </div>`;
+  }
+  document.getElementById('growthMilestones').innerHTML = mlHTML || '<div class="bn warn">No milestones reached within the time horizon.</div>';
+}
+
+// ── Compare tab ──────────────────────────────────────────────
+function doCompare(C, S, i, ioi){
+  const totalInvested = i.P + C.totalContribs;
+
+  // Side-by-side cards
+  document.getElementById('cmpCards').innerHTML = `
+    <div class="cmp-card cc">
+      <div class="cmp-title">🔵 Compound Interest</div>
+      <div class="cmp-row"><span class="cmp-lbl">Final Balance</span><span class="cmp-val">${fd(C.finalBal)}</span></div>
+      <div class="cmp-row"><span class="cmp-lbl">Total Interest</span><span class="cmp-val">${fd(C.totalInterest)}</span></div>
+      <div class="cmp-row"><span class="cmp-lbl">Interest on Interest</span><span class="cmp-val">${fd(ioi)}</span></div>
+      <div class="cmp-row"><span class="cmp-lbl">Return on Capital</span><span class="cmp-val">${pct(totalInvested>0?C.totalInterest/totalInvested:0,1)}</span></div>
+      <div class="cmp-row"><span class="cmp-lbl">APY</span><span class="cmp-val">${pct(i.apy)}</span></div>
+    </div>
+    <div class="cmp-card cs">
+      <div class="cmp-title">🟡 Simple Interest</div>
+      <div class="cmp-row"><span class="cmp-lbl">Final Balance</span><span class="cmp-val">${fd(S.finalBal)}</span></div>
+      <div class="cmp-row"><span class="cmp-lbl">Total Interest</span><span class="cmp-val">${fd(S.totalInterest)}</span></div>
+      <div class="cmp-row"><span class="cmp-lbl">Interest on Interest</span><span class="cmp-val">$0</span></div>
+      <div class="cmp-row"><span class="cmp-lbl">Return on Capital</span><span class="cmp-val">${pct(totalInvested>0?S.totalInterest/totalInvested:0,1)}</span></div>
+      <div class="cmp-row"><span class="cmp-lbl">Effective Rate</span><span class="cmp-val">${pct(i.apr)}</span></div>
+    </div>`;
+
+  // Stacked area chart — decompose compound balance into: principal, contributions, simple interest, interest-on-interest
+  dc('cmpChart');
+  const labels   = C.snaps.map(s=>`Yr ${s.yr}`);
+  const principal= C.snaps.map(()=>i.P);
+  const contribs = C.snaps.map(s=>+s.contribs.toFixed(0));
+  const simpInt  = S.snaps.map(s=>+Math.max(0,s.interest).toFixed(0));
+  const ioiArr   = C.snaps.map((s,idx)=>+Math.max(0,s.interest-(S.snaps[idx]?.interest||0)).toFixed(0));
+  CH['cmpChart'] = new Chart(document.getElementById('cmpChart').getContext('2d'),{
+    type:'bar',
+    data:{labels, datasets:[
+      {label:'Initial Principal',  data:principal, backgroundColor:'rgba(100,116,139,.5)',  stack:'c'},
+      {label:'Contributions',      data:contribs,  backgroundColor:'rgba(99,102,241,.55)',  stack:'c'},
+      {label:'Simple Interest',    data:simpInt,   backgroundColor:'rgba(245,158,11,.65)',  stack:'c'},
+      {label:'Interest on Interest',data:ioiArr,   backgroundColor:'rgba(59,130,246,.75)',  stack:'c'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9}}},
+              y:{stacked:true,ticks:{callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+v,font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // Compounding advantage milestones
+  const keyYears=[1,3,5,10,15,20,25,30,40,50].filter(y=>y<=i.tYrs);
+  let mlHTML='';
+  for(const yr of keyYears){
+    const cs = C.snaps[yr]; const ss = S.snaps[yr];
+    if(!cs||!ss) continue;
+    const adv = cs.bal - ss.bal;
+    const advPct = ss.bal>0 ? adv/ss.bal : 0;
+    mlHTML += `<div class="ms-row">
+      <span class="ms-icon">📅</span>
+      <div class="ms-body">
+        <div class="ms-lbl">Year ${yr} — Compounding Advantage: <strong>${fd(adv)}</strong></div>
+        <div class="ms-sub">Compound: ${fd(cs.bal)} · Simple: ${fd(ss.bal)} · Advantage: +${pct(advPct,1)}</div>
+      </div>
+      <span class="ms-val">+${pct(advPct,1)}</span>
+    </div>`;
+  }
+  document.getElementById('cmpMilestones').innerHTML = mlHTML;
+
+  // Stats
+  document.getElementById('cmpStats').innerHTML = `
+    <div class="stat" data-tip="The extra amount compound interest earns vs simple over the full period — purely from earning interest on past interest.">
+      <div class="sl">Total Compound Bonus</div><div class="sv blu">${fd(ioi)}</div></div>
+    <div class="stat" data-tip="Compound bonus as a percentage of total invested capital.">
+      <div class="sl">Bonus / Invested</div><div class="sv pos">${pct(totalInvested>0?ioi/totalInvested:0,1)}</div></div>
+    <div class="stat" data-tip="How much larger compound's final balance is compared to simple's.">
+      <div class="sl">Compound / Simple</div><div class="sv pos">${S.finalBal>0?(C.finalBal/S.finalBal).toFixed(3)+'×':'—'}</div></div>
+    <div class="stat" data-tip="Interest earned by compound method as a percentage of the simple interest earned.">
+      <div class="sl">Interest Multiplier</div><div class="sv pur">${S.totalInterest>0?(C.totalInterest/S.totalInterest).toFixed(2)+'×':'—'}</div></div>`;
+}
+
+// ── Scenarios tab ────────────────────────────────────────────
+function doScenarios(i){
+  const rates = [2,4,6,8,10,12,15];
+  const rateColors = ['#6366f1','#3b82f6','#06b6d4','#10b981','#f59e0b','#f97316','#f43f5e'];
+  const results = rates.map(r=>{
+    const apr = r/100;
+    const rM  = Math.pow(1+apr/i.n, i.n/12) - 1;
+    const C2  = calcCompound(i.P, i.PMT, rM, i.tYrs, i.cInc);
+    const S2  = calcSimple  (i.P, i.PMT, apr, i.tYrs, i.cInc);
+    return { r, apr, finalC:C2.finalBal, finalS:S2.finalBal, apy:Math.pow(1+apr/i.n,i.n)-1, snapsC:C2.snaps };
+  });
+  const maxVal = Math.max(...results.map(r=>r.finalC));
+
+  document.getElementById('scenYrsLabel') && (document.getElementById('scenYrsLabel').textContent = i.tYrs);
+
+  let gridHTML = '';
+  results.forEach((r,idx)=>{
+    const barW = maxVal>0 ? (r.finalC/maxVal*100).toFixed(1) : 0;
+    gridHTML += `<div class="scen-row-item">
+      <span class="scen-rate-lbl" style="color:${rateColors[idx]}">${r.r}%</span>
+      <span><div class="scen-bar-wrap"><div class="scen-bar" style="width:${barW}%;background:${rateColors[idx]}"></div></div></span>
+      <span class="scen-cval">${fd(r.finalC)}</span>
+      <span class="scen-sval">${fd(r.finalS)}</span>
+      <span class="scen-diff">+${fd(r.finalC-r.finalS)}</span>
+    </div>`;
+  });
+  document.getElementById('scenGrid').innerHTML = gridHTML;
+
+  // Scenarios line chart
+  dc('scenChart');
+  const labels = Array.from({length:Math.round(i.tYrs)+1},(_,y)=>`Yr ${y}`);
+  const datasets = results.map((r,idx)=>({
+    label:`${r.r}% APR`,
+    data: r.snapsC.map(s=>+s.bal.toFixed(0)),
+    borderColor: rateColors[idx],
+    backgroundColor: 'transparent',
+    tension:.4, pointRadius:0, borderWidth:idx===3?2.5:1.5
+  }));
+  CH['scenChart'] = new Chart(document.getElementById('scenChart').getContext('2d'),{
+    type:'line',
+    data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:9.5},padding:6}}},
+      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
+              y:{ticks:{callback:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+v,font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // After-tax / inflation stats
+  const totalInv = i.P + calcCompound(i.P, i.PMT, i.rM, i.tYrs, i.cInc).totalContribs;
+  const statsRates = [4,6,8,10,12];
+  document.getElementById('scenStats').innerHTML = statsRates.map(r=>{
+    const apr2 = r/100;
+    const rM2  = Math.pow(1+apr2/i.n, i.n/12)-1;
+    const C2   = calcCompound(i.P, i.PMT, rM2, i.tYrs, i.cInc);
+    const afterTax  = C2.finalBal - C2.totalInterest*i.taxRate;
+    const realValue = afterTax / Math.pow(1+i.inflRate, i.tYrs);
+    return `<div class="stat" data-tip="At ${r}% APR: after ${(i.taxRate*100).toFixed(0)}% tax on gains and ${(i.inflRate*100).toFixed(1)}% annual inflation over ${i.tYrs} years.">
+      <div class="sl">${r}% After Tax &amp; Inflation</div>
+      <div class="sv ${realValue>=totalInv?'pos':'warn'}">${fd(realValue)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Schedule tab ─────────────────────────────────────────────
+function doSchedule(C, S, i){
+  const maxYrs = Math.round(i.tYrs);
+  let html = `<thead><tr>
+    <th>Year</th>
+    <th>Contributions</th>
+    <th class="td-c">Compound Interest</th>
+    <th class="td-c">Compound Balance</th>
+    <th class="td-s">Simple Interest</th>
+    <th class="td-s">Simple Balance</th>
+    <th>Advantage</th>
+  </tr></thead><tbody>`;
+  const milestoneYrs = new Set([1,5,10,15,20,25,30,40,50].filter(y=>y<=maxYrs));
+  for(let yr=1; yr<=maxYrs; yr++){
+    const cs = C.snaps[yr]; const ss = S.snaps[yr];
+    if(!cs||!ss) continue;
+    const adv = cs.bal - ss.bal;
+    html += `<tr class="${milestoneYrs.has(yr)?'hi':''}">
+      <td>${yr}</td>
+      <td>${fd(cs.contribs)}</td>
+      <td class="td-c">${fd(cs.interest)}</td>
+      <td class="td-c">${fd(cs.bal)}</td>
+      <td class="td-s">${fd(ss.interest)}</td>
+      <td class="td-s">${fd(ss.bal)}</td>
+      <td class="td-adv">+${fd(adv)}</td>
+    </tr>`;
+  }
+  html += '</tbody>';
+  document.getElementById('schedTable').innerHTML = html;
+}
+
+// ── Math Inspector ───────────────────────────────────────────
+function toggleMath(){
+  const p=document.getElementById('mathPanel'), o=document.getElementById('mpOverlay');
+  const opening=!p.classList.contains('open');
+  p.classList.toggle('open'); o.classList.toggle('open');
+  document.querySelector('.math-btn').textContent = opening?'🔍 Hide Math':'🔍 Show Math';
+}
+
+function doMath(C, S, i, ioi, afterTax, realValue){
+  const totalInvested = i.P + C.totalContribs;
+  const f = x => x.toFixed(6);
+  const f2= x => x.toFixed(4);
+  const freqLabel = {365:'daily (365)',12:'monthly (12)',4:'quarterly (4)',2:'semi-annual (2)',1:'annual (1)'}[i.n]||i.n+'/yr';
+
+  document.getElementById('mathContent').innerHTML = `
+<div class="ms2">
+  <div class="ms2-hdr">📥 Inputs</div>
+  <div class="mfb">
+    <div class="mf"><span class="ml">Principal (P)</span><span class="mv hi">${fd(i.P)}</span></div>
+    <div class="mf"><span class="ml">Monthly contribution (PMT)</span><span class="mv hi">${fd(i.PMT)}/mo</span></div>
+    <div class="mf"><span class="ml">Contribution increase</span><span class="mv">${(i.cInc*100).toFixed(1)}%/yr</span></div>
+    <div class="mf"><span class="ml">Time horizon (t)</span><span class="mv">${i.tYrs} years</span></div>
+    <div class="mf"><span class="ml">APR (r)</span><span class="mv hi">${(i.apr*100).toFixed(4)}%</span></div>
+    <div class="mf"><span class="ml">Compounding frequency (n)</span><span class="mv">${freqLabel}</span></div>
+    <div class="mf-div"></div>
+    <div class="mf"><span class="ml">APY = (1 + r/n)ⁿ − 1</span><span class="mv hi">${pct(i.apy)}</span></div>
+    <div class="mf"><span class="ml">r/n (rate per period)</span><span class="mv">${f(i.apr/i.n)}</span></div>
+    <div class="mf"><span class="ml">rM (eff. monthly rate)</span><span class="mv">${f(i.rM)}</span></div>
+  </div>
+</div>
+
+<div class="ms2">
+  <div class="ms2-hdr">🔵 Compound Interest Formula</div>
+  <div class="fbig">
+    A = <span>P · (1 + rM)ⁿ</span> + <span>PMT · [(1 + rM)ⁿ − 1] / rM</span>
+  </div>
+  <div class="mfb">
+    <div class="mfb" style="margin:0">
+      <div class="ft">Where: rM = (1 + APR/n)^(n/12) − 1, and n_months = t × 12</div>
+    </div>
+    <div class="mf"><span class="ml">rM (eff. monthly)</span><span class="mv">${f(i.rM)}</span></div>
+    <div class="mf"><span class="ml">n_months</span><span class="mv">${Math.round(i.tYrs*12)}</span></div>
+    <div class="mf"><span class="ml">Principal growth</span><span class="mv">${fd(i.P)} × (1+${f2(i.rM)})^${Math.round(i.tYrs*12)} = ${fd(i.P*Math.pow(1+i.rM,i.tYrs*12))}</span></div>
+    <div class="mf-div"></div>
+    <div class="mf"><span class="ml">Total invested</span><span class="mv">${fd(i.P)} + ${fd(C.totalContribs)} = ${fd(totalInvested)}</span></div>
+    <div class="mf"><span class="ml">Total interest earned</span><span class="mv pos">${fd(C.totalInterest)}</span></div>
+    <div class="mf"><span class="ml">Final balance</span><span class="mv hi">${fd(C.finalBal)}</span></div>
+  </div>
+</div>
+
+<div class="ms2">
+  <div class="ms2-hdr">🟡 Simple Interest Formula</div>
+  <div class="fbig">
+    A = <span class="sub">P · (1 + r·t)</span> + <span class="sub">PMT_m · (1 + r · t_remaining)</span>
+  </div>
+  <div class="mfb">
+    <div class="mfb" style="margin:0">
+      <div class="ft">Each monthly contribution earns interest only on itself for its remaining time</div>
+    </div>
+    <div class="mf"><span class="ml">Principal + interest</span><span class="mv">${fd(i.P)} × (1 + ${f2(i.apr)} × ${i.tYrs}) = ${fd(i.P*(1+i.apr*i.tYrs))}</span></div>
+    <div class="mf"><span class="ml">Total contrib interest</span><span class="mv warn">${fd(S.totalInterest - i.P*i.apr*i.tYrs)}</span></div>
+    <div class="mf"><span class="ml">Total interest earned</span><span class="mv warn">${fd(S.totalInterest)}</span></div>
+    <div class="mf"><span class="ml">Final balance</span><span class="mv">${fd(S.finalBal)}</span></div>
+  </div>
+</div>
+
+<div class="ms2">
+  <div class="ms2-hdr">💜 Interest on Interest (Compounding Advantage)</div>
+  <div class="mfb">
+    <div class="mf"><span class="ml">Compound interest</span><span class="mv hi">${fd(C.totalInterest)}</span></div>
+    <div class="mf"><span class="ml">Simple interest</span><span class="mv warn">${fd(S.totalInterest)}</span></div>
+    <div class="mf"><span class="ml">Interest on interest</span><span class="mv pos">${fd(ioi)}</span></div>
+    <div class="mf-div"></div>
+    <div class="mf"><span class="ml">IOI as % of compound</span><span class="mv">${pct(C.totalInterest>0?ioi/C.totalInterest:0,1)}</span></div>
+    <div class="mf"><span class="ml">IOI as % of invested</span><span class="mv">${pct(totalInvested>0?ioi/totalInvested:0,1)}</span></div>
+  </div>
+</div>
+
+<div class="ms2">
+  <div class="ms2-hdr">📊 APR → APY Conversion</div>
+  <div class="fbig">APY = (1 + <span>APR / n</span>)ⁿ − 1</div>
+  <div class="mfb">
+    <div class="mf"><span class="ml">APR</span><span class="mv">${(i.apr*100).toFixed(4)}%</span></div>
+    <div class="mf"><span class="ml">n (compounding periods)</span><span class="mv">${i.n}/yr (${freqLabel})</span></div>
+    <div class="mf"><span class="ml">APR/n</span><span class="mv">${f(i.apr/i.n)}</span></div>
+    <div class="mf"><span class="ml">APY = (1+${f2(i.apr/i.n)})^${i.n} − 1</span><span class="mv hi">${pct(i.apy)}</span></div>
+    <div class="mf-div"></div>
+    <div class="mf"><span class="ml">Rule of 72 (yrs to double)</span><span class="mv">${rule72(i.apr).toFixed(2)} years</span></div>
+  </div>
+</div>
+
+<div class="ms2">
+  <div class="ms2-hdr">🌡️ After Tax &amp; Inflation</div>
+  <div class="mfb">
+    <div class="mf"><span class="ml">Gross final balance</span><span class="mv hi">${fd(C.finalBal)}</span></div>
+    <div class="mf"><span class="ml">Tax on gains (${(i.taxRate*100).toFixed(0)}%)</span><span class="mv neg">−${fd(C.totalInterest*i.taxRate)}</span></div>
+    <div class="mf"><span class="ml">After-tax balance</span><span class="mv">${fd(afterTax)}</span></div>
+    <div class="mf-div"></div>
+    <div class="mf"><span class="ml">Inflation factor (${i.tYrs} yrs)</span><span class="mv">${Math.pow(1+i.inflRate,i.tYrs).toFixed(4)}×</span></div>
+    <div class="mf"><span class="ml">Real value (today's $)</span><span class="mv warn">${fd(realValue)}</span></div>
+    <div class="mf"><span class="ml">Real return rate</span><span class="mv">${pct((1+i.apr)/(1+i.inflRate)-1,3)}</span></div>
+  </div>
+</div>`;
+}
+
+// ── Init ─────────────────────────────────────────────────────
+calc();
+</script>
+</body>
+</html>

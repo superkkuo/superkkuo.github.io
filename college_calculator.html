@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>529 College Savings Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --n950:#060d1e;--n900:#0f172a;--n800:#1e293b;--n700:#334155;--n600:#475569;
+  --s400:#94a3b8;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc;
+  --white:#ffffff;
+  --bl6:#2563eb;--bl5:#3b82f6;--bl1:#dbeafe;--bl0:#eff6ff;
+  --pr6:#7c3aed;--pr5:#8b5cf6;--pr1:#ede9fe;--pr0:#faf5ff;
+  --em6:#059669;--em5:#10b981;--em1:#d1fae5;--em0:#ecfdf5;
+  --am6:#d97706;--am5:#f59e0b;--am1:#fef3c7;--am0:#fffbeb;
+  --ro6:#e11d48;--ro5:#f43f5e;--ro1:#ffe4e6;
+  --in6:#4f46e5;--in5:#6366f1;--in1:#e0e7ff;--in0:#eef2ff;
+  --cy6:#0e7490;--cy5:#06b6d4;--cy1:#cffafe;--cy0:#ecfeff;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --rsm:8px;--rmd:12px;--rlg:16px;--rfl:9999px;
+  --sh1:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --sh2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 20% 50%,rgba(6,182,212,.12),transparent),radial-gradient(ellipse 40% 60% at 80% 30%,rgba(99,102,241,.1),transparent);pointer-events:none;}
+.hdr-in{max-width:1300px;margin:0 auto;position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.hdr h1{font-size:1.4rem;font-weight:700;color:var(--white);letter-spacing:-.02em;}
+.hdr h1 span{color:var(--cy5);}
+.hdr-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.htag{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:var(--rfl);border:1px solid rgba(255,255,255,.1);color:var(--s300);background:rgba(255,255,255,.05);letter-spacing:.03em;}
+.nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:var(--rsm);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white);}
+.hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:370px 1fr;min-height:calc(100vh - 78px);}
+
+/* SIDEBAR */
+.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 78px);}
+.sb::-webkit-scrollbar{width:3px;}
+.sb::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.sbh{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
+.sbh::after{content:'';flex:1;height:1px;background:var(--n800);}
+
+/* Partner blocks */
+.pb-block{border-radius:var(--rmd);padding:11px 13px;margin-bottom:7px;border:1px solid var(--n700);}
+.pb-block.pa{border-top:2px solid var(--bl5);background:rgba(59,130,246,.04);}
+.pb-block.pb{border-top:2px solid var(--pr5);background:rgba(139,92,246,.04);}
+.pb-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:5px;margin-bottom:8px;}
+.pb-lbl.la{color:var(--bl5);}.pb-lbl.lb{color:var(--pr5);}
+.pb-dot{width:5px;height:5px;border-radius:50%;}
+.dot-a{background:var(--bl5);}.dot-b{background:var(--pr5);}
+
+/* Child block */
+.child-block{border-radius:var(--rmd);padding:11px 13px;margin-bottom:8px;border:1px solid var(--n700);border-top-width:2px;}
+.child-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.child-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:5px;}
+.child-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.rm-child-btn{background:transparent;border:none;color:var(--n600);font-size:.78rem;font-weight:700;cursor:pointer;padding:2px 6px;border-radius:var(--rsm);transition:all .15s;line-height:1;}
+.rm-child-btn:hover{background:rgba(244,63,94,.15);color:var(--ro5);}
+.add-child-btn{width:100%;background:rgba(6,182,212,.07);border:1px dashed rgba(6,182,212,.3);color:var(--cy5);font-size:.74rem;font-weight:600;padding:9px 12px;border-radius:var(--rsm);cursor:pointer;transition:all .18s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:5px;}
+.add-child-btn:hover{background:rgba(6,182,212,.14);border-color:var(--cy5);}
+
+/* Type selector */
+.type-sel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:9px;}
+.type-btn{background:var(--n800);border:1px solid var(--n700);color:var(--s400);font-size:.72rem;font-weight:600;padding:7px 4px;border-radius:var(--rsm);cursor:pointer;text-align:center;transition:all .15s;}
+.type-btn:hover{border-color:var(--cy5);color:var(--white);}
+.type-btn.active{background:var(--cy5);border-color:var(--cy5);color:var(--white);}
+
+/* Inputs */
+.ig{margin-bottom:9px;}
+.ig:last-child{margin-bottom:0;}
+.ig label{display:block;font-size:.71rem;font-weight:500;color:var(--s400);margin-bottom:3px;}
+.iw{position:relative;}
+.iw .pre,.iw .suf{position:absolute;top:50%;transform:translateY(-50%);font-size:.75rem;font-weight:600;color:var(--n600);pointer-events:none;z-index:1;}
+.iw .pre{left:9px;}.iw .suf{right:9px;}
+input[type="number"],input[type="text"]{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;}
+input[type="number"]:focus,input[type="text"]:focus{outline:none;border-color:var(--cy5);box-shadow:0 0 0 3px rgba(6,182,212,.15);}
+.has-pre input{padding-left:19px;}.has-suf input{padding-right:21px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+/* Sliders */
+input[type="range"]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--n700);border:none;cursor:pointer;padding:0;margin:5px 0 3px;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--cy5);cursor:pointer;box-shadow:0 0 0 3px rgba(6,182,212,.2);}
+.rrow{display:flex;justify-content:space-between;align-items:center;}
+.rlbl{font-size:.65rem;color:var(--n600);}
+.rval{display:flex;align-items:center;gap:1px;}
+.rval input[type="number"]{width:42px;text-align:center;border:none;background:transparent;font-size:.8rem;font-weight:700;color:var(--cy5);padding:0;}
+.rval span{font-size:.8rem;font-weight:700;color:var(--cy5);}
+
+/* Calc box */
+.cb{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:var(--rsm);padding:9px 11px;margin-top:8px;}
+.cb-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.71rem;}
+.cb-lbl{color:var(--s400);}
+.cb-val{color:var(--white);font-weight:600;font-family:var(--mono);font-size:.72rem;}
+.cb-div{height:1px;background:rgba(6,182,212,.2);margin:4px 0;}
+.cb-tot{color:#67e8f9;font-weight:700;}
+
+/* MAIN */
+.main{padding:18px 22px 40px;overflow-y:auto;}
+
+/* Tabs */
+.tabs{display:flex;gap:3px;background:var(--white);border:1px solid var(--s200);border-radius:var(--rfl);padding:4px;margin-bottom:18px;box-shadow:var(--sh1);}
+.tab{flex:1;padding:7px 12px;border:none;border-radius:var(--rfl);font-size:.76rem;font-weight:600;cursor:pointer;background:transparent;color:var(--n600);transition:all .16s;text-align:center;white-space:nowrap;}
+.tab:hover{color:var(--n900);}
+.tab.active{background:var(--n900);color:var(--white);box-shadow:var(--sh1);}
+.tab-panel{display:none;animation:fi .18s ease;}
+.tab-panel.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+
+/* Heroes */
+.heroes{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px;}
+.heroes3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:14px;}
+.hero{border-radius:var(--rlg);padding:16px 14px;border:1px solid transparent;position:relative;overflow:hidden;}
+.hbl{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;}
+.hgr{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#a7f3d0;}
+.ham{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;}
+.hpu{background:linear-gradient(135deg,#faf5ff,#ede9fe);border-color:#ddd6fe;}
+.hcy{background:linear-gradient(135deg,#ecfeff,#cffafe);border-color:#a5f3fc;}
+.hin{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe;}
+.hro{background:linear-gradient(135deg,#fff1f2,#ffe4e6);border-color:#fda4af;}
+.hero .hl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:4px;}
+.hero .hv{font-size:1.45rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-bottom:3px;}
+.hbl .hv{color:var(--bl6);}.hgr .hv{color:var(--em6);}.ham .hv{color:var(--am6);}
+.hpu .hv{color:var(--pr6);}.hcy .hv{color:var(--cy6);}.hin .hv{color:var(--in6);}.hro .hv{color:var(--ro6);}
+.hero .hs{font-size:.7rem;color:var(--n600);}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:13px;}
+.stat{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:10px 12px;box-shadow:var(--sh1);}
+.stat .sl{font-size:.66rem;color:var(--n600);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.stat .sv{font-size:.92rem;font-weight:700;color:var(--n900);font-family:var(--mono);}
+.stat .sv.pos{color:var(--em6);}.stat .sv.neg{color:var(--ro6);}.stat .sv.neu{color:var(--in6);}.stat .sv.warn{color:var(--am6);}
+
+/* Banners */
+.bn{padding:9px 13px;border-radius:var(--rmd);font-size:.8rem;font-weight:500;margin-bottom:12px;line-height:1.5;border:1px solid;}
+.bn strong{font-weight:700;}
+.bn.ok{background:var(--em0);border-color:var(--em1);color:#065f46;}
+.bn.warn{background:var(--am0);border-color:var(--am1);color:#78350f;}
+.bn.info{background:var(--cy0);border-color:var(--cy1);color:#164e63;}
+.bn.danger{background:var(--ro1);border-color:#fda4af;color:#881337;}
+
+/* Section head */
+.sh{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--n600);margin:16px 0 9px;display:flex;align-items:center;gap:8px;}
+.sh::after{content:'';flex:1;height:1px;background:var(--s200);}
+
+/* Info box */
+.ib{background:var(--s50);border-left:3px solid var(--cy5);border-radius:0 var(--rsm) var(--rsm) 0;padding:9px 12px;font-size:.76rem;color:var(--n600);margin-bottom:12px;line-height:1.6;}
+.ib strong{color:var(--n900);}
+
+/* Chart */
+.cw{position:relative;height:220px;margin-top:6px;margin-bottom:4px;}
+
+/* Per-child summary cards */
+.child-summary-grid{display:grid;gap:7px;margin-bottom:14px;}
+.child-card{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:11px 14px;box-shadow:var(--sh1);display:flex;align-items:center;gap:12px;}
+.child-card .cc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.child-card .cc-name{font-size:.78rem;font-weight:700;color:var(--n900);min-width:70px;}
+.child-card .cc-info{flex:1;display:flex;flex-wrap:wrap;gap:10px;}
+.child-card .cc-stat{font-size:.72rem;color:var(--n600);}
+.child-card .cc-stat strong{font-family:var(--mono);color:var(--n900);}
+.cc-prog-wrap{flex:1;min-width:80px;}
+.cc-prog{height:6px;border-radius:3px;background:var(--s200);overflow:hidden;}
+.cc-prog-bar{height:100%;border-radius:3px;}
+.cc-pct{font-size:.68rem;font-weight:700;margin-top:3px;}
+
+/* Contribution/cost grid */
+.data-grid{display:grid;gap:6px;margin-bottom:13px;}
+.data-row{display:grid;gap:8px;align-items:center;background:var(--white);border:1px solid var(--s200);border-radius:var(--rsm);padding:9px 12px;font-size:.74rem;box-shadow:var(--sh1);}
+.data-row.header{background:var(--s50);font-weight:700;color:var(--n600);font-size:.65rem;text-transform:uppercase;letter-spacing:.04em;}
+.data-row.current{border-width:1.5px;}
+.bar-wrap{height:6px;background:var(--s200);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;}
+
+/* Tax comparison */
+.tax-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px;}
+.tax-card{border-radius:var(--rmd);padding:13px 15px;border:1px solid;}
+.tax-card.plan529{background:var(--cy0);border-color:var(--cy1);}
+.tax-card.taxable{background:var(--bl0);border-color:var(--bl1);}
+.tax-card .tl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.tax-card.plan529 .tl{color:var(--cy6);}
+.tax-card.taxable .tl{color:var(--bl6);}
+.tax-card .tv{font-size:1.2rem;font-weight:800;font-family:var(--mono);}
+.tax-card.plan529 .tv{color:var(--cy6);}
+.tax-card.taxable .tv{color:var(--bl6);}
+.tax-card .ts{font-size:.69rem;color:var(--n600);margin-top:2px;}
+
+/* Progress bar */
+.prog-wrap{background:var(--s200);border-radius:var(--rfl);height:10px;overflow:hidden;margin:8px 0 4px;}
+.prog-bar{height:100%;border-radius:var(--rfl);transition:width .5s cubic-bezier(.4,0,.2,1);}
+.prog-lbl{display:flex;justify-content:space-between;font-size:.68rem;color:var(--n600);margin-top:3px;}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;font-size:.77rem;}
+th{background:var(--s50);padding:7px 10px;text-align:left;font-weight:700;color:var(--n600);font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--s200);}
+td{padding:7px 10px;border-bottom:1px solid var(--s100);font-family:var(--mono);font-size:.74rem;}
+td.tl{font-family:var(--font);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--s50);}
+tr.ms-row td{background:rgba(6,182,212,.05)!important;}
+tr.ms-row td:first-child{font-weight:700;color:var(--cy6);}
+
+/* Tooltip */
+#ttip{position:fixed;z-index:9999;background:var(--n800);border:1px solid var(--n700);color:var(--s300);font-size:.73rem;line-height:1.55;padding:9px 12px;border-radius:var(--rmd);max-width:270px;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.35);opacity:0;transition:opacity .15s;word-break:normal;white-space:normal;left:-9999px;top:-9999px;}
+#ttip.show{opacity:1;}
+
+/* Math Inspector Panel */
+.math-btn{background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.4);color:#67e8f9;font-size:.74rem;font-weight:600;padding:6px 14px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;letter-spacing:.01em;white-space:nowrap;}
+.math-btn:hover{background:rgba(6,182,212,.3);color:var(--white);}
+.mp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+.mp-overlay.open{opacity:1;pointer-events:auto;}
+.mp{position:fixed;top:0;right:0;height:100vh;width:580px;max-width:100vw;background:var(--n950);border-left:1px solid var(--n700);z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,.4);}
+.mp.open{transform:translateX(0);}
+.mp-hdr{padding:16px 20px;border-bottom:1px solid var(--n700);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--n900);}
+.mp-hdr h2{font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-.01em;}
+.mp-hdr h2 span{color:var(--cy5);}
+.mp-close{background:var(--n800);border:1px solid var(--n700);color:var(--s400);font-size:.76rem;font-weight:600;padding:5px 12px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;}
+.mp-close:hover{color:var(--white);border-color:var(--s400);}
+.mp-body{overflow-y:auto;flex:1;padding:16px 18px;}
+.mp-body::-webkit-scrollbar{width:4px;}
+.mp-body::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.mf-box{background:var(--n900);border:1px solid var(--n800);border-radius:var(--rmd);padding:13px 15px;margin-bottom:12px;}
+.mf-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:9px;}
+.mf-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:5px;font-size:.73rem;line-height:1.6;}
+.mf-row:last-child{margin-bottom:0;}
+.mf-lbl{color:var(--s400);white-space:nowrap;min-width:160px;flex-shrink:0;}
+.mf-val{color:var(--white);font-family:var(--mono);font-size:.71rem;}
+.mf-eq{color:var(--cy5);font-family:var(--mono);font-size:.71rem;word-break:break-all;}
+.mf-hl{color:#67e8f9;font-weight:700;}
+.mf-red{color:#fca5a5;font-weight:700;}
+.mf-div{height:1px;background:var(--n800);margin:7px 0;}
+.mp-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.mp-tbl{width:100%;border-collapse:collapse;font-size:.68rem;min-width:580px;}
+.mp-tbl th{background:var(--n800);padding:5px 8px;text-align:right;font-weight:700;color:var(--n600);font-size:.59rem;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--n700);white-space:nowrap;position:sticky;top:0;z-index:1;}
+.mp-tbl th:first-child,.mp-tbl th:last-child{text-align:left;}
+.mp-tbl td{padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.035);font-family:var(--mono);text-align:right;color:var(--s400);}
+.mp-tbl td.tl{text-align:left;font-family:var(--font);}
+.mp-tbl td.pos{color:#34d399;}.mp-tbl td.neg{color:#f87171;}
+.mp-tbl td.bld{color:var(--white);font-weight:700;}
+.mp-tbl td.note{color:#fbbf24;font-size:.62rem;white-space:nowrap;text-align:left;}
+.mp-tbl tr.ms-row td{background:rgba(6,182,212,.09);}
+.mp-tbl tr:last-child td{border-bottom:none;}
+
+/* ── MOBILE ─────────────────────────────────────────────────── */
+@media(max-width:700px){
+  .hdr{padding:13px 15px 11px;}
+  .hdr-in{flex-wrap:wrap;gap:8px;}
+  .hdr h1{font-size:1.05rem;}
+  .hdr-tags{display:none;}
+  .hdr-actions{margin-top:0;gap:6px;}
+  .nav-btn{font-size:.67rem;padding:5px 9px;}
+  .math-btn{font-size:.7rem;padding:6px 11px;}
+  .layout{grid-template-columns:1fr;min-height:unset;}
+  .sb{position:static;height:auto;max-height:none;padding:15px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
+  input[type="number"],input[type="text"]{font-size:1rem !important;padding:10px 10px;}
+  .has-pre input{padding-left:22px;}.has-suf input{padding-right:24px;}
+  .rval input[type="number"]{font-size:.95rem !important;width:50px;padding:0;}
+  .ig label{font-size:.78rem;}
+  input[type="range"]{height:5px;margin:9px 0 5px;}
+  input[type="range"]::-webkit-slider-thumb{width:20px;height:20px;}
+  .type-btn{padding:9px 4px;font-size:.78rem;min-height:40px;}
+  .r2{grid-template-columns:1fr 1fr;}
+  .main{padding:13px 12px 30px;}
+  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 5px;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex:0 0 auto;padding:9px 14px;font-size:.75rem;min-height:38px;}
+  .heroes,.heroes3{grid-template-columns:1fr 1fr;gap:8px;}
+  .hero{padding:12px 11px;}.hero .hv{font-size:1.1rem;}
+  .stats{grid-template-columns:1fr 1fr;gap:7px;}
+  .cw{height:175px;}
+  .tax-grid{grid-template-columns:1fr 1fr;}
+  .mp{width:100vw;max-width:100vw;height:90vh;top:auto;bottom:0;right:0;border-left:none;border-top:1px solid var(--n700);border-radius:var(--rlg) var(--rlg) 0 0;transform:translateY(100%);}
+  .mp.open{transform:translateY(0);}
+  .mp-hdr{padding:14px 16px;border-radius:var(--rlg) var(--rlg) 0 0;}
+  .mf-row{flex-direction:column;gap:2px;}
+  .mf-lbl{min-width:unset;font-size:.71rem;}
+  .mf-val,.mf-eq{font-size:.71rem;word-break:break-word;}
+  .child-card{flex-wrap:wrap;gap:8px;}
+}
+@media(max-width:399px){
+  .heroes,.heroes3{grid-template-columns:1fr;}
+  .r2{grid-template-columns:1fr;}
+  .tax-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-in">
+    <div>
+      <h1>🎓 529 &amp; <span>College Savings</span> Calculator</h1>
+      <div class="hdr-tags">
+        <span class="htag">Multiple Children</span>
+        <span class="htag">Compound Growth</span>
+        <span class="htag">College Cost Projection</span>
+        <span class="htag">Contribution Planner</span>
+        <span class="htag">Tax Advantage</span>
+      </div>
+    </div>
+    <div class="hdr-actions">
+      <a href="retirement_calculator.html" class="nav-btn">🔥 Retirement →</a>
+      <a href="mortgage_calculator.html" class="nav-btn">🏡 Mortgage →</a>
+      <a href="interest_calculator.html" class="nav-btn">💰 Interest →</a>
+      <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+<aside class="sb">
+
+  <div class="sbh">Household Income</div>
+  <div class="pb-block pa">
+    <div class="pb-lbl la"><span class="pb-dot dot-a"></span>Partner A</div>
+    <div class="ig"><label>Annual Gross Salary</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="salaryA" value="120000" min="0" step="5000" oninput="calc()"></div></div>
+  </div>
+  <div class="pb-block pb">
+    <div class="pb-lbl lb"><span class="pb-dot dot-b"></span>Partner B</div>
+    <div class="ig"><label>Annual Gross Salary</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="salaryB" value="80000" min="0" step="5000" oninput="calc()"></div></div>
+  </div>
+
+  <div class="sbh">Children &amp; 529 Accounts</div>
+  <div id="childrenContainer"></div>
+  <button class="add-child-btn" onclick="addChild()">➕ Add Child</button>
+
+  <div class="sbh" style="margin-top:14px">Investment &amp; Growth</div>
+  <div class="ig"><label>Expected Annual Return</label>
+    <input type="range" id="returnSlider" min="2" max="12" step="0.25" value="7" oninput="syncS('returnRate','returnSlider');calc()">
+    <div class="rrow">
+      <span class="rlbl">2%</span>
+      <span class="rval"><input type="number" id="returnRate" value="7" min="2" max="12" step="0.25" oninput="syncI('returnRate','returnSlider');calc()"><span>%</span></span>
+      <span class="rlbl">12%</span>
+    </div>
+  </div>
+  <div class="ig"><label>Annual Contribution Increase</label>
+    <div class="iw has-suf"><span class="suf">%</span>
+      <input type="number" id="contribIncrease" value="2" min="0" max="15" step="0.5" oninput="calc()"></div></div>
+
+  <div class="sbh">College Assumptions</div>
+  <div class="type-sel">
+    <div class="type-btn" onclick="setType('instate',this)">In-State</div>
+    <div class="type-btn" onclick="setType('outstate',this)">Out-of-State</div>
+    <div class="type-btn active" onclick="setType('private',this)">Private</div>
+  </div>
+  <div class="ig"><label>Current Annual Cost <span style="color:var(--n600)">(override)</span></label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="annualCost" value="65000" min="5000" step="1000" oninput="calc()"></div></div>
+  <div class="r2">
+    <div class="ig"><label>College Inflation</label>
+      <div class="iw has-suf"><span class="suf">%/yr</span>
+        <input type="number" id="collegeInfl" value="4.5" min="0" max="10" step="0.5" oninput="calc()"></div></div>
+    <div class="ig"><label>Years of College</label>
+      <input type="number" id="collegeYears" value="4" min="1" max="6" step="1" oninput="calc()"></div>
+  </div>
+  <div class="ig"><label>Funding Target</label>
+    <div class="iw has-suf"><span class="suf">%</span>
+      <input type="number" id="fundingPct" value="100" min="10" max="100" step="5" oninput="calc()"></div></div>
+
+  <div class="sbh">Tax Info</div>
+  <div class="ig"><label>Federal Marginal Tax Bracket</label>
+    <div class="iw has-suf"><span class="suf">%</span>
+      <input type="number" id="fedTax" value="22" min="10" max="37" step="1" oninput="calc()"></div></div>
+  <div class="r2">
+    <div class="ig"><label>State Tax Rate</label>
+      <div class="iw has-suf"><span class="suf">%</span>
+        <input type="number" id="stateTax" value="6" min="0" max="15" step="0.5" oninput="calc()"></div></div>
+    <div class="ig"><label>State Deduction Cap</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="stateDeductCap" value="10000" min="0" step="500" oninput="calc()"></div></div>
+  </div>
+
+  <div class="cb" id="summaryBox"></div>
+
+</aside>
+
+<main class="main">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this,'growth')">📈 Growth</button>
+    <button class="tab" onclick="switchTab(this,'costs')">🎓 College Costs</button>
+    <button class="tab" onclick="switchTab(this,'contrib')">💰 Contributions</button>
+    <button class="tab" onclick="switchTab(this,'tax')">⚖️ Tax Advantage</button>
+  </div>
+
+  <!-- GROWTH -->
+  <div id="tab-growth" class="tab-panel active">
+    <div class="ib"><strong>529 Growth Projection</strong>: Each child's 529 projected balance over time vs their inflation-adjusted college cost target.</div>
+    <div id="growthBanner" class="bn info"></div>
+    <div class="heroes3" id="growthHeroes"></div>
+    <div class="sh">Per-Child Progress</div>
+    <div id="childSummaryCards"></div>
+    <div class="sh">Projected Balance vs Target</div>
+    <div class="cw"><canvas id="growthChart"></canvas></div>
+    <div class="sh">Milestones</div>
+    <div class="stats" id="growthStats"></div>
+  </div>
+
+  <!-- COLLEGE COSTS -->
+  <div id="tab-costs" class="tab-panel">
+    <div class="ib"><strong>Future College Cost Breakdown</strong>: College costs rise ~4–5%/yr. Each child's projected 4-year bill at their start date.</div>
+    <div class="heroes3" id="costsHeroes"></div>
+    <div class="sh">Future 4-Year Cost per Child</div>
+    <div class="cw"><canvas id="costsChart"></canvas></div>
+    <div class="sh">Per-Child Cost Detail</div>
+    <div id="costDetail"></div>
+  </div>
+
+  <!-- CONTRIBUTIONS -->
+  <div id="tab-contrib" class="tab-panel">
+    <div class="ib"><strong>Contribution Planner</strong>: What's needed per child vs what you're currently saving. Adjust to close the gap.</div>
+    <div id="contribBanner" class="bn info"></div>
+    <div class="heroes3" id="contribHeroes"></div>
+    <div class="sh">Per-Child: Current vs Required Monthly</div>
+    <div id="contribDetail"></div>
+    <div class="sh">Contribution Scenarios (Combined)</div>
+    <div class="cw"><canvas id="contribChart"></canvas></div>
+  </div>
+
+  <!-- TAX ADVANTAGE -->
+  <div id="tab-tax" class="tab-panel">
+    <div class="ib"><strong>Tax Advantage</strong>: 529 plans grow tax-free. Withdrawals for qualified education expenses are never taxed. Many states also offer a tax deduction on contributions.</div>
+    <div id="taxBanner" class="bn info"></div>
+    <div class="heroes3" id="taxHeroes"></div>
+    <div class="sh">529 vs Taxable Account — Combined Growth</div>
+    <div class="cw"><canvas id="taxChart"></canvas></div>
+    <div class="sh">Tax Breakdown</div>
+    <div class="tax-grid" id="taxGrid"></div>
+    <div class="stats" id="taxStats"></div>
+  </div>
+</main>
+</div>
+
+<div class="mp-overlay" id="mpOverlay" onclick="toggleMath()"></div>
+<div class="mp" id="mathPanel">
+  <div class="mp-hdr">
+    <h2>🔍 Math <span>Inspector</span></h2>
+    <button class="mp-close" onclick="toggleMath()">✕ Close</button>
+  </div>
+  <div class="mp-body" id="mathBody">
+    <p style="color:var(--n600);font-size:.78rem;padding:12px 0">Adjust inputs to populate the math inspector.</p>
+  </div>
+</div>
+
+<div id="ttip"></div>
+<script>
+// ── Constants ─────────────────────────────────────────────────
+const CHILD_COLORS = ['#06b6d4','#8b5cf6','#f59e0b','#10b981','#f43f5e','#3b82f6'];
+const TYPE_COSTS = {instate:28000, outstate:45000, private:65000};
+const CH = {};
+
+// ── Children state ────────────────────────────────────────────
+let children = [
+  {name:'Child 1', age:5, collegeAge:18, balance:15000, monthly:500}
+];
+
+function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+function renderChildren(){
+  document.getElementById('childrenContainer').innerHTML = children.map((c, idx) => {
+    const col = CHILD_COLORS[idx % CHILD_COLORS.length];
+    const bgAlpha = col.replace('#','');
+    return `<div class="child-block" style="border-top-color:${col};background:color-mix(in srgb,${col} 4%,transparent)">
+      <div class="child-hdr">
+        <div class="child-lbl" id="child-name-lbl-${idx}" style="color:${col}">
+          <span class="child-dot" style="background:${col}"></span>${escH(c.name||`Child ${idx+1}`)}
+        </div>
+        ${children.length>1?`<button class="rm-child-btn" onclick="removeChild(${idx})" title="Remove child">✕</button>`:''}
+      </div>
+      <div class="ig"><label>Name</label>
+        <input type="text" value="${escH(c.name)}" placeholder="Child ${idx+1}"
+          oninput="updateChildName(${idx},this.value)" style="font-size:.83rem !important"></div>
+      <div class="r2">
+        <div class="ig"><label>Current Age</label>
+          <input type="number" value="${c.age}" min="0" max="17" step="1"
+            oninput="updateChild(${idx},'age',+this.value)"></div>
+        <div class="ig"><label>College Age</label>
+          <input type="number" value="${c.collegeAge}" min="16" max="22" step="1"
+            oninput="updateChild(${idx},'collegeAge',+this.value)"></div>
+      </div>
+      <div class="ig"><label>Current 529 Balance</label>
+        <div class="iw has-pre"><span class="pre">$</span>
+          <input type="number" value="${c.balance}" min="0" step="1000"
+            oninput="updateChild(${idx},'balance',+this.value)"></div></div>
+      <div class="ig"><label>Monthly Contribution</label>
+        <div class="iw has-pre"><span class="pre">$</span>
+          <input type="number" value="${c.monthly}" min="0" step="50"
+            oninput="updateChild(${idx},'monthly',+this.value)"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function addChild(){
+  children.push({name:`Child ${children.length+1}`, age:0, collegeAge:18, balance:0, monthly:300});
+  renderChildren();
+  calc();
+}
+
+function removeChild(idx){
+  children.splice(idx, 1);
+  renderChildren();
+  calc();
+}
+
+function updateChild(idx, field, val){
+  children[idx][field] = val;
+  calc();
+}
+
+function updateChildName(idx, val){
+  children[idx].name = val || `Child ${idx+1}`;
+  const lbl = document.getElementById(`child-name-lbl-${idx}`);
+  if(lbl){
+    const col = CHILD_COLORS[idx % CHILD_COLORS.length];
+    lbl.innerHTML = `<span class="child-dot" style="background:${col}"></span>${escH(children[idx].name)}`;
+  }
+  calc();
+}
+
+// ── Utilities ─────────────────────────────────────────────────
+const fmt  = n => n==null?'—':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1000?'$'+Math.round(n).toLocaleString():'$'+Math.round(n);
+const fmtM = n => '$'+Math.round(n).toLocaleString()+'/mo';
+const pct  = n => (n*100).toFixed(1)+'%';
+
+let _type = 'private';
+function setType(t, el){
+  _type = t;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('annualCost').value = TYPE_COSTS[t];
+  calc();
+}
+
+function syncS(a,b){ document.getElementById(a).value=document.getElementById(b).value; }
+function syncI(a,b){ document.getElementById(b).value=document.getElementById(a).value; }
+
+function switchTab(btn, name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  calc();
+}
+
+function dc(id){ if(CH[id]){ CH[id].destroy(); delete CH[id]; } }
+
+// ── Core math ─────────────────────────────────────────────────
+function fvWithContribs(pv, annRate, months, monthlyPmt){
+  const r = annRate/12;
+  if(r===0) return pv + monthlyPmt*months;
+  const g = Math.pow(1+r, months);
+  return pv*g + monthlyPmt*(g-1)/r;
+}
+
+function requiredPmt(fv, pv, annRate, months){
+  if(months<=0) return 0;
+  const r = annRate/12;
+  if(r===0) return (fv-pv)/months;
+  const g = Math.pow(1+r, months);
+  if(g<=1) return 0;
+  return (fv - pv*g)*r/(g-1);
+}
+
+function futureCostTotal(annualCostToday, inflRate, yearsUntil, numYears){
+  let total=0;
+  for(let y=0;y<numYears;y++) total += annualCostToday * Math.pow(1+inflRate, yearsUntil+y);
+  return total;
+}
+
+function projectChild(child, annReturn, contribInc){
+  let bal = child.balance;
+  let mo = child.monthly;
+  for(let y=0;y<child.yearsLeft;y++){
+    if(y>0) mo *= (1+contribInc);
+    bal = fvWithContribs(bal, annReturn, 12, mo);
+  }
+  return bal;
+}
+
+function buildYearPts(child, annReturn, contribInc){
+  const pts = [];
+  let bal = child.balance, mo = child.monthly;
+  for(let y=0;y<=child.yearsLeft;y++){
+    pts.push({yr:y, age:child.age+y, bal:+bal.toFixed(0)});
+    if(y<child.yearsLeft){
+      if(y>0) mo *= (1+contribInc);
+      bal = fvWithContribs(bal, annReturn, 12, mo);
+    }
+  }
+  return pts;
+}
+
+// ── Read global inputs + compute per-child ────────────────────
+function getInputs(){
+  const salA   = +document.getElementById('salaryA').value||0;
+  const salB   = +document.getElementById('salaryB').value||0;
+  const combined = salA+salB;
+  const contribInc   = +document.getElementById('contribIncrease').value/100||0;
+  const annReturn    = +document.getElementById('returnRate').value/100||0.07;
+  const annualCost   = +document.getElementById('annualCost').value||65000;
+  const collegeInfl  = +document.getElementById('collegeInfl').value/100||0.045;
+  const collegeYrs   = +document.getElementById('collegeYears').value||4;
+  const fundingPct   = +document.getElementById('fundingPct').value/100||1;
+  const fedTax       = +document.getElementById('fedTax').value/100||0.22;
+  const stateTax     = +document.getElementById('stateTax').value/100||0.06;
+  const stateDeductCap = +document.getElementById('stateDeductCap').value||10000;
+
+  const childInputs = children.map(c => {
+    const yearsLeft = Math.max(0, c.collegeAge - c.age);
+    const proj = projectChild({...c, yearsLeft}, annReturn, contribInc);
+    const totalCost = futureCostTotal(annualCost, collegeInfl, yearsLeft, collegeYrs);
+    const target = totalCost * fundingPct;
+    const funded = target>0 ? Math.min(1, proj/target) : 1;
+    const reqMo = Math.max(0, requiredPmt(target, c.balance, annReturn, yearsLeft*12));
+    return {...c, yearsLeft, proj529:proj, totalFutureCost:totalCost, target, funded, reqMo, gap:target-proj};
+  });
+
+  const totalProj    = childInputs.reduce((s,c)=>s+c.proj529, 0);
+  const totalTarget  = childInputs.reduce((s,c)=>s+c.target, 0);
+  const totalMonthly = children.reduce((s,c)=>s+c.monthly, 0);
+  const totalFunded  = totalTarget>0 ? Math.min(1, totalProj/totalTarget) : 1;
+  const totalGap     = Math.max(0, totalTarget-totalProj);
+  const totalReqMo   = childInputs.reduce((s,c)=>s+c.reqMo, 0);
+
+  const annContrib   = totalMonthly*12;
+  const deductible   = Math.min(annContrib, stateDeductCap);
+  const stateDeductBenefit = deductible * stateTax;
+
+  // Summary box
+  const rows = childInputs.map((c,idx)=>{
+    const col = CHILD_COLORS[idx%CHILD_COLORS.length];
+    const progW = Math.min(100, c.funded*100);
+    const progCol = progW>=100?'#10b981':progW>=75?'#06b6d4':progW>=50?'#f59e0b':'#f43f5e';
+    return `<div class="cb-row">
+      <span class="cb-lbl" style="color:${col};font-weight:600">${c.name}</span>
+      <span class="cb-val" style="color:${col}">${fmt(c.proj529)} · ${(c.funded*100).toFixed(0)}%</span>
+    </div>`;
+  }).join('');
+  document.getElementById('summaryBox').innerHTML = rows +
+    `<div class="cb-div"></div>
+     <div class="cb-row"><span class="cb-lbl">Total monthly</span><span class="cb-val">${fmtM(totalMonthly)}</span></div>
+     <div class="cb-row"><span class="cb-lbl cb-tot">Combined funded</span><span class="cb-val cb-tot">${(totalFunded*100).toFixed(0)}%</span></div>`;
+
+  return {salA,salB,combined,contribInc,annReturn,annualCost,collegeInfl,collegeYrs,fundingPct,
+    fedTax,stateTax,stateDeductCap,childInputs,totalProj,totalTarget,totalMonthly,
+    totalFunded,totalGap,totalReqMo,annContrib,deductible,stateDeductBenefit};
+}
+
+// ── MAIN CALC ─────────────────────────────────────────────────
+function calc(){
+  const i = getInputs();
+  doGrowth(i);
+  doCosts(i);
+  doContrib(i);
+  doTax(i);
+  doMath(i);
+}
+
+// ── GROWTH ───────────────────────────────────────────────────
+function doGrowth(i){
+  const allMet = i.childInputs.every(c=>c.funded>=1);
+  const anyMet = i.childInputs.some(c=>c.funded>=1);
+
+  const bn = document.getElementById('growthBanner');
+  if(allMet){
+    bn.className='bn ok';
+    bn.innerHTML=`✅ All ${i.childInputs.length} children are on track! Combined projected balance <strong>${fmt(i.totalProj)}</strong> meets the combined target of <strong>${fmt(i.totalTarget)}</strong>.`;
+  } else {
+    const short = i.childInputs.filter(c=>c.funded<1);
+    bn.className='bn warn';
+    bn.innerHTML=`⚠️ ${short.map(c=>`<strong>${c.name}</strong>`).join(', ')} ${short.length===1?'is':'are'} underfunded. Combined shortfall: <strong>${fmt(i.totalGap)}</strong>. Additional contribution needed: <strong>${fmtM(i.totalReqMo - i.totalMonthly)}</strong>.`;
+  }
+
+  document.getElementById('growthHeroes').innerHTML=`
+    <div class="hero hcy" data-tip="Sum of all children's projected 529 balances at their respective college start dates.">
+      <div class="hl">Combined at College</div><div class="hv">${fmt(i.totalProj)}</div><div class="hs">${i.childInputs.length} child${i.childInputs.length>1?'ren':''}</div></div>
+    <div class="hero ${allMet?'hgr':'hro'}" data-tip="Combined college cost target across all children, at your funding percentage.">
+      <div class="hl">Combined Target (${(i.fundingPct*100).toFixed(0)}%)</div><div class="hv">${fmt(i.totalTarget)}</div><div class="hs">${fmt(i.childInputs.reduce((s,c)=>s+c.totalFutureCost,0))} total</div></div>
+    <div class="hero ${allMet?'hgr':i.totalFunded>=.75?'hcy':'ham'}" data-tip="Combined funded percentage across all children.">
+      <div class="hl">Overall Funded</div><div class="hv">${(i.totalFunded*100).toFixed(0)}%</div><div class="hs">${allMet?'🎉 All on track':fmt(i.totalGap)+' gap'}</div></div>`;
+
+  // Per-child summary cards
+  document.getElementById('childSummaryCards').innerHTML = `<div class="child-summary-grid">${
+    i.childInputs.map((c,idx)=>{
+      const col = CHILD_COLORS[idx%CHILD_COLORS.length];
+      const progW = Math.min(100,c.funded*100);
+      const progCol = progW>=100?'#10b981':progW>=75?col:progW>=50?'#f59e0b':'#f43f5e';
+      const yearsText = c.yearsLeft===0?'Starting now':`${c.yearsLeft} yrs away`;
+      return `<div class="child-card">
+        <span class="cc-dot" style="background:${col}"></span>
+        <span class="cc-name">${escH(c.name)}</span>
+        <div class="cc-info">
+          <span class="cc-stat">Balance <strong>${fmt(c.proj529)}</strong></span>
+          <span class="cc-stat">Target <strong>${fmt(c.target)}</strong></span>
+          <span class="cc-stat">Gap <strong style="color:${c.gap>0?'var(--ro6)':'var(--em6)'}">${c.gap>0?fmt(c.gap):'✓'}</strong></span>
+          <span class="cc-stat">${yearsText} · Age ${c.collegeAge}</span>
+        </div>
+        <div class="cc-prog-wrap">
+          <div class="cc-prog"><div class="cc-prog-bar" style="width:${progW}%;background:${progCol}"></div></div>
+          <div class="cc-pct" style="color:${progCol}">${progW.toFixed(0)}% funded</div>
+        </div>
+      </div>`;
+    }).join('')
+  }</div>`;
+
+  // Chart — one line per child + target dashes
+  const maxYrs = Math.max(1, ...i.childInputs.map(c=>c.yearsLeft));
+  const labels = Array.from({length:maxYrs+1},(_,y)=>`Yr ${y}`);
+  const datasets = [];
+  i.childInputs.forEach((c,idx)=>{
+    const col = CHILD_COLORS[idx%CHILD_COLORS.length];
+    const pts = buildYearPts({...c}, i.annReturn, i.contribInc);
+    const data = Array(maxYrs+1).fill(null);
+    pts.forEach(p=>{ data[p.yr] = p.bal; });
+    datasets.push({label:c.name,data,borderColor:col,backgroundColor:col+'20',fill:false,tension:.4,pointRadius:2,borderWidth:2.5,spanGaps:false});
+    // Dashed target line for this child
+    const tdata = Array(maxYrs+1).fill(null);
+    for(let y=0;y<=c.yearsLeft;y++) tdata[y]=c.target;
+    datasets.push({label:c.name+' Target',data:tdata,borderColor:col,borderDash:[4,3],borderWidth:1.2,backgroundColor:'transparent',pointRadius:0,spanGaps:false});
+  });
+  dc('growthChart');
+  CH['growthChart']=new Chart(document.getElementById('growthChart').getContext('2d'),{
+    type:'line',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10},filter:l=>!l.text.includes('Target')}}},
+      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
+              y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // Milestone stats
+  const statCards = i.childInputs.flatMap((c,idx)=>{
+    const col = CHILD_COLORS[idx%CHILD_COLORS.length];
+    const pts = buildYearPts({...c}, i.annReturn, i.contribInc);
+    const m100 = pts.find(p=>p.bal>=c.target);
+    return [
+      `<div class="stat"><div class="sl" style="color:${col}">${c.name} — Balance</div><div class="sv">${fmt(c.proj529)}</div></div>`,
+      `<div class="stat"><div class="sl" style="color:${col}">${c.name} — 100% Funded</div><div class="sv ${m100?'pos':'neg'}">${m100?`Age ${m100.age}`:'Not reached'}</div></div>`,
+    ];
+  });
+  document.getElementById('growthStats').innerHTML = statCards.join('');
+}
+
+// ── COLLEGE COSTS ─────────────────────────────────────────────
+function doCosts(i){
+  const totalAll = i.childInputs.reduce((s,c)=>s+c.totalFutureCost, 0);
+  const avgInflPremium = i.childInputs.reduce((s,c)=>s+(c.totalFutureCost-i.annualCost*i.collegeYrs),0)/Math.max(1,i.childInputs.length);
+
+  document.getElementById('costsHeroes').innerHTML=`
+    <div class="hero hro" data-tip="Total projected college cost for all children combined.">
+      <div class="hl">Total All Children</div><div class="hv">${fmt(totalAll)}</div><div class="hs">${i.childInputs.length} child${i.childInputs.length>1?'ren':''} · ${i.collegeYrs} yrs each</div></div>
+    <div class="hero ham" data-tip="Average annual college cost at the time each child starts, after inflation.">
+      <div class="hl">Avg Annual at Start</div><div class="hv">${fmt(i.childInputs.reduce((s,c)=>s+i.annualCost*Math.pow(1+i.collegeInfl,c.yearsLeft),0)/Math.max(1,i.childInputs.length))}</div><div class="hs">${fmt(i.annualCost)}/yr today</div></div>
+    <div class="hero hpu" data-tip="Average extra paid per child due to college inflation above today's prices.">
+      <div class="hl">Avg Inflation Premium</div><div class="hv">${fmt(avgInflPremium)}</div><div class="hs">Per child vs today's cost</div></div>`;
+
+  // Chart: grouped bars per child
+  const labels = i.childInputs.map(c=>c.name);
+  const barColors = i.childInputs.map((_,idx)=>CHILD_COLORS[idx%CHILD_COLORS.length]);
+  const costData = i.childInputs.map(c=>c.totalFutureCost);
+  const targetData = i.childInputs.map(c=>c.target);
+  const projData = i.childInputs.map(c=>c.proj529);
+  dc('costsChart');
+  CH['costsChart']=new Chart(document.getElementById('costsChart').getContext('2d'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Projected 4-Yr Cost',data:costData,backgroundColor:i.childInputs.map((_,idx)=>CHILD_COLORS[idx%CHILD_COLORS.length]+'aa'),borderRadius:4},
+      {label:'529 Projected Balance',data:projData,backgroundColor:i.childInputs.map((_,idx)=>CHILD_COLORS[idx%CHILD_COLORS.length]),borderRadius:4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10}}},
+              y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // Per-child detail table
+  document.getElementById('costDetail').innerHTML = `
+    <div style="background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);overflow:hidden;box-shadow:var(--sh1);">
+    ${i.childInputs.map((c,idx)=>{
+      const col = CHILD_COLORS[idx%CHILD_COLORS.length];
+      const annAtStart = i.annualCost*Math.pow(1+i.collegeInfl,c.yearsLeft);
+      const funded = c.funded;
+      const progW = Math.min(100,funded*100);
+      const progCol = progW>=100?'#10b981':progW>=75?col:progW>=50?'#f59e0b':'#f43f5e';
+      return `<div style="padding:11px 14px;border-bottom:1px solid var(--s100);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:.8rem;color:var(--n900)">
+            <span style="width:8px;height:8px;border-radius:50%;background:${col};display:inline-block"></span>
+            ${escH(c.name)} — Starts Age ${c.collegeAge} (${c.yearsLeft} yrs away)
+          </div>
+          <span style="font-family:var(--mono);font-weight:700;font-size:.78rem;color:${progCol}">${progW.toFixed(0)}% funded</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:.73rem;color:var(--n600);margin-bottom:8px;">
+          <span>Annual at start: <strong style="color:var(--n900);font-family:var(--mono)">${fmt(annAtStart)}</strong></span>
+          <span>Total ${i.collegeYrs}-yr: <strong style="color:var(--ro6);font-family:var(--mono)">${fmt(c.totalFutureCost)}</strong></span>
+          <span>Target (${(i.fundingPct*100).toFixed(0)}%): <strong style="color:var(--n900);font-family:var(--mono)">${fmt(c.target)}</strong></span>
+          <span>529 projected: <strong style="color:${col};font-family:var(--mono)">${fmt(c.proj529)}</strong></span>
+        </div>
+        <div style="background:var(--s200);border-radius:var(--rfl);height:7px;overflow:hidden;">
+          <div style="width:${progW}%;height:100%;background:${progCol};border-radius:var(--rfl);"></div>
+        </div>
+      </div>`;
+    }).join('')}
+    <div style="padding:10px 14px;background:var(--s50);display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;">
+      <span>Combined Total</span>
+      <span style="font-family:var(--mono);color:var(--ro6)">${fmt(totalAll)}</span>
+    </div></div>`;
+}
+
+// ── CONTRIBUTIONS ─────────────────────────────────────────────
+function doContrib(i){
+  const allSufficient = i.childInputs.every(c=>c.monthly>=c.reqMo);
+  const bn = document.getElementById('contribBanner');
+  if(allSufficient){
+    bn.className='bn ok'; bn.innerHTML=`✅ Your combined monthly contributions of <strong>${fmtM(i.totalMonthly)}</strong> are sufficient across all children.`;
+  } else {
+    const add = Math.max(0, i.totalReqMo-i.totalMonthly);
+    bn.className='bn warn'; bn.innerHTML=`⚠️ To fully fund all children you need approximately <strong>${fmtM(i.totalReqMo)}</strong>/mo combined — <strong>${fmtM(add)}</strong> more than current.`;
+  }
+
+  document.getElementById('contribHeroes').innerHTML=`
+    <div class="hero hcy" data-tip="Your combined current monthly contributions across all children.">
+      <div class="hl">Total Monthly</div><div class="hv">${fmtM(i.totalMonthly)}</div><div class="hs">Across all children</div></div>
+    <div class="hero ${allSufficient?'hgr':'ham'}" data-tip="Total required monthly contribution to fully fund all children.">
+      <div class="hl">Total Required</div><div class="hv">${fmtM(i.totalReqMo)}</div><div class="hs">To meet all targets</div></div>
+    <div class="hero ${allSufficient?'hgr':'hro'}" data-tip="Monthly gap between what's needed and what's being contributed.">
+      <div class="hl">${allSufficient?'Monthly Surplus':'Monthly Gap'}</div>
+      <div class="hv">${fmtM(Math.abs(i.totalReqMo-i.totalMonthly))}</div>
+      <div class="hs">${allSufficient?'Ahead of schedule':'Additional needed'}</div></div>`;
+
+  // Per-child contribution detail
+  document.getElementById('contribDetail').innerHTML = `
+    <div class="data-grid">
+      <div class="data-row header" style="grid-template-columns:80px 1fr 90px 90px 80px">
+        <span>Child</span><span>Progress</span><span>Current</span><span>Required</span><span>Gap</span>
+      </div>
+      ${i.childInputs.map((c,idx)=>{
+        const col = CHILD_COLORS[idx%CHILD_COLORS.length];
+        const progW = Math.min(100, c.funded*100);
+        const progCol = progW>=100?'#10b981':progW>=75?col:progW>=50?'#f59e0b':'#f43f5e';
+        const gap = c.reqMo - c.monthly;
+        return `<div class="data-row${c.monthly>=c.reqMo?' current':''}" style="grid-template-columns:80px 1fr 90px 90px 80px;${c.monthly>=c.reqMo?`border-color:${col}`:''}">
+          <span style="font-weight:700;color:${col};font-size:.73rem">${escH(c.name)}</span>
+          <span><div class="bar-wrap"><div class="bar-fill" style="width:${progW}%;background:${progCol}"></div></div><span style="font-size:.65rem;color:${progCol}">${progW.toFixed(0)}%</span></span>
+          <span style="font-family:var(--mono);font-weight:600">${fmtM(c.monthly)}</span>
+          <span style="font-family:var(--mono);color:var(--n700)">${fmtM(c.reqMo)}</span>
+          <span style="font-family:var(--mono);font-weight:700;color:${gap<=0?'var(--em6)':'var(--ro6)'}">${gap<=0?'✓ '+fmtM(Math.abs(gap)):'+'+fmtM(gap)}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // Chart: combined balance at different total monthly amounts
+  const maxYrs = Math.max(1,...i.childInputs.map(c=>c.yearsLeft));
+  const amounts = [200,400,600,800,1000,1200,1500,2000,2500,3000].filter(a=>a<=i.totalMonthly*4||a<=3000);
+  const projByAmt = amounts.map(totalMo=>{
+    // Distribute proportionally to current allocation (or evenly if all zero)
+    const ratio = i.totalMonthly>0 ? i.childInputs.map(c=>c.monthly/i.totalMonthly) : i.childInputs.map(()=>1/i.childInputs.length);
+    return i.childInputs.reduce((sum,c,idx)=>{
+      const mo = totalMo * (ratio[idx]||1/i.childInputs.length);
+      let b = c.balance;
+      for(let y=0;y<c.yearsLeft;y++) b = fvWithContribs(b, i.annReturn, 12, mo);
+      return sum + b;
+    }, 0);
+  });
+  dc('contribChart');
+  CH['contribChart']=new Chart(document.getElementById('contribChart').getContext('2d'),{
+    type:'bar',
+    data:{labels:amounts.map(a=>fmtM(a)),
+      datasets:[
+        {label:'Combined Projected Balance',data:projByAmt,backgroundColor:projByAmt.map(b=>b>=i.totalTarget?'rgba(16,185,129,.7)':'rgba(6,182,212,.6)'),borderRadius:4},
+        {label:'Combined Target',data:Array(amounts.length).fill(i.totalTarget),type:'line',borderColor:'#f59e0b',borderDash:[4,3],borderWidth:2,pointRadius:0,backgroundColor:'transparent'},
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:9.5}}},
+              y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+  });
+}
+
+// ── TAX ADVANTAGE ─────────────────────────────────────────────
+function doTax(i){
+  const capGainsBlend = 0.15*0.4 + i.fedTax*0.3 + i.stateTax*0.3;
+  const afterTaxReturn = i.annReturn*(1-capGainsBlend);
+  // 529 vs taxable (combined)
+  const maxYrs = Math.max(1,...i.childInputs.map(c=>c.yearsLeft));
+  let b529=0, bTax=0;
+  i.childInputs.forEach(c=>{ b529+=c.balance; bTax+=c.balance; });
+  let mo529=i.totalMonthly, moTax=i.totalMonthly;
+  const lbls=[], d529=[], dTax=[];
+  for(let y=0;y<=maxYrs;y++){
+    lbls.push(`Yr ${y}`);
+    d529.push(+b529.toFixed(0));
+    dTax.push(+bTax.toFixed(0));
+    if(y<maxYrs){
+      if(y>0){mo529*=(1+i.contribInc);moTax*=(1+i.contribInc);}
+      b529=fvWithContribs(b529,i.annReturn,12,mo529);
+      bTax=fvWithContribs(bTax,afterTaxReturn,12,moTax);
+    }
+  }
+  const taxAdv = b529-bTax;
+  const annStateDeduct = i.stateDeductBenefit;
+  const totalStateDeduct = annStateDeduct*maxYrs;
+
+  const bn = document.getElementById('taxBanner');
+  bn.className='bn info';
+  bn.innerHTML=`529 tax-free growth saves an estimated <strong>${fmt(taxAdv)}</strong> vs a taxable account over ${maxYrs} years. State deduction saves ~<strong>${fmt(annStateDeduct)}/yr</strong>.`;
+
+  document.getElementById('taxHeroes').innerHTML=`
+    <div class="hero hcy" data-tip="Estimated tax savings from 529 vs taxable account at the same contributions and return.">
+      <div class="hl">Tax Advantage</div><div class="hv">${fmt(taxAdv)}</div><div class="hs">vs taxable account</div></div>
+    <div class="hero hgr" data-tip="Annual state income tax savings from deducting 529 contributions up to your state's cap.">
+      <div class="hl">State Deduction/yr</div><div class="hv">${fmt(annStateDeduct)}</div><div class="hs">${fmt(i.deductible)} deductible</div></div>
+    <div class="hero ham" data-tip="Total state deduction benefit over all contribution years.">
+      <div class="hl">Total State Savings</div><div class="hv">${fmt(totalStateDeduct)}</div><div class="hs">Over ${maxYrs} yrs</div></div>`;
+
+  dc('taxChart');
+  CH['taxChart']=new Chart(document.getElementById('taxChart').getContext('2d'),{
+    type:'line',
+    data:{labels:lbls,datasets:[
+      {label:'529 Plan (tax-free)',data:d529,borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,.1)',fill:true,tension:.4,pointRadius:0,borderWidth:2.5},
+      {label:'Taxable Account',data:dTax,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.07)',fill:true,tension:.4,pointRadius:0,borderWidth:2,borderDash:[4,2]},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
+              y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+  });
+
+  document.getElementById('taxGrid').innerHTML=`
+    <div class="tax-card plan529">
+      <div class="tl">529 Plan</div><div class="tv">${fmt(b529)}</div>
+      <div class="ts">Tax-free at ${(i.annReturn*100).toFixed(1)}%/yr · ${fmt(annStateDeduct)}/yr state deduction</div>
+    </div>
+    <div class="tax-card taxable">
+      <div class="tl">Taxable Account</div><div class="tv">${fmt(bTax)}</div>
+      <div class="ts">After-tax at ${(afterTaxReturn*100).toFixed(2)}%/yr · gains taxed annually</div>
+    </div>`;
+
+  document.getElementById('taxStats').innerHTML=`
+    <div class="stat"><div class="sl">After-Tax Return</div><div class="sv">${(afterTaxReturn*100).toFixed(2)}%</div></div>
+    <div class="stat"><div class="sl">Tax on Gains (blended)</div><div class="sv warn">${(capGainsBlend*100).toFixed(1)}%</div></div>
+    <div class="stat"><div class="sl">Deductible/yr</div><div class="sv">${fmt(i.deductible)}</div></div>
+    <div class="stat"><div class="sl">State Rate</div><div class="sv">${(i.stateTax*100).toFixed(1)}%</div></div>`;
+}
+
+// ── MATH INSPECTOR ────────────────────────────────────────────
+function toggleMath(){
+  const p=document.getElementById('mathPanel'), o=document.getElementById('mpOverlay');
+  const opening=!p.classList.contains('open');
+  p.classList.toggle('open'); o.classList.toggle('open');
+  document.querySelector('.math-btn').textContent=opening?'🔍 Hide Math':'🔍 Show Math';
+}
+
+function doMath(i){
+  let h='';
+  h+=`<div class="mf-box">
+    <div class="mf-title">Compound Growth Formula</div>
+    <div class="mf-row"><span class="mf-lbl">FV formula:</span><span class="mf-val">FV = PV × (1+r)ⁿ + PMT × ((1+r)ⁿ − 1) / r</span></div>
+    <div class="mf-row"><span class="mf-lbl">Monthly rate r:</span><span class="mf-eq">${(i.annReturn/12).toFixed(6)}</span></div>
+    <div class="mf-row"><span class="mf-lbl">Annual return:</span><span class="mf-eq">${(i.annReturn*100).toFixed(2)}%</span></div>
+    <div class="mf-div"></div>
+    ${i.childInputs.map((c,idx)=>`
+    <div class="mf-row"><span class="mf-lbl" style="color:${CHILD_COLORS[idx%CHILD_COLORS.length]}">${escH(c.name)}:</span><span class="mf-eq mf-hl">${fmt(c.proj529)}</span></div>
+    <div class="mf-row"><span class="mf-lbl">  PV / PMT / n:</span><span class="mf-eq">${fmt(c.balance)} / ${fmtM(c.monthly)} / ${c.yearsLeft*12}mo</span></div>
+    `).join('')}
+  </div>`;
+
+  h+=`<div class="mf-box">
+    <div class="mf-title">Future College Cost: C_future = C_today × (1+infl)^years</div>
+    <div class="mf-row"><span class="mf-lbl">Today's annual cost:</span><span class="mf-eq">${fmt(i.annualCost)}/yr</span></div>
+    <div class="mf-row"><span class="mf-lbl">Inflation rate:</span><span class="mf-eq">${(i.collegeInfl*100).toFixed(1)}%/yr</span></div>
+    <div class="mf-div"></div>
+    ${i.childInputs.map((c,idx)=>`
+    <div class="mf-row"><span class="mf-lbl" style="color:${CHILD_COLORS[idx%CHILD_COLORS.length]}">${escH(c.name)} (${c.yearsLeft} yrs):</span><span class="mf-eq mf-red">${fmt(c.totalFutureCost)} total · ${fmt(c.target)} target</span></div>
+    `).join('')}
+    <div class="mf-div"></div>
+    <div class="mf-row"><span class="mf-lbl">Combined target:</span><span class="mf-eq mf-red">${fmt(i.totalTarget)}</span></div>
+  </div>`;
+
+  // Year-by-year table per child
+  i.childInputs.forEach((c,idx)=>{
+    const col = CHILD_COLORS[idx%CHILD_COLORS.length];
+    h+=`<div style="font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${col};margin:14px 0 8px;">
+      📊 ${escH(c.name)} — Year-by-Year (${c.yearsLeft} years)
+    </div>
+    <div class="mp-tbl-wrap"><table class="mp-tbl"><thead><tr>
+      <th style="text-align:left">Year</th><th>Age</th><th>Start Bal</th><th>Contributions</th><th>Growth</th><th>End Bal</th><th>College Cost</th><th>Notes</th>
+    </tr></thead><tbody>`;
+    let bal=c.balance, mo=c.monthly;
+    for(let y=0;y<c.yearsLeft;y++){
+      if(y>0) mo*=(1+i.contribInc);
+      const start=bal;
+      const end=fvWithContribs(bal,i.annReturn,12,mo);
+      const growth=end-start-mo*12;
+      const collegeCost=i.annualCost*Math.pow(1+i.collegeInfl,y);
+      bal=end;
+      h+=`<tr class="${y===c.yearsLeft-1?'ms-row':''}">
+        <td class="tl">Yr ${y+1}</td><td>${c.age+y}</td>
+        <td>${fmt(start)}</td><td class="pos">+${fmt(mo*12)}</td>
+        <td class="pos">+${fmt(Math.round(growth))}</td>
+        <td class="bld">${fmt(end)}</td>
+        <td style="color:var(--ro6)">${fmt(Math.round(collegeCost))}</td>
+        <td class="note">${y===c.yearsLeft-1?'→ College!':''}</td>
+      </tr>`;
+    }
+    h+=`</tbody></table></div>`;
+  });
+
+  document.getElementById('mathBody').innerHTML=h;
+}
+
+// ── Init ──────────────────────────────────────────────────────
+renderChildren();
+calc();
+
+// ── Tooltips ──────────────────────────────────────────────────
+const TIPS={
+  salaryA:"Partner A's annual gross salary. Used to estimate tax bracket for 529 state deduction benefits.",
+  salaryB:"Partner B's annual gross salary. Combined with Partner A's for household income context.",
+  returnRate:"Expected annual investment return. Age-based 529 portfolios typically target 5–8% early, stepping down near college.",
+  returnSlider:"Expected annual investment return. Drag to explore scenarios.",
+  contribIncrease:"Annual % increase to each child's monthly contribution — e.g., 2% means contributions grow with salary raises.",
+  annualCost:"Current annual all-in college cost (tuition + room & board + fees). Pre-set by type; override as needed.",
+  collegeInfl:"Historical college cost inflation is ~4–6%/yr — well above general inflation. This drives future costs.",
+  collegeYears:"Number of years of college to fund per child.",
+  fundingPct:"What percentage of each child's total college cost you plan to cover via 529.",
+  fedTax:"Your federal marginal income tax bracket, used for after-tax return calculations.",
+  stateTax:"Your state income tax rate. Many states allow a deduction on 529 contributions.",
+  stateDeductCap:"Maximum annual 529 contribution eligible for a state tax deduction. Varies significantly by state.",
+};
+Object.entries(TIPS).forEach(([id,tip])=>{
+  const el=document.getElementById(id);
+  if(!el) return;
+  const wrap=el.closest('.ig')||el.closest('.rrow')||el;
+  wrap.setAttribute('data-tip',tip);
+});
+const tt=document.getElementById('ttip');
+let ttTO,ttCurrent=null;
+function ttPos(x,y){
+  const vw=window.innerWidth,vh=window.innerHeight,tw=tt.offsetWidth||270,th=tt.offsetHeight||60;
+  let lx=x+15,ly=y+18;
+  if(lx+tw>vw-8)lx=x-tw-12;
+  if(ly+th>vh-8)ly=y-th-12;
+  tt.style.left=lx+'px';tt.style.top=ly+'px';
+}
+document.addEventListener('mouseover',e=>{
+  const el=e.target.closest('[data-tip]');
+  if(!el) return;
+  clearTimeout(ttTO);
+  if(el!==ttCurrent){ttCurrent=el;tt.textContent=el.dataset.tip;}
+  ttPos(e.clientX,e.clientY);
+  tt.classList.add('show');
+});
+document.addEventListener('mouseout',e=>{
+  const el=e.target.closest('[data-tip]');
+  if(!el) return;
+  if(el.contains(e.relatedTarget)) return;
+  clearTimeout(ttTO);
+  ttTO=setTimeout(()=>{tt.classList.remove('show');ttCurrent=null;},100);
+});
+document.addEventListener('mousemove',e=>{
+  if(!tt.classList.contains('show')) return;
+  ttPos(e.clientX,e.clientY);
+});
+</script>
+</body>
+</html>

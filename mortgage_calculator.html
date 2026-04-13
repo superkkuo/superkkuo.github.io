@@ -377,7 +377,9 @@ tr.ms-row td:first-child{font-weight:700;}
       </div>
     </div>
     <div class="hdr-actions">
-      <a href="index.html" class="nav-btn">🔥 Retirement Calculator →</a>
+      <a href="retirement_calculator.html" class="nav-btn">🔥 Retirement →</a>
+      <a href="college_calculator.html" class="nav-btn">🎓 529 →</a>
+      <a href="interest_calculator.html" class="nav-btn">💰 Interest →</a>
       <button class="math-btn" onclick="toggleMath()" title="Show step-by-step mortgage math">🔍 Show Math</button>
     </div>
   </div>
@@ -432,8 +434,12 @@ tr.ms-row td:first-child{font-weight:700;}
   <div class="r2">
     <div class="ig"><label>HOA (monthly)</label>
       <div class="iw has-pre"><span class="pre">$</span><input type="number" id="hoa" value="0" min="0" step="50" oninput="calc()"></div></div>
-    <div class="ig"><label>PMI Rate <span style="color:var(--n600)">(if &lt;20% down)</span></label>
+    <div class="ig"><label>PMI Rate <span style="color:var(--n600)">(auto if LTV&gt;80%)</span></label>
       <div class="iw has-suf"><input type="number" id="pmiRate" value="0.85" min="0" max="2" step="0.05" oninput="calc()"><span class="suf">%/yr</span></div></div>
+  </div>
+  <div class="ig">
+    <label>PMI Override <span style="color:var(--n600)">($/mo — overrides rate, always applied)</span></label>
+    <div class="iw has-pre"><span class="pre">$</span><input type="number" id="pmiOverride" value="" min="0" step="10" placeholder="Leave blank to auto-calculate" oninput="calc()"></div>
   </div>
 
   <div class="sbh">Target Home Price</div>
@@ -623,17 +629,18 @@ function getInputs(){
   const insR=+document.getElementById('insRate').value/100||0.005;
   const hoaMo=+document.getElementById('hoa').value||0;
   const pmiR=+document.getElementById('pmiRate').value/100||0.0085;
+  const pmiOverrideMo=+(document.getElementById('pmiOverride').value)||0;
   const homePrice=+document.getElementById('homePrice').value||800000;
   const loan=Math.max(0,homePrice-downDollars);
   const ltv=homePrice>0?loan/homePrice:0;
-  const pmi=ltv>0.8?loan*pmiR/12:0;
+  const pmi=pmiOverrideMo>0 ? pmiOverrideMo : (ltv>0.8?loan*pmiR/12:0);
   const taxMo=homePrice*taxR/12;
   const insMo=homePrice*insR/12;
   const pi=moPmt(loan,annRate,termYrs);
   const piti=pi+taxMo+insMo+hoaMo+pmi;
   const rent=+document.getElementById('rent').value||0;
   const rentIncR=+document.getElementById('rentInc').value/100||0.03;
-  const invR=+document.getElementById('invReturn').value/100||0.07;
+  const invReturn=+document.getElementById('invReturn').value/100||0.07;
   // Update combined pill
   document.getElementById('combinedLbl').textContent=fmt(combined)+'/yr';
   // Update PITI box
@@ -646,7 +653,7 @@ function getInputs(){
     ${pmi>0?`<div class="cb-row"><span class="cb-lbl">PMI</span><span class="cb-val">${fmtM(pmi)}</span></div>`:''}
     <div class="cb-div"></div>
     <div class="cb-row"><span class="cb-lbl cb-tot">Total monthly PITI</span><span class="cb-val cb-tot">${fmtM(piti)}</span></div>`;
-  return {salA,salB,combined,grossMo,debts,downP,downDollars,annRate,termYrs,taxR,insR,hoaMo,pmiR,homePrice,loan,ltv,pmi,taxMo,insMo,pi,piti,rent,rentIncR,invR};
+  return {salA,salB,combined,grossMo,debts,downP,downDollars,annRate,termYrs,taxR,insR,hoaMo,pmiR,pmiOverrideMo,homePrice,loan,ltv,pmi,taxMo,insMo,pi,piti,rent,rentIncR,invReturn};
 }
 
 // ── MAIN CALC ─────────────────────────────────────────────────
@@ -704,7 +711,7 @@ function doAfford(i){
     const loan=Math.max(0,hp-i.downDollars);
     const pi=moPmt(loan,i.annRate,i.termYrs);
     const tax=hp*i.taxR/12, ins=hp*i.insR/12;
-    const pmi=loan/hp>0.8?loan*i.pmiR/12:0;
+    const pmi=i.pmiOverrideMo>0 ? i.pmiOverrideMo : (loan/hp>0.8?loan*i.pmiR/12:0);
     const piti=pi+tax+ins+i.hoaMo+pmi;
     const fDTI=grossMo>0?piti/grossMo:0;
     const bDTI=grossMo>0?(piti+i.debts)/grossMo:0;
@@ -776,7 +783,7 @@ function doPayment(i){
   document.getElementById('payStats').innerHTML=`
     <div class="stat" data-tip="Monthly principal and interest payment based on the amortization formula."><div class="sl">P&amp;I Payment</div><div class="sv">${fmtM(i.pi)}</div></div>
     <div class="stat" data-tip="Loan-to-Value ratio. Above 80% triggers PMI requirement."><div class="sl">LTV</div><div class="sv ${i.ltv<=0.8?'pos':'warn'}">${pct(i.ltv)}</div></div>
-    ${i.pmi>0?`<div class="stat" data-tip="PMI is required when LTV > 80%. It can typically be removed once you reach 20% equity."><div class="sl">PMI (monthly)</div><div class="sv warn">${fmtM(i.pmi)}</div></div>`:''}
+    ${i.pmi>0?`<div class="stat" data-tip="${i.pmiOverrideMo>0?'PMI set via manual override — applied regardless of LTV. Clear the override field to switch back to auto-calculation.':'PMI is required when LTV > 80%. It can typically be removed once you reach 20% equity.'}"><div class="sl">PMI (monthly)${i.pmiOverrideMo>0?' ✏️':''}</div><div class="sv warn">${fmtM(i.pmi)}</div></div>`:''}
     <div class="stat" data-tip="Total of all principal and interest payments made over the life of the loan."><div class="sl">Total Payments</div><div class="sv">${fmt(totalPaid)}</div></div>
     <div class="stat" data-tip="Effective interest cost as a percentage of the original loan amount. Higher for shorter loans."><div class="sl">Interest / Loan</div><div class="sv neg">${i.loan>0?pct(totalInterest/i.loan):'—'}</div></div>
     <div class="stat" data-tip="Your annual income needed to keep PITI at or below 28% of gross income."><div class="sl">Income for 28% DTI</div><div class="sv">${fmt(i.piti/0.28*12)}/yr</div></div>`;
@@ -987,7 +994,10 @@ function doMath(i){
     <div class="mf-row"><span class="mf-lbl">Property tax (${(i.taxR*100).toFixed(2)}%/yr ÷ 12):</span><span class="mf-eq">${fd(i.homePrice)} × ${f4(i.taxR)} ÷ 12 = ${fd(i.taxMo)}/mo</span></div>
     <div class="mf-row"><span class="mf-lbl">Homeowners ins (${(i.insR*100).toFixed(2)}%/yr ÷ 12):</span><span class="mf-eq">${fd(i.homePrice)} × ${f4(i.insR)} ÷ 12 = ${fd(i.insMo)}/mo</span></div>
     ${i.hoaMo>0?`<div class="mf-row"><span class="mf-lbl">HOA:</span><span class="mf-eq">${fd(i.hoaMo)}/mo</span></div>`:''}
-    ${i.pmi>0?`<div class="mf-row"><span class="mf-lbl">PMI (${(i.pmiR*100).toFixed(2)}%/yr, LTV ${pct2(i.ltv)}):</span><span class="mf-eq">${fd(i.loan)} × ${f4(i.pmiR)} ÷ 12 = <span class="mf-red">${fd(i.pmi)}/mo</span></span></div>`:''}
+    ${i.pmi>0?(i.pmiOverrideMo>0
+      ?`<div class="mf-row"><span class="mf-lbl">PMI (manual override):</span><span class="mf-eq"><span class="mf-red">${fd(i.pmi)}/mo</span></span></div>`
+      :`<div class="mf-row"><span class="mf-lbl">PMI (${(i.pmiR*100).toFixed(2)}%/yr, LTV ${pct2(i.ltv)}):</span><span class="mf-eq">${fd(i.loan)} × ${f4(i.pmiR)} ÷ 12 = <span class="mf-red">${fd(i.pmi)}/mo</span></span></div>`
+    ):''}
     <div class="mf-div"></div>
     <div class="mf-row"><span class="mf-lbl">Total PITI:</span><span class="mf-eq mf-highlight">${fd(i.piti)}/mo</span></div>
     <div class="mf-row"><span class="mf-lbl">Total over ${i.termYrs} years:</span><span class="mf-eq">${fd(i.piti*n)} (incl. tax, ins, etc.)</span></div>
@@ -1091,7 +1101,8 @@ const TIPS = {
   taxRate:     "Annual property tax as a % of home value. Varies significantly by location — California is ~1.1%, Texas ~1.8%, NJ ~2.2%. Check your county assessor for local rates.",
   insRate:     "Annual homeowners insurance as a % of home value. Typically 0.25–1% depending on location, age, and construction of the home.",
   hoa:         "Monthly HOA (Homeowners Association) fee, if applicable. Common in condos, townhouses, and planned communities. Counts toward your front-end DTI.",
-  pmiRate:     "Private Mortgage Insurance annual rate, applied when your down payment is less than 20% (LTV > 80%). PMI can be removed once you reach 20% equity.",
+  pmiRate:     "Private Mortgage Insurance annual rate. Used to auto-calculate PMI when LTV > 80%. If you enter a PMI Override amount below, this rate is ignored.",
+  pmiOverride: "Enter the exact monthly PMI dollar amount from your lender quote. Overrides the rate-based calculation and applies regardless of your LTV. Leave blank to auto-calculate from the rate above.",
   homePrice:   "The target home price you want to analyze for payment breakdown and amortization. The Affordability tab shows analysis across multiple price points.",
   rent:        "Your current monthly rent payment. Used in the Rent vs. Buy comparison to calculate cumulative renting costs over time.",
   rentInc:     "Expected annual rent increase rate. Landlords typically raise rent 2–5% per year. Higher rent growth makes buying relatively more attractive over time.",
