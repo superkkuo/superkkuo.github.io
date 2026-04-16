@@ -447,13 +447,6 @@ tr.ms-row td:first-child{font-weight:700;}
     <div class="iw has-pre"><span class="pre">$</span><input type="number" id="homePrice" value="800000" min="50000" step="25000" oninput="calc()"></div></div>
   <div class="cb" id="pitiBox"></div>
 
-  <div class="sbh" style="margin-top:14px">Extra Payments</div>
-  <div class="ig">
-    <label>Extra Monthly Payment <span style="color:var(--n600)">(principal-only)</span></label>
-    <div class="iw has-pre"><span class="pre">$</span><input type="number" id="extraPmt" value="" min="0" step="50" placeholder="0" oninput="calc()"></div>
-  </div>
-  <div class="cb" id="extraPmtBox" style="display:none"></div>
-
   <div class="sbh" style="margin-top:14px">Rent vs. Buy Inputs</div>
   <div class="ig"><label>Current Monthly Rent</label>
     <div class="iw has-pre"><span class="pre">$</span><input type="number" id="rent" value="3500" min="0" step="100" oninput="calc()"></div></div>
@@ -472,7 +465,6 @@ tr.ms-row td:first-child{font-weight:700;}
     <button class="tab" onclick="switchTab(this,'payment')">💳 Payment</button>
     <button class="tab" onclick="switchTab(this,'amort')">📅 Amortization</button>
     <button class="tab" onclick="switchTab(this,'rvb')">⚖️ Rent vs. Buy</button>
-    <button class="tab" onclick="switchTab(this,'refi')">🔄 Refinance</button>
   </div>
 
   <!-- AFFORDABILITY -->
@@ -511,27 +503,6 @@ tr.ms-row td:first-child{font-weight:700;}
         <th>Year</th><th>Beginning Balance</th><th>Annual Principal</th><th>Annual Interest</th><th>Ending Balance</th><th>Equity</th><th>Cumul. Interest</th>
       </tr></thead><tbody id="amortBody"></tbody></table>
     </div>
-  </div>
-
-  <!-- REFINANCE -->
-  <div id="tab-refi" class="tab-panel">
-    <div class="ib"><strong>Refinance Break-Even</strong>: Enter your new loan details to see how long it takes for monthly savings to recoup the closing costs — and how much you save over the full loan life.</div>
-    <div class="r2" style="margin-bottom:12px;gap:10px">
-      <div class="ig"><label>New Interest Rate</label>
-        <div class="iw has-suf"><input type="number" id="refiRate" value="6.0" min="1" max="15" step="0.125" oninput="doRefi()"><span class="suf">%</span></div></div>
-      <div class="ig"><label>New Term</label>
-        <div class="iw has-suf"><input type="number" id="refiTerm" value="30" min="5" max="30" step="5" oninput="doRefi()"><span class="suf">yrs</span></div></div>
-      <div class="ig"><label>Closing Costs</label>
-        <div class="iw has-pre"><span class="pre">$</span><input type="number" id="refiCosts" value="5000" min="0" step="500" oninput="doRefi()"></div></div>
-      <div class="ig"><label>Current Balance Owed</label>
-        <div class="iw has-pre"><span class="pre">$</span><input type="number" id="refiBalance" value="" min="0" step="10000" placeholder="Uses loan amount" oninput="doRefi()"></div></div>
-    </div>
-    <div id="refiBanner" class="bn info"></div>
-    <div class="heroes3" id="refiHeroes"></div>
-    <div class="sh">Monthly Savings Cumulative vs. Closing Costs</div>
-    <div class="cw" style="height:240px"><canvas id="refiChart"></canvas></div>
-    <div class="sh">10-Year Comparison Snapshot</div>
-    <div class="stats" id="refiStats"></div>
   </div>
 
   <!-- RENT VS BUY -->
@@ -575,30 +546,6 @@ function setTerm(t, el){
   el.classList.add('active');
   calc();
 }
-// ── URL state ─────────────────────────────────────────────────
-function saveState(){
-  try{
-    const s={};
-    document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.type!=='range')s[el.id]=el.value;});
-    s['__term']=_term;
-    history.replaceState(null,'','#'+btoa(JSON.stringify(s)));
-  }catch(e){}
-}
-function loadState(){
-  try{
-    if(!location.hash||location.hash.length<4) return false;
-    const s=JSON.parse(atob(location.hash.slice(1)));
-    Object.entries(s).forEach(([id,val])=>{
-      if(id==='__term'){_term=+val;document.querySelectorAll('.term-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`[onclick="setTerm(${val},this)"]`)?.classList.add('active');return;}
-      const el=document.getElementById(id);
-      if(el&&el.type!=='range') el.value=val;
-    });
-    return true;
-  }catch(e){return false;}
-}
-const _calcOrig=calc;
-function calc(){_calcOrig();saveState();}
-
 // Init: only 30yr active
 document.querySelector('[onclick="setTerm(15,this)"]').classList.remove('active');
 
@@ -621,7 +568,7 @@ function switchTab(btn,name){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
-  if(name==='refi') doRefi(); else calc();
+  calc();
 }
 
 // ── Core mortgage math ────────────────────────────────────────
@@ -646,8 +593,8 @@ function maxHome(maxPITI, annRate, termYrs, taxRateAnn, insRateAnn, downAmt){
   return Math.max(0,H);
 }
 
-// Full amortization (annual summary), optional extra monthly principal payment
-function amortize(loan, annRate, termYrs, extraMo=0){
+// Full amortization (annual summary)
+function amortize(loan, annRate, termYrs){
   const r=annRate/12, n=termYrs*12;
   const pmt=moPmt(loan,annRate,termYrs);
   let bal=loan, cumInt=0;
@@ -656,15 +603,13 @@ function amortize(loan, annRate, termYrs, extraMo=0){
     let annPrin=0,annInt=0;
     const startBal=bal;
     for(let m=0;m<12;m++){
-      if(bal<=0) break;
       const interest=bal*r;
-      const principal=Math.min(pmt-interest+extraMo,bal);
+      const principal=Math.min(pmt-interest,bal);
       annInt+=interest; annPrin+=principal;
       bal=Math.max(0,bal-principal);
     }
     cumInt+=annInt;
     rows.push({yr,startBal,annPrin,annInt,endBal:bal,equity:loan-bal,cumInt});
-    if(bal<=0) break;
   }
   return rows;
 }
@@ -693,7 +638,6 @@ function getInputs(){
   const insMo=homePrice*insR/12;
   const pi=moPmt(loan,annRate,termYrs);
   const piti=pi+taxMo+insMo+hoaMo+pmi;
-  const extraPmt=+(document.getElementById('extraPmt').value)||0;
   const rent=+document.getElementById('rent').value||0;
   const rentIncR=+document.getElementById('rentInc').value/100||0.03;
   const invReturn=+document.getElementById('invReturn').value/100||0.07;
@@ -709,24 +653,7 @@ function getInputs(){
     ${pmi>0?`<div class="cb-row"><span class="cb-lbl">PMI</span><span class="cb-val">${fmtM(pmi)}</span></div>`:''}
     <div class="cb-div"></div>
     <div class="cb-row"><span class="cb-lbl cb-tot">Total monthly PITI</span><span class="cb-val cb-tot">${fmtM(piti)}</span></div>`;
-  // Extra payment sidebar summary
-  if(extraPmt>0){
-    const rowsBase=amortize(loan,annRate,termYrs,0);
-    const rowsExtra=amortize(loan,annRate,termYrs,extraPmt);
-    const intBase=rowsBase.reduce((s,r)=>s+r.annInt,0);
-    const intExtra=rowsExtra.reduce((s,r)=>s+r.annInt,0);
-    const yrsSaved=rowsBase.length-rowsExtra.length;
-    const intSaved=intBase-intExtra;
-    document.getElementById('extraPmtBox').style.display='';
-    document.getElementById('extraPmtBox').innerHTML=`
-      <div class="cb-row"><span class="cb-lbl">New payoff</span><span class="cb-val pos">${rowsExtra.length} yrs</span></div>
-      <div class="cb-row"><span class="cb-lbl">Years saved</span><span class="cb-val pos">${yrsSaved} yr${yrsSaved!==1?'s':''}</span></div>
-      <div class="cb-div"></div>
-      <div class="cb-row"><span class="cb-lbl">Interest saved</span><span class="cb-val pos">${fmt(intSaved)}</span></div>`;
-  } else {
-    document.getElementById('extraPmtBox').style.display='none';
-  }
-  return {salA,salB,combined,grossMo,debts,downP,downDollars,annRate,termYrs,taxR,insR,hoaMo,pmiR,pmiOverrideMo,homePrice,loan,ltv,pmi,taxMo,insMo,pi,piti,extraPmt,rent,rentIncR,invReturn};
+  return {salA,salB,combined,grossMo,debts,downP,downDollars,annRate,termYrs,taxR,insR,hoaMo,pmiR,pmiOverrideMo,homePrice,loan,ltv,pmi,taxMo,insMo,pi,piti,rent,rentIncR,invReturn};
 }
 
 // ── MAIN CALC ─────────────────────────────────────────────────
@@ -882,49 +809,34 @@ function doPayment(i){
 
 // ── AMORTIZATION ──────────────────────────────────────────────
 function doAmort(i){
-  const rows=amortize(i.loan,i.annRate,i.termYrs,i.extraPmt);
-  const rowsBase=i.extraPmt>0?amortize(i.loan,i.annRate,i.termYrs,0):rows;
+  const rows=amortize(i.loan,i.annRate,i.termYrs);
   const totalInt=rows.reduce((s,r)=>s+r.annInt,0);
-  const totalIntBase=rowsBase.reduce((s,r)=>s+r.annInt,0);
   const midYear=Math.floor(i.termYrs/2);
-  const midRow=rows[midYear-1]||rows[rows.length-1]||rows[0];
-  const payoffYrs=rows.length;
-  const intSaved=i.extraPmt>0?totalIntBase-totalInt:0;
-  const yrsSaved=i.extraPmt>0?i.termYrs-payoffYrs:0;
+  const midRow=rows[midYear-1]||rows[0];
   document.getElementById('amortHeroes').innerHTML=`
     <div class="hero hbl" data-tip="Original loan amount — the home price minus your down payment.">
       <div class="hl">Loan Amount</div><div class="hv">${fmt(i.loan)}</div><div class="hs">${fmt(i.homePrice)} home · ${i.downP}% down</div></div>
-    <div class="hero hro" data-tip="Total interest paid over the full loan life${i.extraPmt>0?' with extra payments':''}. This is the cost of borrowing beyond the principal.">
-      <div class="hl">Total Interest</div><div class="hv">${fmt(totalInt)}</div>
-      <div class="hs">${i.extraPmt>0?`<span style="color:var(--em5)">Save ${fmt(intSaved)} vs no extra</span>`:`Over ${i.termYrs} years`}</div></div>
-    <div class="hero ${i.extraPmt>0?'hgr':'hgr'}" data-tip="${i.extraPmt>0?`Payoff accelerated by ${yrsSaved} years with $${i.extraPmt}/mo extra.`:`Equity built after ${midYear} years — roughly the halfway point of the loan.`}">
-      <div class="hl">${i.extraPmt>0?'Payoff In':'Equity at Yr '+midYear}</div>
-      <div class="hv">${i.extraPmt>0?payoffYrs+' yrs':fmt(i.downDollars+(midRow?midRow.equity:0))}</div>
-      <div class="hs">${i.extraPmt>0?`${yrsSaved} yr${yrsSaved!==1?'s':''} sooner · +${fmtM(i.extraPmt)} extra`:'Including down payment'}</div></div>`;
-  // Chart: with vs without extra payments
-  const maxYrs=Math.max(rows.length, rowsBase.length);
-  const lbls=Array.from({length:maxYrs},(_,y)=>`Yr ${y+1}`);
-  const equity=Array(maxYrs).fill(null);
-  const balance=Array(maxYrs).fill(null);
-  rows.forEach(r=>{ equity[r.yr-1]=(i.downDollars+r.equity).toFixed(0)*1; balance[r.yr-1]=+r.endBal.toFixed(0); });
-  const datasets=[
-    {label:'Equity Built',data:equity,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.12)',fill:true,tension:.4,pointRadius:0,borderWidth:2},
-    {label:'Remaining Balance',data:balance,borderColor:'#f43f5e',backgroundColor:'rgba(244,63,94,.07)',fill:true,tension:.4,pointRadius:0,borderWidth:2},
-  ];
-  if(i.extraPmt>0){
-    const balBase=Array(maxYrs).fill(null);
-    rowsBase.forEach(r=>{ balBase[r.yr-1]=+r.endBal.toFixed(0); });
-    datasets.push({label:'Balance (no extra)',data:balBase,borderColor:'#f43f5e',borderDash:[4,3],backgroundColor:'transparent',fill:false,tension:.4,pointRadius:0,borderWidth:1.5});
-  }
+    <div class="hero hro" data-tip="Total interest paid over the full ${i.termYrs}-year loan life. This is the cost of borrowing beyond the principal.">
+      <div class="hl">Total Interest Paid</div><div class="hv">${fmt(totalInt)}</div><div class="hs">Over ${i.termYrs} years</div></div>
+    <div class="hero hgr" data-tip="Equity built after ${midYear} years — roughly the halfway point of the loan. Early payments are mostly interest; equity builds faster toward the end.">
+      <div class="hl">Equity at Year ${midYear}</div><div class="hv">${fmt(i.downDollars+(midRow?midRow.equity:0))}</div><div class="hs">Including down payment</div></div>`;
+  // Chart
+  const lbls=rows.map(r=>`Yr ${r.yr}`);
+  const equity=rows.map(r=>(i.downDollars+r.equity).toFixed(0)*1);
+  const balance=rows.map(r=>+r.endBal.toFixed(0));
   dc('amortChart');
   CH['amortChart']=new Chart(document.getElementById('amortChart').getContext('2d'),{
-    type:'line',data:{labels:lbls,datasets},
+    type:'line',
+    data:{labels:lbls,datasets:[
+      {label:'Equity Built',data:equity,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.12)',fill:true,tension:.4,pointRadius:0,borderWidth:2},
+      {label:'Remaining Balance',data:balance,borderColor:'#f43f5e',backgroundColor:'rgba(244,63,94,.07)',fill:true,tension:.4,pointRadius:0,borderWidth:2},
+    ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
       scales:{x:{grid:{display:false},ticks:{maxTicksLimit:8,font:{size:9.5}}},
               y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
   });
-  // Table
+  // Table (every year, highlight every 5th)
   document.getElementById('amortBody').innerHTML=rows.map(r=>`
     <tr class="${r.yr%5===0?'highlight':''}">
       <td class="tl">Year ${r.yr}</td>
@@ -1006,87 +918,6 @@ function doRvB(i){
       <div style="font-size:.67rem;color:var(--n600);margin-top:2px">Own: ${fmt(bi)} · Rent: ${fmt(ri)}</div>
     </div>`;
   }).join('');
-}
-
-// ── REFINANCE ────────────────────────────────────────────────
-function doRefi(){
-  const i = getInputs();
-  const currentBal = +(document.getElementById('refiBalance').value) || i.loan;
-  const newRate = +document.getElementById('refiRate').value/100 || 0.06;
-  const newTerm = +document.getElementById('refiTerm').value || 30;
-  const closingCosts = +document.getElementById('refiCosts').value || 5000;
-
-  const currentPmt = i.pi; // current PI payment (original loan)
-  const newPmt = moPmt(currentBal, newRate, newTerm);
-  const monthlySavings = currentPmt - newPmt;
-
-  const bn = document.getElementById('refiBanner');
-  if(monthlySavings <= 0){
-    bn.className='bn warn';
-    bn.innerHTML=`⚠️ The new rate of ${(newRate*100).toFixed(3)}% results in a higher payment of ${fmtM(newPmt)} vs your current ${fmtM(currentPmt)}. Refinancing at this rate would increase your monthly costs.`;
-  } else {
-    const beMonths = Math.ceil(closingCosts / monthlySavings);
-    const beYrs = (beMonths/12).toFixed(1);
-    bn.className='bn ok';
-    bn.innerHTML=`✅ You save <strong>${fmtM(monthlySavings)}/mo</strong>. Break-even in <strong>${beYrs} years</strong> (${beMonths} months) — after that, every month you stay puts money back in your pocket.`;
-  }
-
-  // Interest totals comparison
-  const rowsCurrent = amortize(currentBal, i.annRate, i.termYrs, 0);
-  const rowsNew = amortize(currentBal, newRate, newTerm, 0);
-  const intCurrent = rowsCurrent.reduce((s,r)=>s+r.annInt,0);
-  const intNew = rowsNew.reduce((s,r)=>s+r.annInt,0) + closingCosts;
-  const lifetimeSavings = intCurrent - intNew;
-
-  document.getElementById('refiHeroes').innerHTML=`
-    <div class="hero ${monthlySavings>0?'hgr':'hro'}" data-tip="Difference in monthly principal & interest payment between current and new loan.">
-      <div class="hl">Monthly Savings</div>
-      <div class="hv">${monthlySavings>0?fmtM(monthlySavings):'−'+fmtM(-monthlySavings)}</div>
-      <div class="hs">${fmtM(currentPmt)} → ${fmtM(newPmt)}</div></div>
-    <div class="hero ${monthlySavings>0?'hcy':'hro'}" data-tip="How many months of savings it takes to fully recover the closing costs.">
-      <div class="hl">Break-Even</div>
-      <div class="hv">${monthlySavings>0?Math.ceil(closingCosts/monthlySavings)+' mo':'N/A'}</div>
-      <div class="hs">${monthlySavings>0?((closingCosts/monthlySavings)/12).toFixed(1)+' years to recover costs':'Higher rate = no savings'}</div></div>
-    <div class="hero ${lifetimeSavings>0?'hgr':'hro'}" data-tip="Total interest paid on new loan + closing costs vs total interest remaining on current loan.">
-      <div class="hl">Lifetime ${lifetimeSavings>0?'Savings':'Cost'}</div>
-      <div class="hv">${fmt(Math.abs(lifetimeSavings))}</div>
-      <div class="hs">${lifetimeSavings>0?'Net interest saved incl. closing costs':'Net more interest paid'}</div></div>`;
-
-  // Chart: cumulative monthly savings vs closing costs line
-  const maxMos = Math.max(rowsCurrent.length, rowsNew.length)*12;
-  const beMonths2 = monthlySavings>0 ? Math.ceil(closingCosts/monthlySavings) : maxMos;
-  const chartMos = Math.min(maxMos, Math.max(beMonths2*2, 60));
-  const moLabels=[], cumSavings=[], ccLine=[];
-  let cum=0;
-  for(let m=1;m<=chartMos;m++){
-    moLabels.push(m%12===0?`Yr ${m/12}`:'');
-    cum += monthlySavings;
-    cumSavings.push(+cum.toFixed(0));
-    ccLine.push(closingCosts);
-  }
-  dc('refiChart');
-  CH['refiChart']=new Chart(document.getElementById('refiChart').getContext('2d'),{
-    type:'line',
-    data:{labels:moLabels,datasets:[
-      {label:'Cumulative Savings',data:cumSavings,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.1)',fill:true,tension:.4,pointRadius:0,borderWidth:2},
-      {label:'Closing Costs',data:ccLine,borderColor:'#f59e0b',borderDash:[4,3],backgroundColor:'transparent',fill:false,tension:0,pointRadius:0,borderWidth:2},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
-      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
-              y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
-  });
-
-  // Snapshot stats
-  const snaps=[1,2,3,5,7,10].map(yr=>{
-    const msCum=monthlySavings*yr*12-closingCosts;
-    return `<div class="stat" data-tip="After ${yr} year${yr>1?'s':''}: cumulative monthly savings minus closing costs.">
-      <div class="sl">After ${yr} yr${yr>1?'s':''}</div>
-      <div class="sv ${msCum>0?'pos':'neg'}">${msCum>0?'+':''} ${fmt(Math.abs(msCum))}</div>
-      <div style="font-size:.67rem;color:var(--n600);margin-top:2px">${msCum>0?'Net ahead':'Still recovering costs'}</div>
-    </div>`;
-  });
-  document.getElementById('refiStats').innerHTML=snaps.join('');
 }
 
 // ── Math Inspector toggle ─────────────────────────────────────
@@ -1256,7 +1087,6 @@ function doMath(i){
   document.getElementById('mathContent').innerHTML = h;
 }
 
-loadState();
 calc();
 
 // ── Tooltips ─────────────────────────────────────────────────
