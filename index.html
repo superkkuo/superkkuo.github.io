@@ -36,6 +36,9 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .htag{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:var(--rfl);border:1px solid rgba(255,255,255,.1);color:var(--s300);background:rgba(255,255,255,.05);letter-spacing:.03em;}
 .nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:var(--rsm);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
 .nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white);}
+.nav-select{background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid rgba(255,255,255,.2);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 30px 7px 12px;border-radius:var(--rsm);cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;width:auto;max-width:160px;}
+.nav-select:hover{background-color:rgba(255,255,255,.12);color:var(--white);}
+.nav-select option{background:#1e293b;color:#e2e8f0;}
 .hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
 
 /* LAYOUT */
@@ -282,6 +285,7 @@ tr:hover td{background:var(--s50);}
   .hdr h1{font-size:1.05rem;}
   .hdr-tags{display:none;}
   .hdr-actions{margin-top:0;gap:6px;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
   .math-btn{font-size:.7rem;padding:7px 12px;min-height:36px;}
 
   /* Layout — stack sidebar above main */
@@ -378,7 +382,7 @@ tr:hover td{background:var(--s50);}
   <div class="hdr-in">
     <div>
       <h1>🔥 Retirement &amp; <span>Coast FIRE</span> Calculator</h1>
-      <div class="hdr-tags">
+      <div class="hdr-tags" style="display:none">
         <span class="htag">Two Partners</span>
         <span class="htag">Post-Retirement Savings</span>
         <span class="htag">Home Purchase Impact</span>
@@ -389,9 +393,12 @@ tr:hover td{background:var(--s50);}
       </div>
     </div>
     <div class="hdr-actions">
-      <a href="mortgage_calculator.html" class="nav-btn">🏡 Mortgage →</a>
-      <a href="college_calculator.html" class="nav-btn">🎓 529 →</a>
-      <a href="interest_calculator.html" class="nav-btn">💰 Interest →</a>
+      <select class="nav-select" onchange="if(this.value)window.location=this.value">
+        <option value="retirement_calculator.html" selected>🔥 Retirement</option>
+        <option value="mortgage_calculator.html">🏡 Mortgage</option>
+        <option value="college_calculator.html">🎓 529 College</option>
+        <option value="interest_calculator.html">💰 Interest</option>
+      </select>
       <button class="math-btn" onclick="toggleMath()" title="Show year-by-year math breakdown">🔍 Show Math</button>
     </div>
   </div>
@@ -540,6 +547,34 @@ tr:hover td{background:var(--s50);}
     </div>
   </div>
 
+  <!-- Social Security -->
+  <div class="ts">
+    <div class="ts-hdr" onclick="toggleSec('ssBody','ssToggle')">
+      <span class="ts-title">🏛️ Social Security</span>
+      <label class="tpill" onclick="event.stopPropagation()">
+        <input type="checkbox" id="ssToggle" onchange="toggleSec('ssBody','ssToggle');calc()">
+        <span class="trk"></span>
+      </label>
+    </div>
+    <div class="ts-body" id="ssBody">
+      <div class="ts-inner">
+        <div class="ts-note">SS kicks in at your start age and reduces how much the portfolio needs to cover — lowering your effective withdrawal rate and extending portfolio life.</div>
+        <div class="r2">
+          <div class="ig"><label>Partner A Monthly Benefit</label>
+            <div class="iw has-pre"><span class="pre">$</span><input type="number" id="ssA" value="2200" min="0" step="100" oninput="calc()"></div></div>
+          <div class="ig"><label>Partner B Monthly Benefit</label>
+            <div class="iw has-pre"><span class="pre">$</span><input type="number" id="ssB" value="1800" min="0" step="100" oninput="calc()"></div></div>
+        </div>
+        <div class="r2">
+          <div class="ig"><label>A starts collecting (age)</label>
+            <div class="iw has-suf"><input type="number" id="ssAgeA" value="67" min="62" max="70" step="1" oninput="calc()"><span class="suf">age</span></div></div>
+          <div class="ig"><label>B starts collecting (age)</label>
+            <div class="iw has-suf"><input type="number" id="ssAgeB" value="67" min="62" max="70" step="1" oninput="calc()"><span class="suf">age</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </aside>
 
 <main class="main">
@@ -628,6 +663,9 @@ tr:hover td{background:var(--s50);}
     <div style="overflow-x:auto"><table><thead><tr><th>Rate</th><th>Annual</th><th>Monthly</th><th>Portfolio Life</th><th>Safety</th></tr></thead><tbody id="swrBody"></tbody></table></div>
     <div class="sh">Retirement Income Sources</div>
     <div class="cw" style="height:185px"><canvas id="incomeChart"></canvas></div>
+    <div class="sh">Portfolio Drawdown Over Retirement</div>
+    <div class="ib" id="drawdownNote" style="margin-bottom:10px"></div>
+    <div class="cw" style="height:220px"><canvas id="drawdownChart"></canvas></div>
   </div>
 </main>
 
@@ -791,6 +829,17 @@ function getInputs(){
   const brOn  =document.getElementById('brToggle').checked;
   const brInc =+document.getElementById('brIncome').value||0;
 
+  // Social Security
+  const ssOn   =document.getElementById('ssToggle').checked;
+  const ssA    =+document.getElementById('ssA').value||0;
+  const ssB    =+document.getElementById('ssB').value||0;
+  const ssAgeA =+document.getElementById('ssAgeA').value||67;
+  const ssAgeB =+document.getElementById('ssAgeB').value||67;
+  // Annual SS income in today's dollars
+  const ssAnnA = ssOn ? ssA*12 : 0;
+  const ssAnnB = ssOn ? ssB*12 : 0;
+  const ssTotal= ssAnnA + ssAnnB; // combined when both collecting
+
   return {
     ageA,retA,ageB,retB,yFirst,yFull,fw,fAge,sAge,
     salaryA,salaryB,
@@ -802,7 +851,8 @@ function getInputs(){
     hmOn,hmVal,hmDownPct,hmAgeA,hmRateN,hmTerm,hmTaxPct,
     dp,loan,mthly,annMort,annTM,annCarry,netAnnCarry,hmYear,
     currentRentMo,currentHousingAnn,
-    brOn,brInc
+    brOn,brInc,
+    ssOn,ssA,ssB,ssAgeA,ssAgeB,ssAnnA,ssAnnB,ssTotal
   };
 }
 
@@ -906,6 +956,7 @@ function calc(){
   doSWR(i,realAtFull);
   doSalary(i,fireNum,coastNum);
   renderMathPanel(i,fireNum,coastNum);
+  saveState();
 }
 
 // ── Annotation helper ─────────────────────────────────────────
@@ -1085,10 +1136,16 @@ function doSWR(i,realAtFull){
   document.getElementById('swrAnn').textContent=fmt(swrA);
   document.getElementById('swrSub').textContent=`${(i.swr*100).toFixed(2)}% SWR · $${Math.round(swrA/12).toLocaleString()}/mo`;
 
+  // Net expense = total expenses - SS income (when both collecting)
+  const ssAnnual = i.ssTotal; // total SS when fully in payment
+  const netExpenses = Math.max(0, i.expenses - ssAnnual);
+  const netWithdrawal = Math.max(0, swrA - ssAnnual);
+
   const rates=[2.5,3,3.5,4,4.5,5,5.5,6];
   document.getElementById('swrBody').innerHTML=rates.map(r=>{
     const a=realAtFull*(r/100),mo=a/12;
-    const life=portLife(realAtFull,a,i.realPost);
+    const netA = Math.max(0, a - ssAnnual);
+    const life=portLife(realAtFull,netA,i.realPost);
     const ls=life===Infinity?'∞ perpetual':life>200?'>200 yrs':life.toFixed(0)+' yrs';
     const cls=life>40?'tg':life>25?'to':'tb';
     const saf=life>40?'✅ Safe':life>25?'⚠️ Moderate':'❌ Risky';
@@ -1096,7 +1153,7 @@ function doSWR(i,realAtFull){
     return`<tr ${hi?'style="background:var(--bl0)"':''}><td><strong>${r}%</strong>${hi?' ← you':''}</td><td>${fmt(a)}</td><td>$${Math.round(mo).toLocaleString()}</td><td class="${cls}">${ls}</td><td>${saf}</td></tr>`;
   }).join('');
 
-  const lifes=rates.map(r=>{const a=realAtFull*(r/100);const l=portLife(realAtFull,a,i.realPost);return l>100?100:+l.toFixed(1);});
+  const lifes=rates.map(r=>{const a=realAtFull*(r/100);const netA=Math.max(0,a-ssAnnual);const l=portLife(realAtFull,netA,i.realPost);return l>100?100:+l.toFixed(1);});
   dc('swrChart');
   CH['swrChart']=new Chart(document.getElementById('swrChart').getContext('2d'),{
     type:'bar',
@@ -1108,15 +1165,69 @@ function doSWR(i,realAtFull){
   });
 
   const bInc=i.brOn?i.brInc:0;
-  const unc=Math.max(0,i.expenses-swrA-bInc);
+  const unc=Math.max(0,i.expenses-swrA-bInc-ssAnnual);
+  const incLabels=['Portfolio Withdrawals'];
+  const incData=[Math.max(0,Math.round(netWithdrawal))];
+  const incColors=['#3b82f6'];
+  if(bInc>0){incLabels.push('Part-Time Income');incData.push(Math.round(bInc));incColors.push('#f59e0b');}
+  if(ssAnnual>0){incLabels.push('Social Security');incData.push(Math.round(ssAnnual));incColors.push('#10b981');}
+  if(unc>0){incLabels.push('Uncovered Gap');incData.push(Math.round(unc));incColors.push('#e2e8f0');}
   dc('incomeChart');
   CH['incomeChart']=new Chart(document.getElementById('incomeChart').getContext('2d'),{
     type:'doughnut',
-    data:{labels:['Portfolio Withdrawals','Part-Time Income','Uncovered Gap'],
-      datasets:[{data:[Math.round(swrA),Math.round(bInc),Math.round(unc)],backgroundColor:['#3b82f6','#f59e0b','#e2e8f0'],borderWidth:2,borderColor:'#fff'}]},
+    data:{labels:incLabels,datasets:[{data:incData,backgroundColor:incColors,borderWidth:2,borderColor:'#fff'}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
       plugins:{legend:{position:'right',labels:{boxWidth:11,font:{size:10}}},
                tooltip:{callbacks:{label:c=>c.label+': '+fmt(c.raw)+'/yr'}}}}
+  });
+
+  // ── Drawdown simulation ────────────────────────────────────
+  // Simulate year-by-year portfolio in retirement for up to 50 years
+  // SS kicks in at specified ages; before that, full withdrawal from portfolio
+  const retireAgeA = i.retA, retireAgeB = i.retB;
+  const drawYrs = 50;
+  let port = realAtFull;
+  const drawData=[], drawLabels=[];
+  const drawDataNoSS=[];
+  let portNoSS = realAtFull;
+  let depleteYr=-1, depleteYrNoSS=-1;
+  for(let y=0;y<drawYrs;y++){
+    const ageA_now = retireAgeA + y;
+    const ageB_now = retireAgeB + y;
+    const ssThisYr = i.ssOn
+      ? (ageA_now>=i.ssAgeA?i.ssAnnA:0)+(ageB_now>=i.ssAgeB?i.ssAnnB:0)
+      : 0;
+    const baristaThisYr = i.brOn ? i.brInc : 0;
+    const netDraw = Math.max(0, i.expenses - ssThisYr - baristaThisYr);
+    const netDrawNoSS = Math.max(0, i.expenses - baristaThisYr);
+    drawLabels.push(`Age ${ageA_now}`);
+    drawData.push(depleteYr>=0 ? 0 : +port.toFixed(0));
+    drawDataNoSS.push(depleteYrNoSS>=0 ? 0 : +portNoSS.toFixed(0));
+    port = port*(1+i.realPost) - netDraw;
+    portNoSS = portNoSS*(1+i.realPost) - netDrawNoSS;
+    if(port<=0 && depleteYr<0) depleteYr=y;
+    if(portNoSS<=0 && depleteYrNoSS<0) depleteYrNoSS=y;
+    port=Math.max(0,port);
+    portNoSS=Math.max(0,portNoSS);
+  }
+  const noteEl=document.getElementById('drawdownNote');
+  const ssNote = i.ssOn&&ssAnnual>0 ? ` SS (${fmt(ssAnnual)}/yr) kicks in at age A:${i.ssAgeA}/B:${i.ssAgeB}.` : '';
+  if(depleteYr<0){
+    noteEl.textContent=`Portfolio is projected to last the full 50-year simulation.${ssNote}`;
+  } else {
+    noteEl.textContent=`⚠️ Portfolio depletes after ~${depleteYr} years (age ${retireAgeA+depleteYr}).${ssNote} Reduce spending or delay retirement to extend.`;
+  }
+  const drawDatasets=[{label:'Portfolio Balance',data:drawData,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.3,pointRadius:0,borderWidth:2}];
+  if(i.ssOn && ssAnnual>0){
+    drawDatasets.push({label:'Without Social Security',data:drawDataNoSS,borderColor:'#f43f5e',backgroundColor:'transparent',borderDash:[5,4],tension:.3,pointRadius:0,borderWidth:1.5});
+  }
+  dc('drawdownChart');
+  CH['drawdownChart']=new Chart(document.getElementById('drawdownChart').getContext('2d'),{
+    type:'line',data:{labels:drawLabels,datasets:drawDatasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
+              y:{min:0,ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
   });
 }
 
@@ -1331,6 +1442,31 @@ function renderMathPanel(i,fireNum,coastNum){
   }).join('');
 }
 
+// ── URL state ─────────────────────────────────────────────────
+function saveState(){
+  try{
+    const s={};
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{
+      if(el.type==='checkbox') s[el.id]=el.checked;
+      else if(el.type!=='range') s[el.id]=el.value;
+    });
+    history.replaceState(null,'','#'+btoa(JSON.stringify(s)));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    if(!location.hash||location.hash.length<4) return false;
+    const s=JSON.parse(atob(location.hash.slice(1)));
+    Object.entries(s).forEach(([id,val])=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      if(el.type==='checkbox'){el.checked=val;const bd=el.closest('.ts')?.querySelector('.ts-body');if(bd)bd.style.display=val?'':'none';}
+      else if(el.type!=='range') el.value=val;
+    });
+    return true;
+  }catch(e){return false;}
+}
+loadState();
 calc();
 
 // ── Tooltips ─────────────────────────────────────────────────
