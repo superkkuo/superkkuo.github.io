@@ -37,6 +37,9 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .htag{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:var(--rfl);border:1px solid rgba(255,255,255,.1);color:var(--s300);background:rgba(255,255,255,.05);letter-spacing:.03em;}
 .nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:var(--rsm);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
 .nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white);}
+.nav-select{background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid rgba(255,255,255,.2);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 30px 7px 12px;border-radius:var(--rsm);cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;width:auto;max-width:160px;}
+.nav-select:hover{background-color:rgba(255,255,255,.12);color:var(--white);}
+.nav-select option{background:#1e293b;color:#e2e8f0;}
 .hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
 
 /* LAYOUT */
@@ -257,6 +260,7 @@ tr.ms-row td:first-child{font-weight:700;color:var(--cy6);}
   .hdr-tags{display:none;}
   .hdr-actions{margin-top:0;gap:6px;}
   .nav-btn{font-size:.67rem;padding:5px 9px;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
   .math-btn{font-size:.7rem;padding:6px 11px;}
   .layout{grid-template-columns:1fr;min-height:unset;}
   .sb{position:static;height:auto;max-height:none;padding:15px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
@@ -298,7 +302,7 @@ tr.ms-row td:first-child{font-weight:700;color:var(--cy6);}
   <div class="hdr-in">
     <div>
       <h1>🎓 529 &amp; <span>College Savings</span> Calculator</h1>
-      <div class="hdr-tags">
+      <div class="hdr-tags" style="display:none">
         <span class="htag">Multiple Children</span>
         <span class="htag">Compound Growth</span>
         <span class="htag">College Cost Projection</span>
@@ -307,9 +311,12 @@ tr.ms-row td:first-child{font-weight:700;color:var(--cy6);}
       </div>
     </div>
     <div class="hdr-actions">
-      <a href="index.html" class="nav-btn">🔥 Retirement →</a>
-      <a href="mortgage_calculator.html" class="nav-btn">🏡 Mortgage →</a>
-      <a href="interest_calculator.html" class="nav-btn">💰 Interest →</a>
+      <select class="nav-select" onchange="if(this.value)window.location=this.value">
+        <option value="college_calculator.html" selected>🎓 529 College</option>
+        <option value="mortgage_calculator.html">🏡 Mortgage</option>
+        <option value="index.html">🔥 Retirement</option>
+        <option value="interest_calculator.html">💰 Interest</option>
+      </select>
       <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
     </div>
   </div>
@@ -462,7 +469,7 @@ const CH = {};
 
 // ── Children state ────────────────────────────────────────────
 let children = [
-  {name:'Child 1', age:5, collegeAge:18, balance:15000, monthly:500}
+  {name:'Child 1', age:5, collegeAge:18, balance:15000, monthly:500, stopAge:18, scholarship:0}
 ];
 
 function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
@@ -497,12 +504,35 @@ function renderChildren(){
         <div class="iw has-pre"><span class="pre">$</span>
           <input type="number" value="${c.monthly}" min="0" step="50"
             oninput="updateChild(${idx},'monthly',+this.value)"></div></div>
+      <div class="r2">
+        <div class="ig">
+          <label>Stop Contributions <span style="color:var(--n600);font-size:.63rem">(age)</span></label>
+          <div class="iw">
+            <input type="number" value="${c.stopAge ?? c.collegeAge}" min="${c.age}" max="${c.collegeAge}" step="1"
+              onchange="updateStopAge(${idx},this.value)"
+              onblur="updateStopAge(${idx},this.value)">
+          </div>
+        </div>
+        <div class="ig" style="display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:2px">
+          ${(c.stopAge ?? c.collegeAge) < c.collegeAge
+            ? `<span style="font-size:.67rem;font-weight:700;color:${col}">⏸ Coast ${c.collegeAge-(c.stopAge??c.collegeAge)} yr${c.collegeAge-(c.stopAge??c.collegeAge)!==1?'s':''}</span>
+               <span style="font-size:.65rem;color:var(--n600)">Contrib ${Math.max(0,(c.stopAge??c.collegeAge)-c.age)} yrs, then grow</span>`
+            : `<span style="font-size:.67rem;color:var(--n600)">Contributing full</span>
+               <span style="font-size:.65rem;color:var(--n600)">${Math.max(0,c.collegeAge-c.age)} yrs until college</span>`}
+        </div>
+      </div>
+      <div class="ig">
+        <label>Scholarships / Gifts <span style="color:var(--n600);font-size:.63rem">(reduces target)</span></label>
+        <div class="iw has-pre"><span class="pre">$</span>
+          <input type="number" value="${c.scholarship||0}" min="0" step="1000" placeholder="0"
+            oninput="updateScholarship(${idx},this.value)"></div>
+      </div>
     </div>`;
   }).join('');
 }
 
 function addChild(){
-  children.push({name:`Child ${children.length+1}`, age:0, collegeAge:18, balance:0, monthly:300});
+  children.push({name:`Child ${children.length+1}`, age:0, collegeAge:18, balance:0, monthly:300, stopAge:18, scholarship:0});
   renderChildren();
   calc();
 }
@@ -515,6 +545,18 @@ function removeChild(idx){
 
 function updateChild(idx, field, val){
   children[idx][field] = val;
+  calc();
+}
+
+function updateStopAge(idx, val){
+  const c = children[idx];
+  children[idx].stopAge = Math.max(c.age, Math.min(c.collegeAge, +val || c.collegeAge));
+  renderChildren();
+  calc();
+}
+
+function updateScholarship(idx, val){
+  children[idx].scholarship = Math.max(0, +val||0);
   calc();
 }
 
@@ -572,6 +614,16 @@ function requiredPmt(fv, pv, annRate, months){
   return (fv - pv*g)*r/(g-1);
 }
 
+// PMT needed when contributions stop early and balance coasts to target
+function requiredPmtWithStop(target, pv, annRate, contribMonths, coastMonths){
+  if(contribMonths <= 0) return 0; // already in coast/no-contrib phase
+  const r = annRate/12;
+  // Discount target back through the coast period to find the required balance at stop
+  const gCoast = coastMonths > 0 ? Math.pow(1+r, coastMonths) : 1;
+  const targetAtStop = r === 0 ? target : target / gCoast;
+  return requiredPmt(targetAtStop, pv, annRate, contribMonths);
+}
+
 function futureCostTotal(annualCostToday, inflRate, yearsUntil, numYears){
   let total=0;
   for(let y=0;y<numYears;y++) total += annualCostToday * Math.pow(1+inflRate, yearsUntil+y);
@@ -579,23 +631,36 @@ function futureCostTotal(annualCostToday, inflRate, yearsUntil, numYears){
 }
 
 function projectChild(child, annReturn, contribInc){
+  const stopAge = Math.min(child.stopAge ?? child.collegeAge, child.collegeAge);
+  const contribYrs = Math.max(0, stopAge - child.age);
+  const coastYrs = Math.max(0, child.yearsLeft - contribYrs);
   let bal = child.balance;
   let mo = child.monthly;
-  for(let y=0;y<child.yearsLeft;y++){
+  // Phase 1: contribute
+  for(let y=0; y<contribYrs; y++){
     if(y>0) mo *= (1+contribInc);
     bal = fvWithContribs(bal, annReturn, 12, mo);
   }
+  // Phase 2: coast (no contributions, balance grows on its own)
+  if(coastYrs > 0) bal = fvWithContribs(bal, annReturn, coastYrs*12, 0);
   return bal;
 }
 
 function buildYearPts(child, annReturn, contribInc){
+  const stopAge = Math.min(child.stopAge ?? child.collegeAge, child.collegeAge);
+  const contribYrs = Math.max(0, stopAge - child.age);
   const pts = [];
   let bal = child.balance, mo = child.monthly;
-  for(let y=0;y<=child.yearsLeft;y++){
-    pts.push({yr:y, age:child.age+y, bal:+bal.toFixed(0)});
-    if(y<child.yearsLeft){
-      if(y>0) mo *= (1+contribInc);
-      bal = fvWithContribs(bal, annReturn, 12, mo);
+  for(let y=0; y<=child.yearsLeft; y++){
+    const coasting = y >= contribYrs;
+    pts.push({yr:y, age:child.age+y, bal:+bal.toFixed(0), coasting});
+    if(y < child.yearsLeft){
+      if(!coasting){
+        if(y>0) mo *= (1+contribInc);
+        bal = fvWithContribs(bal, annReturn, 12, mo);
+      } else {
+        bal = fvWithContribs(bal, annReturn, 12, 0);
+      }
     }
   }
   return pts;
@@ -618,12 +683,18 @@ function getInputs(){
 
   const childInputs = children.map(c => {
     const yearsLeft = Math.max(0, c.collegeAge - c.age);
+    const stopAge = Math.min(c.stopAge ?? c.collegeAge, c.collegeAge);
+    const contribYrs = Math.max(0, stopAge - c.age);
+    const coastYrs = Math.max(0, yearsLeft - contribYrs);
+    const contribMonths = contribYrs * 12;
+    const coastMonths = coastYrs * 12;
     const proj = projectChild({...c, yearsLeft}, annReturn, contribInc);
     const totalCost = futureCostTotal(annualCost, collegeInfl, yearsLeft, collegeYrs);
-    const target = totalCost * fundingPct;
+    const scholarship = c.scholarship || 0;
+    const target = Math.max(0, totalCost * fundingPct - scholarship);
     const funded = target>0 ? Math.min(1, proj/target) : 1;
-    const reqMo = Math.max(0, requiredPmt(target, c.balance, annReturn, yearsLeft*12));
-    return {...c, yearsLeft, proj529:proj, totalFutureCost:totalCost, target, funded, reqMo, gap:target-proj};
+    const reqMo = Math.max(0, requiredPmtWithStop(target, c.balance, annReturn, contribMonths, coastMonths));
+    return {...c, yearsLeft, contribYrs, coastYrs, scholarship, proj529:proj, totalFutureCost:totalCost, target, funded, reqMo, gap:target-proj};
   });
 
   const totalProj    = childInputs.reduce((s,c)=>s+c.proj529, 0);
@@ -665,6 +736,7 @@ function calc(){
   doContrib(i);
   doTax(i);
   doMath(i);
+  saveState();
 }
 
 // ── GROWTH ───────────────────────────────────────────────────
@@ -697,6 +769,9 @@ function doGrowth(i){
       const progW = Math.min(100,c.funded*100);
       const progCol = progW>=100?'#10b981':progW>=75?col:progW>=50?'#f59e0b':'#f43f5e';
       const yearsText = c.yearsLeft===0?'Starting now':`${c.yearsLeft} yrs away`;
+      const coastText = c.coastYrs>0
+        ? `⏸ Contrib ${c.contribYrs} yr${c.contribYrs!==1?'s':''}, coast ${c.coastYrs}`
+        : `${c.yearsLeft} yrs away · Age ${c.collegeAge}`;
       return `<div class="child-card">
         <span class="cc-dot" style="background:${col}"></span>
         <span class="cc-name">${escH(c.name)}</span>
@@ -704,7 +779,7 @@ function doGrowth(i){
           <span class="cc-stat">Balance <strong>${fmt(c.proj529)}</strong></span>
           <span class="cc-stat">Target <strong>${fmt(c.target)}</strong></span>
           <span class="cc-stat">Gap <strong style="color:${c.gap>0?'var(--ro6)':'var(--em6)'}">${c.gap>0?fmt(c.gap):'✓'}</strong></span>
-          <span class="cc-stat">${yearsText} · Age ${c.collegeAge}</span>
+          <span class="cc-stat" style="color:${c.coastYrs>0?col:'inherit'}">${coastText}</span>
         </div>
         <div class="cc-prog-wrap">
           <div class="cc-prog"><div class="cc-prog-bar" style="width:${progW}%;background:${progCol}"></div></div>
@@ -714,16 +789,30 @@ function doGrowth(i){
     }).join('')
   }</div>`;
 
-  // Chart — one line per child + target dashes
+  // Chart — one line per child (solid=contrib, dashed=coast) + target dashes
   const maxYrs = Math.max(1, ...i.childInputs.map(c=>c.yearsLeft));
   const labels = Array.from({length:maxYrs+1},(_,y)=>`Yr ${y}`);
   const datasets = [];
   i.childInputs.forEach((c,idx)=>{
     const col = CHILD_COLORS[idx%CHILD_COLORS.length];
     const pts = buildYearPts({...c}, i.annReturn, i.contribInc);
-    const data = Array(maxYrs+1).fill(null);
-    pts.forEach(p=>{ data[p.yr] = p.bal; });
-    datasets.push({label:c.name,data,borderColor:col,backgroundColor:col+'20',fill:false,tension:.4,pointRadius:2,borderWidth:2.5,spanGaps:false});
+    const contribData = Array(maxYrs+1).fill(null);
+    const coastData = Array(maxYrs+1).fill(null);
+    pts.forEach((p,pi)=>{
+      if(!p.coasting){
+        contribData[p.yr] = p.bal;
+        // bridge point: if next point is coasting, mirror into coast data so lines connect
+        if(pts[pi+1]?.coasting) coastData[p.yr] = p.bal;
+      } else {
+        coastData[p.yr] = p.bal;
+      }
+    });
+    // Contribution phase — solid
+    datasets.push({label:c.name,data:contribData,borderColor:col,backgroundColor:col+'18',fill:false,tension:.4,pointRadius:2,borderWidth:2.5,spanGaps:false});
+    // Coast phase — dashed (only if there's a coast period)
+    if(c.coastYrs>0){
+      datasets.push({label:c.name+' (coasting)',data:coastData,borderColor:col,backgroundColor:'transparent',fill:false,tension:.4,pointRadius:2,borderWidth:2,borderDash:[7,4],spanGaps:false});
+    }
     // Dashed target line for this child
     const tdata = Array(maxYrs+1).fill(null);
     for(let y=0;y<=c.yearsLeft;y++) tdata[y]=c.target;
@@ -733,7 +822,7 @@ function doGrowth(i){
   CH['growthChart']=new Chart(document.getElementById('growthChart').getContext('2d'),{
     type:'line',data:{labels,datasets},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10},filter:l=>!l.text.includes('Target')}}},
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10},filter:l=>!l.text.includes('Target')&&!l.text.includes('coasting')}}},
       scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
               y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
   });
@@ -803,7 +892,8 @@ function doCosts(i){
         <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:.73rem;color:var(--n600);margin-bottom:8px;">
           <span>Annual at start: <strong style="color:var(--n900);font-family:var(--mono)">${fmt(annAtStart)}</strong></span>
           <span>Total ${i.collegeYrs}-yr: <strong style="color:var(--ro6);font-family:var(--mono)">${fmt(c.totalFutureCost)}</strong></span>
-          <span>Target (${(i.fundingPct*100).toFixed(0)}%): <strong style="color:var(--n900);font-family:var(--mono)">${fmt(c.target)}</strong></span>
+          ${c.scholarship>0?`<span>Scholarship/Gift: <strong style="color:var(--em6);font-family:var(--mono)">−${fmt(c.scholarship)}</strong></span>`:''}
+          <span>Target (${(i.fundingPct*100).toFixed(0)}%${c.scholarship>0?' − gift':''}): <strong style="color:var(--n900);font-family:var(--mono)">${fmt(c.target)}</strong></span>
           <span>529 projected: <strong style="color:${col};font-family:var(--mono)">${fmt(c.proj529)}</strong></span>
         </div>
         <div style="background:var(--s200);border-radius:var(--rfl);height:7px;overflow:hidden;">
@@ -842,22 +932,26 @@ function doContrib(i){
   document.getElementById('contribDetail').innerHTML = `
     <div class="data-grid">
       <div class="data-row header" style="grid-template-columns:80px 1fr 90px 90px 80px">
-        <span>Child</span><span>Progress</span><span>Current</span><span>Required</span><span>Gap</span>
+        <span>Child</span><span>Progress</span><span>Current</span><span>Required*</span><span>Gap</span>
       </div>
       ${i.childInputs.map((c,idx)=>{
         const col = CHILD_COLORS[idx%CHILD_COLORS.length];
         const progW = Math.min(100, c.funded*100);
         const progCol = progW>=100?'#10b981':progW>=75?col:progW>=50?'#f59e0b':'#f43f5e';
         const gap = c.reqMo - c.monthly;
+        const coastNote = c.coastYrs>0
+          ? `<div style="font-size:.62rem;color:${col};margin-top:2px;font-weight:600">⏸ Contrib ${c.contribYrs} yr${c.contribYrs!==1?'s':''} → coast ${c.coastYrs} yr${c.coastYrs!==1?'s':''}</div>`
+          : '';
         return `<div class="data-row${c.monthly>=c.reqMo?' current':''}" style="grid-template-columns:80px 1fr 90px 90px 80px;${c.monthly>=c.reqMo?`border-color:${col}`:''}">
-          <span style="font-weight:700;color:${col};font-size:.73rem">${escH(c.name)}</span>
+          <span style="font-weight:700;color:${col};font-size:.73rem">${escH(c.name)}${coastNote}</span>
           <span><div class="bar-wrap"><div class="bar-fill" style="width:${progW}%;background:${progCol}"></div></div><span style="font-size:.65rem;color:${progCol}">${progW.toFixed(0)}%</span></span>
           <span style="font-family:var(--mono);font-weight:600">${fmtM(c.monthly)}</span>
           <span style="font-family:var(--mono);color:var(--n700)">${fmtM(c.reqMo)}</span>
           <span style="font-family:var(--mono);font-weight:700;color:${gap<=0?'var(--em6)':'var(--ro6)'}">${gap<=0?'✓ '+fmtM(Math.abs(gap)):'+'+fmtM(gap)}</span>
         </div>`;
       }).join('')}
-    </div>`;
+    </div>
+    <div style="font-size:.67rem;color:var(--n600);padding:8px 4px 0">* Required amount is during contribution phase only. Coast children show the monthly payment needed before stopping.</div>`;
 
   // Chart: combined balance at different total monthly amounts
   const maxYrs = Math.max(1,...i.childInputs.map(c=>c.yearsLeft));
@@ -969,10 +1063,14 @@ function doMath(i){
     <div class="mf-row"><span class="mf-lbl">Monthly rate r:</span><span class="mf-eq">${(i.annReturn/12).toFixed(6)}</span></div>
     <div class="mf-row"><span class="mf-lbl">Annual return:</span><span class="mf-eq">${(i.annReturn*100).toFixed(2)}%</span></div>
     <div class="mf-div"></div>
-    ${i.childInputs.map((c,idx)=>`
-    <div class="mf-row"><span class="mf-lbl" style="color:${CHILD_COLORS[idx%CHILD_COLORS.length]}">${escH(c.name)}:</span><span class="mf-eq mf-hl">${fmt(c.proj529)}</span></div>
-    <div class="mf-row"><span class="mf-lbl">  PV / PMT / n:</span><span class="mf-eq">${fmt(c.balance)} / ${fmtM(c.monthly)} / ${c.yearsLeft*12}mo</span></div>
-    `).join('')}
+    ${i.childInputs.map((c,idx)=>{
+      const coastInfo = c.coastYrs>0
+        ? ` (contrib ${c.contribYrs}yr → coast ${c.coastYrs}yr)`
+        : ` (${c.yearsLeft} yrs straight)`;
+      return `
+    <div class="mf-row"><span class="mf-lbl" style="color:${CHILD_COLORS[idx%CHILD_COLORS.length]}">${escH(c.name)}${coastInfo}:</span><span class="mf-eq mf-hl">${fmt(c.proj529)}</span></div>
+    <div class="mf-row"><span class="mf-lbl">  PV / PMT / n:</span><span class="mf-eq">${fmt(c.balance)} / ${fmtM(c.monthly)} / ${c.contribYrs*12}mo contrib${c.coastYrs>0?` + ${c.coastYrs*12}mo coast`:''}</span></div>
+    `;}).join('')}
   </div>`;
 
   h+=`<div class="mf-box">
@@ -990,27 +1088,32 @@ function doMath(i){
   // Year-by-year table per child
   i.childInputs.forEach((c,idx)=>{
     const col = CHILD_COLORS[idx%CHILD_COLORS.length];
+    const coastLabel = c.coastYrs>0 ? ` · Contrib ${c.contribYrs} yr${c.contribYrs!==1?'s':''}, coast ${c.coastYrs} yr${c.coastYrs!==1?'s':''}` : '';
     h+=`<div style="font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:${col};margin:14px 0 8px;">
-      📊 ${escH(c.name)} — Year-by-Year (${c.yearsLeft} years)
+      📊 ${escH(c.name)} — Year-by-Year (${c.yearsLeft} years${coastLabel})
     </div>
     <div class="mp-tbl-wrap"><table class="mp-tbl"><thead><tr>
       <th style="text-align:left">Year</th><th>Age</th><th>Start Bal</th><th>Contributions</th><th>Growth</th><th>End Bal</th><th>College Cost</th><th>Notes</th>
     </tr></thead><tbody>`;
     let bal=c.balance, mo=c.monthly;
     for(let y=0;y<c.yearsLeft;y++){
-      if(y>0) mo*=(1+i.contribInc);
+      const coasting = y >= c.contribYrs;
+      if(!coasting && y>0) mo*=(1+i.contribInc);
+      const effectiveMo = coasting ? 0 : mo;
       const start=bal;
-      const end=fvWithContribs(bal,i.annReturn,12,mo);
-      const growth=end-start-mo*12;
+      const end=fvWithContribs(bal,i.annReturn,12,effectiveMo);
+      const growth=end-start-effectiveMo*12;
       const collegeCost=i.annualCost*Math.pow(1+i.collegeInfl,y);
       bal=end;
-      h+=`<tr class="${y===c.yearsLeft-1?'ms-row':''}">
+      const rowNote = y===c.yearsLeft-1 ? '→ College!' : coasting ? '⏸ Coasting' : (y===c.contribYrs-1 ? '⏸ Last contrib yr' : '');
+      h+=`<tr class="${y===c.yearsLeft-1?'ms-row':''}" style="${coasting?`opacity:.75;background:rgba(6,182,212,.03)`:''}">
         <td class="tl">Yr ${y+1}</td><td>${c.age+y}</td>
-        <td>${fmt(start)}</td><td class="pos">+${fmt(mo*12)}</td>
+        <td>${fmt(start)}</td>
+        <td ${coasting?'style="color:var(--n600)"':' class="pos"'}>${coasting?'—':'+'+fmt(effectiveMo*12)}</td>
         <td class="pos">+${fmt(Math.round(growth))}</td>
         <td class="bld">${fmt(end)}</td>
         <td style="color:var(--ro6)">${fmt(Math.round(collegeCost))}</td>
-        <td class="note">${y===c.yearsLeft-1?'→ College!':''}</td>
+        <td class="note">${rowNote}</td>
       </tr>`;
     }
     h+=`</tbody></table></div>`;
@@ -1019,7 +1122,30 @@ function doMath(i){
   document.getElementById('mathBody').innerHTML=h;
 }
 
+// ── URL state ─────────────────────────────────────────────────
+function saveState(){
+  try{
+    const s={};
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.type!=='range')s[el.id]=el.value;});
+    s['__children']=JSON.stringify(children);
+    history.replaceState(null,'','#'+btoa(JSON.stringify(s)));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    if(!location.hash||location.hash.length<4) return false;
+    const s=JSON.parse(atob(location.hash.slice(1)));
+    if(s['__children']){children=JSON.parse(s['__children']);}
+    Object.entries(s).forEach(([id,val])=>{
+      if(id==='__children') return;
+      const el=document.getElementById(id);
+      if(el&&el.type!=='range') el.value=val;
+    });
+    return true;
+  }catch(e){return false;}
+}
 // ── Init ──────────────────────────────────────────────────────
+loadState();
 renderChildren();
 calc();
 

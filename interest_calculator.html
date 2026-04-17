@@ -37,6 +37,9 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .htag{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:var(--rfl);border:1px solid rgba(255,255,255,.1);color:var(--s300);background:rgba(255,255,255,.05);letter-spacing:.03em;}
 .nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:var(--rsm);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
 .nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white);}
+.nav-select{background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid rgba(255,255,255,.2);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 30px 7px 12px;border-radius:var(--rsm);cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;width:auto;max-width:160px;}
+.nav-select:hover{background-color:rgba(255,255,255,.12);color:var(--white);}
+.nav-select option{background:#1e293b;color:#e2e8f0;}
 .hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
 .math-btn{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:#93c5fd;font-size:.74rem;font-weight:600;padding:6px 14px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;letter-spacing:.01em;white-space:nowrap;}
 .math-btn:hover{background:rgba(59,130,246,.3);color:var(--white);}
@@ -219,6 +222,7 @@ tr.hi td{background:rgba(59,130,246,.04);}
   .hdr-tags{display:none;}
   .hdr-actions{flex-shrink:1;width:100%;margin-top:0;gap:5px;flex-wrap:wrap;}
   .nav-btn{font-size:.67rem;padding:5px 9px;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
   .math-btn{font-size:.7rem;padding:6px 12px;margin-left:auto;}
 
   /* Layout */
@@ -302,7 +306,7 @@ tr.hi td{background:rgba(59,130,246,.04);}
   <div class="hdr-in">
     <div>
       <h1>💰 <span>Compound</span> & Simple Interest</h1>
-      <div class="hdr-tags">
+      <div class="hdr-tags" style="display:none">
         <span class="htag">Investment Growth</span>
         <span class="htag">Power of Compounding</span>
         <span class="htag">Rate Scenarios</span>
@@ -310,9 +314,12 @@ tr.hi td{background:rgba(59,130,246,.04);}
       </div>
     </div>
     <div class="hdr-actions">
-      <a href="mortgage_calculator.html" class="nav-btn">🏡 Mortgage →</a>
-      <a href="index.html" class="nav-btn">🔥 Retirement →</a>
-      <a href="college_calculator.html" class="nav-btn">🎓 529 →</a>
+      <select class="nav-select" onchange="if(this.value)window.location=this.value">
+        <option value="interest_calculator.html" selected>💰 Interest</option>
+        <option value="mortgage_calculator.html">🏡 Mortgage</option>
+        <option value="index.html">🔥 Retirement</option>
+        <option value="college_calculator.html">🎓 529 College</option>
+      </select>
       <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
     </div>
   </div>
@@ -402,6 +409,7 @@ tr.hi td{background:rgba(59,130,246,.04);}
     <button class="tab" onclick="switchTab(this,'compare')">⚖️ vs Simple</button>
     <button class="tab" onclick="switchTab(this,'scenarios')">🎯 Scenarios</button>
     <button class="tab" onclick="switchTab(this,'schedule')">📅 Schedule</button>
+    <button class="tab" onclick="switchTab(this,'payoff')">💳 Loan Payoff</button>
   </div>
 
   <!-- GROWTH TAB -->
@@ -447,6 +455,29 @@ tr.hi td{background:rgba(59,130,246,.04);}
       <table id="schedTable"></table>
     </div>
   </div>
+
+  <!-- LOAN PAYOFF TAB -->
+  <div id="tab-payoff" class="tab-panel">
+    <div class="ib"><strong>Loan Payoff:</strong> Enter any debt — mortgage, student loan, auto loan, credit card — and see how long it takes to pay off, total interest paid, and how extra payments dramatically shorten payoff time.</div>
+    <div class="r2" style="margin-bottom:12px;gap:10px">
+      <div class="ig"><label>Loan Balance</label>
+        <div class="iw has-pre"><span class="pre">$</span><input type="number" id="loanBal" value="25000" min="100" step="1000" oninput="doPayoff()"></div></div>
+      <div class="ig"><label>Annual Interest Rate</label>
+        <div class="iw has-suf"><input type="number" id="loanRate" value="6.5" min="0.1" max="30" step="0.25" oninput="doPayoff()"><span class="suf">%</span></div></div>
+      <div class="ig"><label>Monthly Payment</label>
+        <div class="iw has-pre"><span class="pre">$</span><input type="number" id="loanPmt" value="400" min="1" step="25" oninput="doPayoff()"></div></div>
+      <div class="ig"><label>Extra Monthly Payment</label>
+        <div class="iw has-pre"><span class="pre">$</span><input type="number" id="loanExtra" value="" min="0" step="25" placeholder="0" oninput="doPayoff()"></div></div>
+    </div>
+    <div id="payoffBanner" class="bn info"></div>
+    <div class="heroes3" id="payoffHeroes"></div>
+    <div class="sh">Balance Over Time</div>
+    <div class="cw" style="height:230px"><canvas id="payoffChart"></canvas></div>
+    <div class="sh">Payoff Summary</div>
+    <div class="stats" id="payoffStats"></div>
+    <div class="sh">Amortization Schedule</div>
+    <div class="sched-wrap"><table id="payoffTable"></table></div>
+  </div>
 </main>
 </div>
 
@@ -484,6 +515,7 @@ function switchTab(btn,id){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
+  if(id==='payoff') doPayoff();
 }
 
 // ── Core math ────────────────────────────────────────────────
@@ -566,6 +598,7 @@ function calc(){
   doScenarios(i);
   doSchedule(C, S, i);
   doMath(C, S, i, ioi, afterTax, realValue);
+  saveState();
 }
 
 // ── Sidebar summary ──────────────────────────────────────────
@@ -945,7 +978,131 @@ function doMath(C, S, i, ioi, afterTax, realValue){
 </div>`;
 }
 
+// ── Loan Payoff tab ──────────────────────────────────────────
+function doPayoff(){
+  const bal    = +document.getElementById('loanBal').value  || 25000;
+  const apr    = +document.getElementById('loanRate').value/100 || 0.065;
+  const pmt    = +document.getElementById('loanPmt').value  || 400;
+  const extra  = +(document.getElementById('loanExtra').value) || 0;
+  const r      = apr/12;
+
+  // Minimum payment check
+  const minPmt = r>0 ? bal*r : 1; // interest-only
+  const bn = document.getElementById('payoffBanner');
+
+  if(pmt <= minPmt && r > 0){
+    bn.className='bn warn';
+    bn.innerHTML=`⚠️ Monthly payment of ${fmt(pmt)} doesn't cover the monthly interest of ${fmt(minPmt)}. Increase payment to make progress on the balance.`;
+    document.getElementById('payoffHeroes').innerHTML='';
+    document.getElementById('payoffStats').innerHTML='';
+    dc('payoffChart');
+    document.getElementById('payoffTable').innerHTML='';
+    return;
+  }
+
+  // Simulate payoff with and without extra
+  function simulate(extraMo){
+    let b=bal, month=0, totalInt=0;
+    const rows=[];
+    while(b>0 && month<600){
+      month++;
+      const interest=b*r;
+      const principal=Math.min(pmt+extraMo-interest, b);
+      totalInt+=interest;
+      b=Math.max(0,b-principal);
+      if(month<=360) rows.push({month,interest:+interest.toFixed(2),principal:+principal.toFixed(2),balance:+b.toFixed(2),cumInt:+totalInt.toFixed(2)});
+    }
+    return {months:month, totalInt, rows};
+  }
+
+  const base=simulate(0);
+  const withExtra=extra>0?simulate(extra):base;
+
+  const mosSaved=base.months-withExtra.months;
+  const intSaved=base.totalInt-withExtra.totalInt;
+
+  bn.className='bn ok';
+  if(extra>0){
+    bn.innerHTML=`💡 Paying an extra ${fmt(extra)}/mo cuts <strong>${mosSaved} months</strong> off your payoff timeline and saves <strong>${fmt(intSaved)}</strong> in interest.`;
+  } else {
+    const yrs=Math.floor(base.months/12), mos=base.months%12;
+    bn.innerHTML=`📅 Payoff in <strong>${yrs} yr${yrs!==1?'s':''} ${mos>0?mos+' mo':''}</strong> with total interest of <strong>${fmt(base.totalInt)}</strong>. Add an extra monthly payment to see the savings.`;
+  }
+
+  const activeResult = withExtra;
+  const yrs=Math.floor(activeResult.months/12), mos=activeResult.months%12;
+  document.getElementById('payoffHeroes').innerHTML=`
+    <div class="hero hbl" data-tip="Total loan balance being paid off.">
+      <div class="hl">Loan Balance</div><div class="hv">${fmt(bal)}</div><div class="hs">${(apr*100).toFixed(2)}% APR</div></div>
+    <div class="hero hro" data-tip="Total interest paid over the life of the loan.">
+      <div class="hl">Total Interest</div><div class="hv">${fmt(activeResult.totalInt)}</div>
+      <div class="hs">${extra>0?`Saved ${fmt(intSaved)} with extra`:`${(activeResult.totalInt/bal*100).toFixed(0)}% of principal`}</div></div>
+    <div class="hero ${mosSaved>0?'hgr':'hcy'}" data-tip="Time until fully paid off.">
+      <div class="hl">Payoff Timeline</div><div class="hv">${yrs>0?yrs+'yr ':''} ${mos>0?mos+'mo':''}</div>
+      <div class="hs">${mosSaved>0?`${mosSaved} mo sooner · ${fmt(intSaved)} saved`:`${activeResult.months} months total`}</div></div>`;
+
+  // Chart: balance over time, with vs without extra
+  const maxMos=base.months;
+  const balData=Array(maxMos).fill(null);
+  const balDataExtra=extra>0?Array(maxMos).fill(null):null;
+  for(let m=0;m<base.rows.length;m++) balData[m]=base.rows[m].balance;
+  if(balDataExtra){for(let m=0;m<withExtra.rows.length;m++) balDataExtra[m]=withExtra.rows[m].balance;}
+  const moLabels=base.rows.map((r,idx)=>(idx+1)%12===0?`Yr ${Math.round((idx+1)/12)}`:'');
+  const datasets=[{label:`Balance (${fmt(pmt)}/mo)`,data:balData,borderColor:'#f43f5e',backgroundColor:'rgba(244,63,94,.08)',fill:true,tension:.3,pointRadius:0,borderWidth:2}];
+  if(balDataExtra) datasets.push({label:`With +${fmt(extra)}/mo extra`,data:balDataExtra,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:.3,pointRadius:0,borderWidth:2});
+  dc('payoffChart');
+  CH['payoffChart']=new Chart(document.getElementById('payoffChart').getContext('2d'),{
+    type:'line',data:{labels:moLabels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
+      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12,font:{size:9.5}}},
+              y:{min:0,ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+  });
+
+  // Summary stats
+  const snap=[6,12,24,36,60,120].filter(m=>m<=base.months);
+  document.getElementById('payoffStats').innerHTML=snap.map(mo=>{
+    const row=activeResult.rows[mo-1];
+    return row?`<div class="stat"><div class="sl">Month ${mo} (Yr ${(mo/12).toFixed(1)})</div><div class="sv">${fmt(row.balance)}</div><div style="font-size:.67rem;color:var(--n600);margin-top:2px">Paid ${fmt(row.cumInt)} interest so far</div></div>`:'';
+  }).join('');
+
+  // Table (every 12 months = annual)
+  const activeRows=activeResult.rows.filter(r=>r.month%12===0||r.month===activeResult.months);
+  document.getElementById('payoffTable').innerHTML=`
+    <thead><tr><th>Month</th><th>Year</th><th>Principal</th><th>Interest</th><th>Balance</th><th>Cumul. Interest</th></tr></thead>
+    <tbody>${activeRows.map(r=>`<tr>
+      <td>${r.month}</td><td>${(r.month/12).toFixed(1)}</td>
+      <td style="color:var(--em6)">${fmt(r.principal)}</td>
+      <td style="color:var(--ro6)">${fmt(r.interest)}</td>
+      <td>${fmt(r.balance)}</td>
+      <td style="color:var(--ro6)">${fmt(r.cumInt)}</td>
+    </tr>`).join('')}</tbody>`;
+}
+
+// ── URL state ─────────────────────────────────────────────────
+function saveState(){
+  try{
+    const s={};
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{if(el.type!=='range')s[el.id]=el.value;});
+    history.replaceState(null,'','#'+btoa(JSON.stringify(s)));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    if(!location.hash||location.hash.length<4) return false;
+    const s=JSON.parse(atob(location.hash.slice(1)));
+    Object.entries(s).forEach(([id,val])=>{
+      const el=document.getElementById(id);
+      if(el&&el.type!=='range') el.value=val;
+    });
+    // Sync sliders after setting number inputs
+    if(s['yearsNum']){document.getElementById('yearsSlider').value=Math.min(50,Math.max(1,+s['yearsNum']));}
+    if(s['rateNum']){document.getElementById('rateSlider').value=Math.min(30,Math.max(0.1,+s['rateNum']));}
+    return true;
+  }catch(e){return false;}
+}
 // ── Init ─────────────────────────────────────────────────────
+loadState();
 calc();
 </script>
 </body>

@@ -36,6 +36,9 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .htag{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:var(--rfl);border:1px solid rgba(255,255,255,.1);color:var(--s300);background:rgba(255,255,255,.05);letter-spacing:.03em;}
 .nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:var(--rsm);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
 .nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white);}
+.nav-select{background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid rgba(255,255,255,.2);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 30px 7px 12px;border-radius:var(--rsm);cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;width:auto;max-width:160px;}
+.nav-select:hover{background-color:rgba(255,255,255,.12);color:var(--white);}
+.nav-select option{background:#1e293b;color:#e2e8f0;}
 .hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
 
 /* LAYOUT */
@@ -282,6 +285,7 @@ tr:hover td{background:var(--s50);}
   .hdr h1{font-size:1.05rem;}
   .hdr-tags{display:none;}
   .hdr-actions{margin-top:0;gap:6px;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
   .math-btn{font-size:.7rem;padding:7px 12px;min-height:36px;}
 
   /* Layout — stack sidebar above main */
@@ -378,7 +382,7 @@ tr:hover td{background:var(--s50);}
   <div class="hdr-in">
     <div>
       <h1>🔥 Retirement &amp; <span>Coast FIRE</span> Calculator</h1>
-      <div class="hdr-tags">
+      <div class="hdr-tags" style="display:none">
         <span class="htag">Two Partners</span>
         <span class="htag">Post-Retirement Savings</span>
         <span class="htag">Home Purchase Impact</span>
@@ -389,9 +393,12 @@ tr:hover td{background:var(--s50);}
       </div>
     </div>
     <div class="hdr-actions">
-      <a href="mortgage_calculator.html" class="nav-btn">🏡 Mortgage →</a>
-      <a href="college_calculator.html" class="nav-btn">🎓 529 →</a>
-      <a href="interest_calculator.html" class="nav-btn">💰 Interest →</a>
+      <select class="nav-select" onchange="if(this.value)window.location=this.value">
+        <option value="retirement_calculator.html" selected>🔥 Retirement</option>
+        <option value="mortgage_calculator.html">🏡 Mortgage</option>
+        <option value="college_calculator.html">🎓 529 College</option>
+        <option value="interest_calculator.html">💰 Interest</option>
+      </select>
       <button class="math-btn" onclick="toggleMath()" title="Show year-by-year math breakdown">🔍 Show Math</button>
     </div>
   </div>
@@ -949,6 +956,7 @@ function calc(){
   doSWR(i,realAtFull);
   doSalary(i,fireNum,coastNum);
   renderMathPanel(i,fireNum,coastNum);
+  saveState();
 }
 
 // ── Annotation helper ─────────────────────────────────────────
@@ -1458,8 +1466,6 @@ function loadState(){
     return true;
   }catch(e){return false;}
 }
-const _retCalcOrig=calc;
-function calc(){_retCalcOrig();saveState();}
 loadState();
 calc();
 
