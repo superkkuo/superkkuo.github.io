@@ -23,8 +23,8 @@
   --sh2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100%;}
+body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;max-width:100%;}
 
 /* ── HEADER ──────────────────────────────────────────────── */
 .hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
@@ -204,8 +204,8 @@ select{cursor:pointer;padding-right:28px;background-image:url("data:image/svg+xm
   .hdr-in{flex-wrap:wrap;gap:8px;}
   .hdr h1{font-size:1.05rem;}
   .hdr-tags{display:none;}
-  .hdr-actions{margin-top:0;gap:6px;}
-  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
+  .hdr-actions{margin-top:0;gap:5px;flex-shrink:1;width:100%;flex-wrap:wrap;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;max-width:160px;}
   .layout{grid-template-columns:1fr;min-height:unset;}
   .sb{position:static;height:auto;max-height:none;padding:15px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
   input[type="number"],select{font-size:1rem !important;padding:10px 10px;}
@@ -213,8 +213,8 @@ select{cursor:pointer;padding-right:28px;background-image:url("data:image/svg+xm
   .has-suf input{padding-right:21px;}
   .ig label{font-size:.78rem;}
   .sbh{font-size:.68rem;margin:16px 0 9px;}
-  .main{padding:13px 12px 30px;}
-  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:3px 4px;width:100%;box-sizing:border-box;}
+  .main{padding:13px 12px 30px;overflow-y:visible;}
+  .tabs{overflow-x:scroll;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:3px 4px;width:100%;max-width:calc(100vw - 24px);box-sizing:border-box;}
   .tabs::-webkit-scrollbar{display:none;}
   .tab{flex:0 0 auto;padding:7px 11px;font-size:.71rem;min-height:36px;white-space:nowrap;}
   .heroes,.heroes2{grid-template-columns:1fr 1fr;gap:8px;}

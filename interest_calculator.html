@@ -24,8 +24,8 @@
   --sh2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+html{scroll-behavior:smooth;overflow-x:hidden;max-width:100%;}
+body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;max-width:100%;}
 
 /* HEADER */
 .hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
@@ -217,12 +217,12 @@ tr.hi td{background:rgba(59,130,246,.04);}
 @media(max-width:700px){
   /* Header — stack vertically so all buttons are always reachable */
   .hdr{padding:13px 15px 11px;}
-  .hdr-in{flex-direction:column;gap:8px;}
+  .hdr-in{flex-wrap:wrap;gap:8px;}
   .hdr h1{font-size:1.05rem;}
   .hdr-tags{display:none;}
   .hdr-actions{flex-shrink:1;width:100%;margin-top:0;gap:5px;flex-wrap:wrap;}
   .nav-btn{font-size:.67rem;padding:5px 9px;}
-  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;max-width:160px;}
   .math-btn{font-size:.7rem;padding:6px 12px;margin-left:auto;}
 
   /* Layout */
@@ -237,17 +237,17 @@ tr.hi td{background:rgba(59,130,246,.04);}
   .iw .pre{left:8px;font-size:.8rem;}
   .iw .suf{right:8px;font-size:.8rem;}
   .ig label{font-size:.78rem;}
-  .sbh{font-size:.67rem;margin:15px 0 8px;}
+  .sbh{font-size:.68rem;margin:16px 0 9px;}
 
   /* Slider — larger touch targets */
   input[type="range"]{height:5px;margin:9px 0 5px;}
   input[type="range"]::-webkit-slider-thumb{width:20px;height:20px;}
 
   /* Main */
-  .main{padding:13px 12px 30px;}
+  .main{padding:13px 12px 30px;overflow-y:visible;}
 
   /* Tabs — horizontally scrollable */
-  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:3px 4px;width:100%;box-sizing:border-box;}
+  .tabs{overflow-x:scroll;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:3px 4px;width:100%;max-width:calc(100vw - 24px);box-sizing:border-box;}
   .tabs::-webkit-scrollbar{display:none;}
   .tab{flex:0 0 auto;padding:7px 11px;font-size:.71rem;min-height:36px;white-space:nowrap;}
 
@@ -294,7 +294,7 @@ tr.hi td{background:rgba(59,130,246,.04);}
 
 /* Extra-small phones */
 @media(max-width:399px){
-  .heroes,.heroes3,.cmp-cards{grid-template-columns:1fr;}
+  .heroes,.heroes3,.cmp-cards{grid-template-columns:1fr;}.hero .hv{font-size:1.2rem;}
   .stats{grid-template-columns:1fr 1fr;}
   .r2{grid-template-columns:1fr;}
 }
