@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏛️ Estate Tax Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --n950:#060d1e;--n900:#0f172a;--n800:#1e293b;--n700:#334155;--n600:#475569;
+  --s400:#94a3b8;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc;
+  --white:#ffffff;
+  --bl6:#2563eb;--bl5:#3b82f6;--bl1:#dbeafe;--bl0:#eff6ff;
+  --pr6:#7c3aed;--pr5:#8b5cf6;--pr1:#ede9fe;--pr0:#faf5ff;
+  --em6:#059669;--em5:#10b981;--em1:#d1fae5;--em0:#ecfdf5;
+  --am6:#d97706;--am5:#f59e0b;--am1:#fef3c7;--am0:#fffbeb;
+  --ro6:#e11d48;--ro5:#f43f5e;--ro1:#ffe4e6;--ro0:#fff1f2;
+  --in6:#4f46e5;--in5:#6366f1;--in1:#e0e7ff;--in0:#eef2ff;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --rsm:8px;--rmd:12px;--rlg:16px;--rfl:9999px;
+  --sh1:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --sh2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── HEADER ──────────────────────────────────────────────── */
+.hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 80% at 15% 50%,rgba(139,92,246,.14),transparent),radial-gradient(ellipse 40% 60% at 85% 30%,rgba(124,58,237,.08),transparent);pointer-events:none;}
+.hdr-in{max-width:1300px;margin:0 auto;position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.hdr h1{font-size:1.4rem;font-weight:700;color:var(--white);letter-spacing:-.02em;}
+.hdr h1 span{color:var(--pr5);}
+.hdr-tags{display:none;}
+.nav-select{background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid rgba(255,255,255,.2);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 30px 7px 12px;border-radius:var(--rsm);cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;width:auto;max-width:160px;}
+.nav-select:hover{background-color:rgba(255,255,255,.12);color:var(--white);}
+.nav-select option{background:#1e293b;color:#e2e8f0;}
+.hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
+.math-btn{background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.4);color:#c4b5fd;font-size:.74rem;font-weight:600;padding:6px 14px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;letter-spacing:.01em;white-space:nowrap;}
+.math-btn:hover{background:rgba(139,92,246,.3);color:var(--white);}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 78px);}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 78px);}
+.sb::-webkit-scrollbar{width:3px;}
+.sb::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.sbh{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
+.sbh::after{content:'';flex:1;height:1px;background:var(--n800);}
+.sbh:first-child{margin-top:0;}
+
+.ig{margin-bottom:9px;}
+.ig:last-child{margin-bottom:0;}
+.ig label{display:block;font-size:.71rem;font-weight:500;color:var(--s400);margin-bottom:3px;}
+.ig label em{font-style:normal;color:var(--n600);font-size:.66rem;}
+.iw{position:relative;}
+.iw .pre,.iw .suf{position:absolute;top:50%;transform:translateY(-50%);font-size:.75rem;font-weight:600;color:var(--n600);pointer-events:none;z-index:1;}
+.iw .pre{left:9px;} .iw .suf{right:9px;}
+input[type="number"],select{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+input[type="number"]:focus,select:focus{outline:none;border-color:var(--pr5);box-shadow:0 0 0 3px rgba(139,92,246,.15);}
+input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
+.has-pre input{padding-left:19px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+select{cursor:pointer;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23475569'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:8px;}
+
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.tog-row:last-child{border-bottom:none;}
+.tog-lbl{font-size:.71rem;color:var(--s400);flex:1;padding-right:10px;line-height:1.4;}
+.tog-lbl em{display:block;font-style:normal;font-size:.63rem;color:var(--n600);margin-top:1px;}
+.ck-wrap{display:flex;align-items:center;flex-shrink:0;}
+input[type="checkbox"]{width:15px;height:15px;accent-color:var(--pr5);cursor:pointer;flex-shrink:0;}
+
+/* Calc summary box */
+.cb{background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.18);border-radius:var(--rsm);padding:9px 11px;margin-top:10px;}
+.cb-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.71rem;}
+.cb-lbl{color:var(--s400);}
+.cb-val{color:var(--white);font-weight:600;font-family:var(--mono);font-size:.72rem;}
+.cb-div{height:1px;background:rgba(139,92,246,.2);margin:5px 0;}
+.cb-tot{color:#c4b5fd;font-weight:700;}
+
+/* ── MAIN ────────────────────────────────────────────────── */
+.main{padding:18px 22px 40px;overflow-y:auto;}
+
+/* Tabs */
+.tabs{display:flex;gap:3px;background:var(--white);border:1px solid var(--s200);border-radius:var(--rfl);padding:4px;margin-bottom:18px;box-shadow:var(--sh1);}
+.tab{flex:1;padding:7px 12px;border:none;border-radius:var(--rfl);font-size:.76rem;font-weight:600;cursor:pointer;background:transparent;color:var(--n600);transition:all .16s;text-align:center;white-space:nowrap;}
+.tab:hover{color:var(--n900);}
+.tab.active{background:var(--n900);color:var(--white);box-shadow:var(--sh1);}
+.tab-panel{display:none;animation:fi .18s ease;}
+.tab-panel.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+
+/* Hero cards */
+.heroes{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px;margin-bottom:14px;}
+.heroes2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px;}
+.hero{border-radius:var(--rlg);padding:16px 14px;border:1px solid transparent;position:relative;overflow:hidden;}
+.hbl{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;}
+.hgr{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#a7f3d0;}
+.ham{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;}
+.hpu{background:linear-gradient(135deg,#faf5ff,#ede9fe);border-color:#ddd6fe;}
+.hin{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe;}
+.hro{background:linear-gradient(135deg,#fff1f2,#ffe4e6);border-color:#fda4af;}
+.hcy{background:linear-gradient(135deg,#ecfeff,#cffafe);border-color:#a5f3fc;}
+.hero .hl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:4px;}
+.hero .hv{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-bottom:3px;}
+.hbl .hv{color:var(--bl6);}
+.hgr .hv{color:var(--em6);}
+.ham .hv{color:var(--am6);}
+.hpu .hv{color:var(--pr6);}
+.hin .hv{color:var(--in6);}
+.hro .hv{color:var(--ro6);}
+.hcy .hv{color:#0e7490;}
+.hero .hs{font-size:.7rem;color:var(--n600);}
+
+/* Section heading */
+.sh{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--n600);margin:16px 0 9px;display:flex;align-items:center;gap:8px;}
+.sh::after{content:'';flex:1;height:1px;background:var(--s200);}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:13px;}
+.stat{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:10px 12px;box-shadow:var(--sh1);}
+.stat .sl{font-size:.66rem;color:var(--n600);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.stat .sv{font-size:.92rem;font-weight:700;color:var(--n900);font-family:var(--mono);}
+.stat .sv.pos{color:var(--em6);}
+.stat .sv.neg{color:var(--ro6);}
+.stat .sv.warn{color:var(--am6);}
+.stat .sv.pur{color:var(--pr6);}
+
+/* Banners */
+.bn{padding:9px 13px;border-radius:var(--rmd);font-size:.8rem;font-weight:500;margin-bottom:12px;line-height:1.5;border:1px solid;}
+.bn strong{font-weight:700;}
+.bn.ok{background:var(--em0);border-color:var(--em1);color:#065f46;}
+.bn.warn{background:var(--am0);border-color:var(--am1);color:#78350f;}
+.bn.info{background:var(--bl0);border-color:var(--bl1);color:#1e3a8a;}
+.bn.pur{background:var(--pr0);border-color:var(--pr1);color:#4c1d95;}
+
+/* Info box */
+.ib{background:var(--s50);border-left:3px solid var(--pr5);border-radius:0 var(--rsm) var(--rsm) 0;padding:9px 12px;font-size:.76rem;color:var(--n600);margin-bottom:12px;line-height:1.6;}
+.ib strong{color:var(--n900);}
+
+/* Chart wrapper */
+.cw{position:relative;height:220px;margin-bottom:6px;}
+
+/* Bracket table */
+.btbl-wrap{overflow-x:auto;margin-bottom:13px;}
+table.btbl{width:100%;border-collapse:collapse;font-size:.77rem;}
+table.btbl th{background:var(--s50);padding:7px 10px;text-align:left;font-weight:700;color:var(--n600);font-size:.63rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--s200);}
+table.btbl th.r{text-align:right;}
+table.btbl td{padding:8px 10px;border-bottom:1px solid var(--s100);font-size:.76rem;}
+table.btbl td.r{text-align:right;font-family:var(--mono);}
+table.btbl td.muted{color:var(--n600);}
+table.btbl tr:last-child td{border-bottom:none;}
+table.btbl tr.active-row td{background:rgba(139,92,246,.06);}
+table.btbl tr.active-row td:first-child{border-left:3px solid var(--pr5);padding-left:7px;}
+table.btbl tr:hover:not(.active-row) td{background:var(--s50);}
+.tbl-foot{display:flex;justify-content:flex-end;align-items:center;padding:8px 12px;font-size:.77rem;color:var(--n600);border-top:1px solid var(--s200);}
+.tbl-foot strong{color:var(--n900);font-family:var(--mono);margin-left:6px;}
+
+/* Donut chart row */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.chart-box{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:16px;box-shadow:var(--sh1);}
+.chart-box .ch{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--n600);margin-bottom:12px;}
+
+/* Waterfall chart */
+.wfall{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);overflow:hidden;margin-bottom:13px;box-shadow:var(--sh1);}
+.wf-row{display:grid;grid-template-columns:160px 1fr auto;align-items:center;gap:12px;padding:9px 13px;border-bottom:1px solid var(--s100);font-size:.77rem;}
+.wf-row:last-child{border-bottom:none;background:var(--s50);}
+.wf-lbl{font-weight:600;color:var(--n700);}
+.wf-lbl.sub{font-weight:400;color:var(--n600);padding-left:10px;}
+.wf-bar-wrap{height:9px;background:var(--s200);border-radius:4px;overflow:hidden;}
+.wf-bar{height:100%;border-radius:4px;transition:width .3s;}
+.wf-val{font-family:var(--mono);font-weight:700;font-size:.74rem;white-space:nowrap;}
+.wf-val.neg{color:var(--ro6);}
+.wf-val.pos{color:var(--em6);}
+.wf-val.pur{color:var(--pr6);}
+
+/* State grid */
+.state-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.state-card{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:13px 14px;box-shadow:var(--sh1);}
+.sc-lbl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--n600);margin-bottom:6px;}
+.sc-val{font-size:1.15rem;font-weight:800;font-family:var(--mono);color:var(--n900);margin-bottom:2px;}
+.sc-sub{font-size:.68rem;color:var(--n600);}
+
+/* ── MATH INSPECTOR ──────────────────────────────────────── */
+.mp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+.mp-overlay.open{opacity:1;pointer-events:auto;}
+.mp{position:fixed;top:0;right:0;height:100vh;width:580px;max-width:100vw;background:var(--n950);border-left:1px solid var(--n700);z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,.4);}
+.mp.open{transform:translateX(0);}
+.mp-hdr{padding:16px 20px;border-bottom:1px solid var(--n700);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--n900);}
+.mp-hdr h2{font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-.01em;}
+.mp-hdr h2 span{color:var(--pr5);}
+.mp-close{background:var(--n800);border:1px solid var(--n700);color:var(--s400);font-size:.76rem;font-weight:600;padding:5px 12px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;}
+.mp-close:hover{color:var(--white);border-color:var(--s400);}
+.mp-body{overflow-y:auto;flex:1;padding:16px 18px;}
+.mp-body::-webkit-scrollbar{width:4px;}
+.mp-body::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.ms2{margin-bottom:20px;}
+.ms2-hdr{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--pr5);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--n800);}
+.mfb{background:var(--n900);border:1px solid var(--n800);border-radius:var(--rmd);padding:12px 15px;margin-bottom:8px;}
+.mfb .ft{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:7px;}
+.mf{display:flex;align-items:flex-start;gap:10px;margin-bottom:5px;font-size:.76rem;line-height:1.6;}
+.mf:last-child{margin-bottom:0;}
+.ml{color:var(--s400);white-space:nowrap;min-width:175px;flex-shrink:0;font-size:.73rem;}
+.mv{color:var(--white);font-family:var(--mono);font-size:.73rem;}
+.mv.hi{color:var(--pr5);}
+.mv.pos{color:var(--em5);}
+.mv.neg{color:#f87171;}
+.mf-div{height:1px;background:var(--n800);margin:7px 0;}
+
+/* ── MOBILE ──────────────────────────────────────────────── */
+@media(max-width:960px){
+  .layout{grid-template-columns:1fr;}
+  .heroes{grid-template-columns:1fr 1fr;}
+  .chart-row{grid-template-columns:1fr;}
+  .state-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:700px){
+  .hdr{padding:13px 15px 11px;}
+  .hdr-in{flex-wrap:wrap;gap:8px;}
+  .hdr h1{font-size:1.05rem;}
+  .hdr-tags{display:none;}
+  .hdr-actions{margin-top:0;gap:6px;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
+  .layout{grid-template-columns:1fr;min-height:unset;}
+  .sb{position:static;height:auto;max-height:none;padding:15px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
+  input[type="number"],select{font-size:1rem !important;padding:10px 10px;}
+  .has-pre input{padding-left:22px;}
+  .ig label{font-size:.78rem;}
+  .sbh{font-size:.68rem;margin:16px 0 9px;}
+  .main{padding:13px 12px 30px;}
+  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 5px;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex:0 0 auto;padding:9px 14px;font-size:.75rem;min-height:38px;}
+  .heroes,.heroes2{grid-template-columns:1fr 1fr;gap:8px;}
+  .hero{padding:12px 11px;}
+  .hero .hv{font-size:1.1rem;}
+  .hero .hs{font-size:.66rem;}
+  .stats{grid-template-columns:1fr 1fr;gap:7px;}
+  .chart-row{grid-template-columns:1fr;}
+  .btbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.btbl{min-width:420px;}
+  table.btbl th,table.btbl td{padding:6px 8px;font-size:.72rem;}
+  .wf-row{grid-template-columns:120px 1fr auto;}
+  .mp{width:100vw;max-width:100vw;height:90vh;top:auto;bottom:0;right:0;border-left:none;border-top:1px solid var(--n700);border-radius:var(--rlg) var(--rlg) 0 0;transform:translateY(100%);}
+  .mp.open{transform:translateY(0);}
+  .mp-hdr{border-radius:var(--rlg) var(--rlg) 0 0;padding:14px 16px;}
+  .mp-body{padding:13px;}
+  .mf{flex-direction:column;gap:2px;}
+  .ml{min-width:unset;font-size:.72rem;}
+  .mv{font-size:.72rem;}
+}
+@media(max-width:399px){
+  .heroes,.heroes2{grid-template-columns:1fr 1fr;}
+  .hero .hv{font-size:1.2rem;}
+  .state-grid{grid-template-columns:1fr;}
+}
+
+/* ── Breadcrumb ── */
+.hdr-bc{font-size:.63rem;font-weight:600;margin-bottom:7px;}
+.hdr-bc a{color:var(--n600);text-decoration:none;letter-spacing:.02em;transition:color .15s;}
+.hdr-bc a:hover{color:var(--s300);}
+/* ── Copy-link button ── */
+.copy-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--s300);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+.copy-btn.copied{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);color:#6ee7b7;}
+/* ── Mobile scroll pill ── */
+.sb-scroll-hint{display:none;padding:12px 0 4px;text-align:center;}
+.sb-scroll-pill{background:linear-gradient(135deg,var(--cy5),var(--cy6));color:var(--n950);font-size:.8rem;font-weight:700;padding:10px 28px;border-radius:var(--rfl);border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 4px 14px rgba(6,182,212,.35);}
+@media(max-width:700px){.sb-scroll-hint{display:block;}}
+/* ── Smooth hero-value transitions ── */
+.hv{transition:all .35s cubic-bezier(.4,0,.2,1);}
+/* ── Print styles ── */
+.print-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.print-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+@media print{
+  .sb,.hdr-actions{display:none!important;}
+  .wrap{grid-template-columns:1fr!important;}
+  .main{padding:20px!important;}
+  body{background:white!important;color:black!important;}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;}
+  .math-panel{display:block!important;position:static!important;transform:none!important;}
+}
+
+
+/* ── Reset button ── */
+.reset-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.reset-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+/* ── Input validation ── */
+.input-err{border-color:var(--ro5) !important;box-shadow:0 0 0 3px rgba(244,63,94,.15) !important;}
+.err-msg{font-size:.66rem;color:#fca5a5;margin-top:3px;padding-left:2px;display:block;}
+
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+<header class="hdr">
+  <div class="hdr-in">
+    <div>
+      <div class="hdr-bc"><a href="index.html">← All Calculators</a></div>
+        <h1>🏛️ <span>Estate Tax</span> Calculator</h1>
+      <div class="hdr-tags" style="display:none"></div>
+    </div>
+    <div class="hdr-actions">
+      <select class="nav-select" onchange="if(this.value)window.location=this.value">
+        <option value="estate_calculator.html" selected>🏛️ Estate Tax</option>
+        <option value="tax_calculator.html">💸 Income Tax</option>
+        <option value="mortgage_calculator.html">🏡 Mortgage</option>
+        <option value="retirement_calculator.html">🔥 Retirement</option>
+        <option value="college_calculator.html">🎓 529 College</option>
+        <option value="interest_calculator.html">💰 Interest</option>
+        <option value="social_security_calculator.html">🔒 Social Security</option>
+        <option value="col_calculator.html">🌆 Cost of Living</option>
+      </select>
+      <button class="reset-btn" onclick="resetDefaults()" title="Reset all inputs to defaults">&#8635; Reset</button>
+        <button class="copy-btn" id="copyLinkBtn" onclick="copyLink()">🔗 Copy Link</button>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+        <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<!-- ═══ SIDEBAR ══════════════════════════════════════════════ -->
+<div class="sb">
+
+  <div class="sbh">Estate Value</div>
+  <div class="ig">
+    <label>Gross Estate Value</label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="grossEstate" value="5000000" min="0" max="1000000000" step="100000" oninput="calc()">
+    </div>
+  </div>
+  <div class="ig">
+    <label>State of Domicile</label>
+    <select id="estateState" onchange="calc()">
+      <option value="NONE">No State Estate Tax</option>
+      <optgroup label="States With Estate Tax">
+        <option value="CT">Connecticut</option>
+        <option value="DC">Washington DC</option>
+        <option value="HI">Hawaii</option>
+        <option value="IL">Illinois</option>
+        <option value="ME">Maine</option>
+        <option value="MD">Maryland</option>
+        <option value="MA">Massachusetts</option>
+        <option value="MN">Minnesota</option>
+        <option value="NY">New York</option>
+        <option value="OR">Oregon</option>
+        <option value="RI">Rhode Island</option>
+        <option value="VT">Vermont</option>
+        <option value="WA">Washington</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <div class="sbh">Deductions</div>
+  <div class="ig">
+    <label>Marital Deduction <em>(transfers to spouse)</em></label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="maritalDed" value="0" min="0" step="100000" oninput="calc()">
+    </div>
+  </div>
+  <div class="ig">
+    <label>Charitable Deduction</label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="charDed" value="0" min="0" step="10000" oninput="calc()">
+    </div>
+  </div>
+  <div class="ig">
+    <label>Debts, Mortgages &amp; Expenses</label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="debts" value="0" min="0" step="10000" oninput="calc()">
+    </div>
+  </div>
+
+  <div class="sbh">Exemption Portability</div>
+  <div class="tog-row">
+    <span class="tog-lbl">Use Deceased Spouse's Unused Exemption (DSUE)
+      <em>Portability election on estate return</em>
+    </span>
+    <span class="ck-wrap"><input type="checkbox" id="useDSUE" onchange="calc()"></span>
+  </div>
+  <div id="dsue-row" style="display:none;margin-top:6px">
+    <div class="ig">
+      <label>DSUE Amount</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="dsueAmt" value="13610000" min="0" step="100000" oninput="calc()">
+      </div>
+    </div>
+  </div>
+
+  <div class="sbh">Summary</div>
+  <div class="cb" id="sidebarSummary">
+    <div class="cb-row"><span class="cb-lbl">Gross Estate</span><span class="cb-val" id="sb-gross">—</span></div>
+    <div class="cb-row"><span class="cb-lbl">Total Deductions</span><span class="cb-val" id="sb-ded">—</span></div>
+    <div class="cb-row"><span class="cb-lbl">Taxable Estate</span><span class="cb-val" id="sb-taxable">—</span></div>
+    <div class="cb-div"></div>
+    <div class="cb-row"><span class="cb-lbl">Federal Tax</span><span class="cb-val" id="sb-fed">—</span></div>
+    <div class="cb-row"><span class="cb-lbl">State Tax</span><span class="cb-val" id="sb-state">—</span></div>
+    <div class="cb-div"></div>
+    <div class="cb-row cb-tot"><span class="cb-lbl">Net Estate to Heirs</span><span class="cb-val cb-tot" id="sb-net">—</span></div>
+  </div>
+
+<div class="sb-scroll-hint"><button class="sb-scroll-pill" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">See Results ↓</button></div>
+</div><!-- /sb -->
+
+<!-- ═══ MAIN ═════════════════════════════════════════════════ -->
+<div class="main">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('overview')">Overview</button>
+    <button class="tab" onclick="switchTab('federal')">Federal Estate Tax</button>
+    <button class="tab" onclick="switchTab('state')">State Estate Tax</button>
+    <button class="tab" onclick="switchTab('planning')">Planning</button>
+  </div>
+
+  <!-- ── OVERVIEW TAB ─────────────────────────────── -->
+  <div class="tab-panel active" id="tp-overview">
+    <div class="heroes" id="heroCards">
+      <div class="hero hpu"><div class="hl">Federal Tax</div><div class="hv" id="h-fedtax">$0</div><div class="hs">40% on taxable estate</div></div>
+      <div class="hero hro"><div class="hl">State Tax</div><div class="hv" id="h-statetax">$0</div><div class="hs" id="h-statelbl">No state estate tax</div></div>
+      <div class="hero hgr"><div class="hl">Net to Heirs</div><div class="hv" id="h-net">—</div><div class="hs" id="h-netpct">after all taxes</div></div>
+      <div class="hero ham"><div class="hl">Effective Rate</div><div class="hv" id="h-effrate">0%</div><div class="hs">combined fed + state</div></div>
+    </div>
+
+    <div id="banner-area"></div>
+
+    <div class="sh">Estate Waterfall</div>
+    <div class="wfall" id="waterfallTable">
+      <div class="wf-row" style="background:var(--s50);font-weight:700;font-size:.7rem;color:var(--n600);">
+        <div>ITEM</div><div>BAR</div><div>AMOUNT</div>
+      </div>
+    </div>
+
+    <div class="sh">Distribution</div>
+    <div class="chart-row">
+      <div class="chart-box">
+        <div class="ch">Estate Distribution</div>
+        <div class="cw"><canvas id="donutChart"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="ch">Effective Rate by Estate Size</div>
+        <div class="cw"><canvas id="rateChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FEDERAL TAB ──────────────────────────────── -->
+  <div class="tab-panel" id="tp-federal">
+    <div class="bn info" id="fed-banner"></div>
+
+    <div class="sh">2024 Federal Estate Tax Brackets</div>
+    <div class="btbl-wrap">
+      <table class="btbl" id="fedBracketTable">
+        <thead><tr>
+          <th>Taxable Estate Range</th>
+          <th class="r">Rate</th>
+          <th class="r">Amount in Bracket</th>
+          <th class="r">Tax in Bracket</th>
+          <th class="r">Cumulative Tax</th>
+        </tr></thead>
+        <tbody id="fedBracketBody"></tbody>
+        <tfoot><tr>
+          <td colspan="3" class="r muted" style="font-size:.7rem;">Total Federal Estate Tax</td>
+          <td class="r" id="fedTotalCell" style="font-weight:700;font-family:var(--mono);"></td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+    </div>
+
+    <div class="ib">
+      <strong>2024 Federal Exemption: $13,610,000 per person.</strong> Married couples can combine exemptions (portability), effectively shielding up to $27,220,000. The 40% flat rate applies only to the taxable estate above the applicable exemption. The exemption is scheduled to sunset after 2025, potentially reverting to ~$7M (inflation-adjusted).
+    </div>
+
+    <div class="sh">Key Federal Figures</div>
+    <div class="stats" id="fedStats"></div>
+  </div>
+
+  <!-- ── STATE TAB ────────────────────────────────── -->
+  <div class="tab-panel" id="tp-state">
+    <div id="state-content"></div>
+  </div>
+
+  <!-- ── PLANNING TAB ─────────────────────────────── -->
+  <div class="tab-panel" id="tp-planning">
+    <div class="sh">Tax Reduction Scenarios</div>
+    <div class="bn pur">
+      <strong>Disclaimer:</strong> These projections illustrate general planning concepts. Consult a qualified estate planning attorney and tax advisor for personalized guidance.
+    </div>
+    <div class="btbl-wrap">
+      <table class="btbl" id="planningTable">
+        <thead><tr>
+          <th>Planning Strategy</th>
+          <th class="r">Potential Reduction</th>
+          <th class="r">Net Estate</th>
+          <th class="r">Combined Tax Rate</th>
+        </tr></thead>
+        <tbody id="planningBody"></tbody>
+      </table>
+    </div>
+
+    <div class="sh">Annual Gift Tax Exclusion</div>
+    <div class="state-grid">
+      <div class="state-card">
+        <div class="sc-lbl">Annual Gift Exclusion (2024)</div>
+        <div class="sc-val">$18,000</div>
+        <div class="sc-sub">Per recipient, per year</div>
+      </div>
+      <div class="state-card">
+        <div class="sc-lbl">Medical/Tuition Direct Pay</div>
+        <div class="sc-val">Unlimited</div>
+        <div class="sc-sub">Paid directly to provider</div>
+      </div>
+      <div class="state-card" id="gift-10yr">
+        <div class="sc-lbl">10-Year Gift to 2 Children</div>
+        <div class="sc-val" id="gift10-val">$360,000</div>
+        <div class="sc-sub">$18k × 2 recipients × 10 yrs</div>
+      </div>
+      <div class="state-card">
+        <div class="sc-lbl">Lifetime Gift Exemption (2024)</div>
+        <div class="sc-val">$13,610,000</div>
+        <div class="sc-sub">Unified with estate exemption</div>
+      </div>
+    </div>
+
+    <div class="sh">Planning Strategies Overview</div>
+    <div class="ib">
+      <strong>Irrevocable Life Insurance Trust (ILIT):</strong> Life insurance held in an ILIT passes outside the estate. The death benefit is not included in the taxable estate, potentially saving 40% in federal estate taxes.<br><br>
+      <strong>Qualified Personal Residence Trust (QPRT):</strong> Transfers your home to heirs at a discounted gift tax value, removing future appreciation from the estate.<br><br>
+      <strong>Grantor Retained Annuity Trust (GRAT):</strong> Transfer assets to a trust while retaining an annuity. If assets appreciate faster than the IRS hurdle rate (7520 rate), the excess passes to heirs estate-tax-free.<br><br>
+      <strong>Charitable Remainder Trust (CRT):</strong> Receive income from a trust during your lifetime, with the remainder going to charity. Provides income, a current charitable deduction, and estate reduction.<br><br>
+      <strong>Family Limited Partnership (FLP):</strong> Move assets into an FLP and transfer limited partnership interests to heirs, potentially at a valuation discount of 15–40% for lack of control and marketability.
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ═══ MATH INSPECTOR ════════════════════════════════════ -->
+<div class="mp-overlay" id="mp-overlay" onclick="closeMath()"></div>
+<div class="mp" id="mp">
+  <div class="mp-hdr">
+    <h2>🔍 Estate Tax <span>Math</span></h2>
+    <button class="mp-close" onclick="closeMath()">✕ Close</button>
+  </div>
+  <div class="mp-body" id="mp-body"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+
+const FED_EXEMPTION = 13610000;
+const FED_RATE = 0.40;
+
+// Federal estate tax brackets (progressive up to 40%)
+// These apply to the taxable estate above $0; the exemption is subtracted first
+// In practice the IRS uses a tentative tax formula, but simplified:
+// All taxable estate taxed at 40% flat (after exemption). For display we show the
+// tentative tax rate schedule (Form 706).
+const FED_BRACKETS = [
+  [10000,      0.18],
+  [20000,      0.20],
+  [40000,      0.22],
+  [60000,      0.24],
+  [80000,      0.26],
+  [100000,     0.28],
+  [150000,     0.30],
+  [250000,     0.32],
+  [500000,     0.34],
+  [750000,     0.37],
+  [1000000,    0.39],
+  [Infinity,   0.40],
+];
+
+// State estate tax data
+const STATE_ESTATE = {
+  CT: {
+    name: 'Connecticut',
+    exemption: 12920000,
+    brackets: [
+      [10000000, 0.084],
+      [Infinity, 0.12],
+    ],
+    maxRate: 0.12,
+    notes: 'CT phases out the exemption for estates over ~$15M',
+  },
+  DC: {
+    name: 'Washington DC',
+    exemption: 4528800,
+    brackets: [
+      [1000000,  0.082],
+      [2000000,  0.086],
+      [3000000,  0.090],
+      [4000000,  0.093],
+      [5000000,  0.097],
+      [6000000,  0.100],
+      [7000000,  0.106],
+      [8000000,  0.113],
+      [9000000,  0.119],
+      [Infinity, 0.160],
+    ],
+    maxRate: 0.16,
+    notes: 'Progressive rates 8.2%–16% on taxable estate',
+  },
+  HI: {
+    name: 'Hawaii',
+    exemption: 5490000,
+    brackets: [
+      [1000000,  0.100],
+      [2000000,  0.110],
+      [3000000,  0.120],
+      [4000000,  0.130],
+      [5000000,  0.140],
+      [6000000,  0.155],
+      [7000000,  0.165],
+      [8000000,  0.175],
+      [9000000,  0.185],
+      [10000000, 0.195],
+      [Infinity, 0.200],
+    ],
+    maxRate: 0.20,
+    notes: 'Progressive rates 10%–20%',
+  },
+  IL: {
+    name: 'Illinois',
+    exemption: 4000000,
+    brackets: [
+      [1000000,  0.080],
+      [2000000,  0.090],
+      [3000000,  0.100],
+      [4000000,  0.110],
+      [5000000,  0.120],
+      [6000000,  0.130],
+      [7000000,  0.140],
+      [8000000,  0.150],
+      [9000000,  0.155],
+      [10000000, 0.160],
+      [Infinity, 0.160],
+    ],
+    maxRate: 0.16,
+    notes: 'Progressive rates 8%–16% on entire estate (no bracket exclusion)',
+  },
+  ME: {
+    name: 'Maine',
+    exemption: 6410000,
+    brackets: [
+      [1000000,  0.080],
+      [2000000,  0.085],
+      [3000000,  0.090],
+      [4000000,  0.095],
+      [5000000,  0.100],
+      [Infinity, 0.120],
+    ],
+    maxRate: 0.12,
+    notes: 'Progressive rates 8%–12%',
+  },
+  MD: {
+    name: 'Maryland',
+    exemption: 5000000,
+    brackets: [
+      [1000000,  0.080],
+      [2000000,  0.090],
+      [3000000,  0.100],
+      [4000000,  0.110],
+      [5000000,  0.120],
+      [6000000,  0.130],
+      [7000000,  0.140],
+      [8000000,  0.150],
+      [Infinity, 0.160],
+    ],
+    maxRate: 0.16,
+    notes: 'Maryland also has a separate inheritance tax of 10% for non-immediate family',
+  },
+  MA: {
+    name: 'Massachusetts',
+    exemption: 2000000,
+    brackets: [
+      [1000000,  0.008],
+      [2000000,  0.016],
+      [4000000,  0.032],
+      [6000000,  0.048],
+      [8000000,  0.064],
+      [10000000, 0.080],
+      [Infinity, 0.160],
+    ],
+    maxRate: 0.16,
+    notes: 'MA uses an unusual rate schedule. Effective rates start very low on small estates.',
+  },
+  MN: {
+    name: 'Minnesota',
+    exemption: 3000000,
+    brackets: [
+      [3000000,  0.130],
+      [4000000,  0.130],
+      [5000000,  0.140],
+      [6000000,  0.150],
+      [7000000,  0.155],
+      [8000000,  0.155],
+      [9000000,  0.160],
+      [10000000, 0.160],
+      [Infinity, 0.160],
+    ],
+    maxRate: 0.16,
+    notes: 'Progressive rates 13%–16% on taxable estate over exemption',
+  },
+  NY: {
+    name: 'New York',
+    exemption: 6940000,
+    brackets: [
+      [500000,   0.0316],
+      [1000000,  0.0532],
+      [1500000,  0.0584],
+      [2100000,  0.0636],
+      [2600000,  0.0682],
+      [3100000,  0.0720],
+      [3600000,  0.0767],
+      [4100000,  0.0815],
+      [5100000,  0.0909],
+      [6100000,  0.1024],
+      [7100000,  0.1131],
+      [Infinity, 0.1600],
+    ],
+    maxRate: 0.16,
+    cliff: true,
+    notes: '⚠️ NY "Cliff": if estate > 105% of $6.94M exemption, the ENTIRE estate is taxed (no exemption). Estates just over the threshold face massive marginal rates.',
+  },
+  OR: {
+    name: 'Oregon',
+    exemption: 1000000,
+    brackets: [
+      [1000000,  0.100],
+      [2000000,  0.105],
+      [Infinity, 0.160],
+    ],
+    maxRate: 0.16,
+    notes: 'Progressive rates 10%–16%. Very low $1M exemption.',
+  },
+  RI: {
+    name: 'Rhode Island',
+    exemption: 1774583,
+    brackets: [
+      [Infinity, 0.160],
+    ],
+    maxRate: 0.16,
+    notes: 'Flat 16% on taxable estate over exemption (approximate)',
+  },
+  VT: {
+    name: 'Vermont',
+    exemption: 5000000,
+    brackets: [
+      [Infinity, 0.160],
+    ],
+    maxRate: 0.16,
+    notes: 'Flat 16% on taxable estate over exemption',
+  },
+  WA: {
+    name: 'Washington',
+    exemption: 2193000,
+    brackets: [
+      [1000000,  0.100],
+      [2000000,  0.140],
+      [3000000,  0.150],
+      [4000000,  0.155],
+      [6000000,  0.160],
+      [7000000,  0.175],
+      [8000000,  0.185],
+      [9000000,  0.190],
+      [Infinity, 0.200],
+    ],
+    maxRate: 0.20,
+    notes: 'Progressive rates 10%–20% on taxable estate',
+  },
+  NONE: null,
+};
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+
+function fmt(n, decimals=0) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '$' + n.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+function fmtPct(n, dec=1) { return (n*100).toFixed(dec) + '%'; }
+function fmtN(n) { return n.toLocaleString('en-US', {maximumFractionDigits:0}); }
+
+function calcBracketTax(taxableAmount, brackets) {
+  if (taxableAmount <= 0 || !brackets) return { tax: 0, rows: [] };
+  let tax = 0, prev = 0, rows = [];
+  for (const [max, rate] of brackets) {
+    const top = max === Infinity ? taxableAmount : Math.min(taxableAmount, max);
+    const amount = Math.max(0, top - prev);
+    const bracketTax = amount * rate;
+    tax += bracketTax;
+    const active = taxableAmount > prev && (max === Infinity || taxableAmount <= max);
+    rows.push({ min: prev, max, rate, amount, bracketTax, cumTax: tax, active });
+    prev = max === Infinity ? taxableAmount : max;
+    if (taxableAmount <= max) break;
+  }
+  return { tax, rows };
+}
+
+function calcStateTax(grossEstate, stateCode) {
+  const st = STATE_ESTATE[stateCode];
+  if (!st) return { tax: 0, rows: [], exemption: 0, notes: '' };
+
+  // NY cliff
+  if (st.cliff) {
+    const cliff = st.exemption * 1.05;
+    if (grossEstate > cliff) {
+      // Entire estate taxed — no exemption
+      const { tax, rows } = calcBracketTax(grossEstate, st.brackets);
+      return { tax, rows, exemption: 0, notes: st.notes, cliff: true };
+    }
+  }
+
+  const taxable = Math.max(0, grossEstate - st.exemption);
+  if (taxable <= 0) return { tax: 0, rows: [], exemption: st.exemption, notes: st.notes };
+
+  const { tax, rows } = calcBracketTax(taxable, st.brackets);
+  return { tax, rows, exemption: st.exemption, notes: st.notes };
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+
+let donutChart = null, rateChart = null;
+let lastResult = {};
+
+// ═══════════════════════════════════════════════════════════
+// CALC
+// ═══════════════════════════════════════════════════════════
+
+function calc() {
+  const grossEstate = +document.getElementById('grossEstate').value || 0;
+  const maritalDed  = Math.min(+document.getElementById('maritalDed').value || 0, grossEstate);
+  const charDed     = +document.getElementById('charDed').value || 0;
+  const debts       = +document.getElementById('debts').value || 0;
+  const stateCode   = document.getElementById('estateState').value;
+  const useDSUE     = document.getElementById('useDSUE').checked;
+  const dsueAmt     = useDSUE ? (+document.getElementById('dsueAmt').value || 0) : 0;
+
+  // Show/hide DSUE input
+  document.getElementById('dsue-row').style.display = useDSUE ? 'block' : 'none';
+
+  const totalDed = maritalDed + charDed + debts;
+  const netEstate = Math.max(0, grossEstate - totalDed);
+
+  // Federal
+  const fedExemption = Math.min(FED_EXEMPTION + dsueAmt, netEstate);
+  const fedTaxable = Math.max(0, netEstate - fedExemption);
+  const { tax: fedTax, rows: fedRows } = calcBracketTax(fedTaxable, FED_BRACKETS);
+
+  // State
+  const stateResult = calcStateTax(grossEstate, stateCode);
+  const stateTax = stateResult.tax;
+
+  const totalTax = fedTax + stateTax;
+  const netToHeirs = Math.max(0, grossEstate - totalDed - totalTax);
+  const effRate = grossEstate > 0 ? totalTax / grossEstate : 0;
+
+  lastResult = { grossEstate, maritalDed, charDed, debts, totalDed, netEstate,
+    fedExemption, fedTaxable, fedTax, fedRows, stateTax, stateResult,
+    totalTax, netToHeirs, effRate, stateCode };
+
+  updateUI(lastResult);
+
+  // Cross-field validation
+  clearAllErrs(); validateMinMax();
+  saveState();
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI UPDATES
+// ═══════════════════════════════════════════════════════════
+
+function updateUI(r) {
+  // Hero cards
+  document.getElementById('h-fedtax').textContent = fmt(r.fedTax);
+  document.getElementById('h-statetax').textContent = fmt(r.stateTax);
+  const st = STATE_ESTATE[r.stateCode];
+  document.getElementById('h-statelbl').textContent = st ? st.name : 'No state estate tax';
+  document.getElementById('h-net').textContent = fmt(r.netToHeirs);
+  document.getElementById('h-netpct').textContent = r.grossEstate > 0
+    ? fmtPct(r.netToHeirs / r.grossEstate) + ' of gross estate'
+    : 'after all taxes';
+  document.getElementById('h-effrate').textContent = fmtPct(r.effRate);
+
+  // Sidebar
+  document.getElementById('sb-gross').textContent = fmt(r.grossEstate);
+  document.getElementById('sb-ded').textContent = fmt(r.totalDed);
+  document.getElementById('sb-taxable').textContent = fmt(r.netEstate);
+  document.getElementById('sb-fed').textContent = fmt(r.fedTax);
+  document.getElementById('sb-state').textContent = fmt(r.stateTax);
+  document.getElementById('sb-net').textContent = fmt(r.netToHeirs);
+
+  // Banner
+  const ba = document.getElementById('banner-area');
+  if (r.fedTaxable <= 0 && r.stateTax <= 0) {
+    ba.innerHTML = `<div class="bn ok">✓ <strong>No estate tax owed.</strong> The gross estate (after deductions) of ${fmt(r.netEstate)} falls below the applicable exemption${st ? 's' : ''} of ${fmt(FED_EXEMPTION)} (federal)${st ? ' / ' + fmt(st.exemption) + ' (' + st.name + ')' : ''}.</div>`;
+  } else if (r.effRate > 0.3) {
+    ba.innerHTML = `<div class="bn warn">⚠️ <strong>Significant estate tax exposure.</strong> Combined effective rate of ${fmtPct(r.effRate)} represents ${fmt(r.totalTax)} in estate taxes. Consider planning strategies to reduce exposure.</div>`;
+  } else if (r.stateResult && r.stateResult.cliff && r.stateCode === 'NY') {
+    ba.innerHTML = `<div class="bn warn">⚠️ <strong>NY Cliff Rule applies.</strong> This estate exceeds 105% of the NY exemption — the <em>entire</em> estate is subject to NY estate tax with no exemption offset. Planning to stay below the cliff threshold is critical.</div>`;
+  } else {
+    ba.innerHTML = `<div class="bn info">ℹ️ Combined estate tax of ${fmt(r.totalTax)} at an effective rate of ${fmtPct(r.effRate)}. Federal exemption remaining: ${fmt(FED_EXEMPTION - r.fedExemption + (r.stateResult?.cliff ? 0 : 0))}.</div>`;
+  }
+
+  renderWaterfall(r);
+  renderFederalTab(r);
+  renderStateTab(r);
+  renderPlanningTab(r);
+  renderCharts(r);
+}
+
+function renderWaterfall(r) {
+  const maxBar = r.grossEstate || 1;
+  const rows = [
+    { lbl: 'Gross Estate',        val: r.grossEstate,   color: '#8b5cf6', sub: false },
+    { lbl: '  Marital Deduction', val: -r.maritalDed,   color: '#10b981', sub: true  },
+    { lbl: '  Charitable Ded.',   val: -r.charDed,      color: '#10b981', sub: true  },
+    { lbl: '  Debts & Expenses',  val: -r.debts,        color: '#10b981', sub: true  },
+    { lbl: 'Net Taxable Estate',  val: r.netEstate,     color: '#6366f1', sub: false },
+    { lbl: '  Fed. Exemption',    val: -r.fedExemption, color: '#3b82f6', sub: true  },
+    { lbl: 'Fed. Taxable Estate', val: r.fedTaxable,    color: '#f59e0b', sub: false },
+    { lbl: '  Federal Tax (40%)', val: -r.fedTax,       color: '#ef4444', sub: true  },
+    { lbl: '  State Tax',        val: -r.stateTax,      color: '#f97316', sub: true  },
+    { lbl: 'Net to Heirs',        val: r.netToHeirs,    color: '#10b981', sub: false },
+  ];
+  const wt = document.getElementById('waterfallTable');
+  wt.innerHTML = rows.filter(rw => Math.abs(rw.val) > 0 || (!rw.sub)).map(rw => {
+    const pct = Math.abs(rw.val) / maxBar * 100;
+    const negClass = rw.val < 0 ? 'neg' : (rw.lbl === 'Net to Heirs' ? 'pos' : 'pur');
+    return `<div class="wf-row">
+      <div class="wf-lbl${rw.sub ? ' sub' : ''}">${rw.lbl}</div>
+      <div class="wf-bar-wrap"><div class="wf-bar" style="width:${pct}%;background:${rw.color};opacity:${rw.val<0?.6:1}"></div></div>
+      <div class="wf-val ${negClass}">${rw.val < 0 ? '−' : ''}${fmt(Math.abs(rw.val))}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderFederalTab(r) {
+  document.getElementById('fed-banner').innerHTML =
+    r.fedTaxable > 0
+      ? `Federal taxable estate: <strong>${fmt(r.fedTaxable)}</strong> (after ${fmt(r.fedExemption)} exemption). Federal estate tax: <strong>${fmt(r.fedTax)}</strong>.`
+      : `Estate of <strong>${fmt(r.netEstate)}</strong> is fully covered by the federal exemption of <strong>${fmt(FED_EXEMPTION)}</strong>. No federal estate tax owed.`;
+
+  const tbody = document.getElementById('fedBracketBody');
+  let cumTax = 0;
+  tbody.innerHTML = FED_BRACKETS.map(([max, rate]) => {
+    const min = FED_BRACKETS[FED_BRACKETS.indexOf(FED_BRACKETS.find(b => b[1] === rate && b[0] === max)) - 1]?.[0] || 0;
+    const prev = FED_BRACKETS[FED_BRACKETS.indexOf(FED_BRACKETS.find(b => b[0] === max && b[1] === rate)) - 1]?.[0] || 0;
+    const top = max === Infinity ? r.fedTaxable : Math.min(r.fedTaxable, max);
+    const amt = r.fedTaxable > 0 ? Math.max(0, top - prev) : 0;
+    const bTax = amt * rate;
+    cumTax += bTax;
+    const active = r.fedTaxable > prev && (max === Infinity || r.fedTaxable <= max) && r.fedTaxable > 0;
+    return `<tr${active ? ' class="active-row"' : ''}>
+      <td>${fmt(prev)} – ${max === Infinity ? 'above' : fmt(max)}</td>
+      <td class="r">${fmtPct(rate,0)}</td>
+      <td class="r muted">${amt > 0 ? fmt(amt) : '—'}</td>
+      <td class="r">${bTax > 0 ? fmt(bTax) : '—'}</td>
+      <td class="r">${cumTax > 0 ? fmt(cumTax) : '—'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('fedTotalCell').textContent = fmt(r.fedTax);
+
+  const stats = [
+    { l: 'Federal Exemption', v: fmt(FED_EXEMPTION), c: '' },
+    { l: 'DSUE Added', v: r.fedExemption > FED_EXEMPTION ? fmt(r.fedExemption - FED_EXEMPTION) : '$0', c: '' },
+    { l: 'Net Taxable Estate', v: fmt(r.fedTaxable), c: r.fedTaxable > 0 ? 'warn' : 'pos' },
+    { l: 'Federal Tax', v: fmt(r.fedTax), c: r.fedTax > 0 ? 'neg' : 'pos' },
+    { l: 'Federal Effective Rate', v: r.grossEstate > 0 ? fmtPct(r.fedTax / r.grossEstate) : '0%', c: '' },
+    { l: 'Marginal Fed Rate', v: r.fedTaxable > 0 ? '40.0%' : '0%', c: '' },
+  ];
+  document.getElementById('fedStats').innerHTML = stats.map(s =>
+    `<div class="stat"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div></div>`
+  ).join('');
+}
+
+function renderStateTab(r) {
+  const div = document.getElementById('state-content');
+  const st = STATE_ESTATE[r.stateCode];
+  if (!st) {
+    div.innerHTML = `<div class="bn ok">✓ <strong>${r.stateCode === 'NONE' ? 'No state estate tax selected.' : 'This state has no estate tax.'}</strong> Only federal estate tax (if any) applies.</div>
+      <div class="ib">As of 2024, only 12 states and Washington DC impose a separate estate tax. States with no estate tax include all other states. Select a state from the sidebar to see its details.</div>
+      <div class="sh">States With Estate Tax (2024)</div>
+      <div class="btbl-wrap"><table class="btbl"><thead><tr><th>State</th><th class="r">Exemption</th><th class="r">Max Rate</th></tr></thead><tbody>
+      ${Object.entries(STATE_ESTATE).filter(([k,v])=>v).map(([k,v])=>`<tr><td>${v.name}</td><td class="r muted">${fmt(v.exemption)}</td><td class="r">${fmtPct(v.maxRate,0)}</td></tr>`).join('')}
+      </tbody></table></div>`;
+    return;
+  }
+
+  const { tax: stTax, rows, exemption, notes, cliff } = r.stateResult;
+  const stTaxable = cliff ? r.grossEstate : Math.max(0, r.grossEstate - exemption);
+
+  div.innerHTML = `
+    <div class="sh">${st.name} Estate Tax</div>
+    <div class="state-grid">
+      <div class="state-card"><div class="sc-lbl">State Exemption</div><div class="sc-val">${fmt(exemption)}</div><div class="sc-sub">${cliff ? 'Cliff applies >105%' : 'per estate'}</div></div>
+      <div class="state-card"><div class="sc-lbl">Max Rate</div><div class="sc-val">${fmtPct(st.maxRate,0)}</div><div class="sc-sub">top bracket</div></div>
+      <div class="state-card"><div class="sc-lbl">State Taxable Estate</div><div class="sc-val" style="color:${stTaxable>0?'var(--ro6)':'var(--em6)'}">${fmt(stTaxable)}</div><div class="sc-sub">${cliff?'cliff — full estate':'above exemption'}</div></div>
+      <div class="state-card"><div class="sc-lbl">State Tax Owed</div><div class="sc-val" style="color:${stTax>0?'var(--ro6)':'var(--em6)'}">${fmt(stTax)}</div><div class="sc-sub">${r.grossEstate>0?fmtPct(stTax/r.grossEstate)+' effective rate':''}</div></div>
+    </div>
+    ${notes ? `<div class="bn warn"><strong>Note:</strong> ${notes}</div>` : ''}
+    <div class="sh">${st.name} Tax Brackets</div>
+    <div class="btbl-wrap"><table class="btbl">
+      <thead><tr><th>Taxable Estate Range</th><th class="r">Rate</th><th class="r">Amount in Bracket</th><th class="r">Tax in Bracket</th></tr></thead>
+      <tbody>${(rows.length ? rows : [{min:0,max:Infinity,rate:st.brackets[0][1],amount:stTaxable,bracketTax:stTax,active:stTaxable>0}]).map(row=>
+        `<tr${row.active?' class="active-row"':''}>
+          <td>${fmt(row.min)} – ${row.max===Infinity?'above':fmt(row.max)}</td>
+          <td class="r">${fmtPct(row.rate,1)}</td>
+          <td class="r muted">${row.amount>0?fmt(row.amount):'—'}</td>
+          <td class="r">${row.bracketTax>0?fmt(row.bracketTax):'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+      <tfoot><tr><td colspan="2" class="r muted" style="font-size:.7rem;">Total State Tax</td><td></td><td class="r" style="font-weight:700;font-family:var(--mono);">${fmt(stTax)}</td></tr></tfoot>
+    </table></div>`;
+}
+
+function renderPlanningTab(r) {
+  if (!r.grossEstate) return;
+  const annualGift = 18000;
+  const scenarios = [
+    { name: 'Current (no planning)', reduction: 0, desc: 'Baseline' },
+    { name: 'Max annual gifts (2 heirs × 10yr)', reduction: annualGift * 2 * 10, desc: '$360k gifted out' },
+    { name: 'Annual gifts (5 heirs × 10yr)', reduction: annualGift * 5 * 10, desc: '$900k gifted out' },
+    { name: 'Charitable deduction ($500k)', reduction: 500000, desc: 'Charitable trust' },
+    { name: 'Life insurance via ILIT', reduction: 0, extraNote: 'Death benefit excluded from estate', desc: 'Insurance outside estate' },
+    { name: 'FLP 25% discount', reduction: r.grossEstate * 0.25, desc: 'Family Limited Partnership' },
+  ];
+
+  const tbody = document.getElementById('planningBody');
+  tbody.innerHTML = scenarios.map(s => {
+    const adjEstate = Math.max(0, r.grossEstate - s.reduction);
+    const adjTaxable = Math.max(0, adjEstate - FED_EXEMPTION);
+    const adjFedTax = calcBracketTax(adjTaxable, FED_BRACKETS).tax;
+    const adjStateTax = calcStateTax(adjEstate, r.stateCode).tax;
+    const adjTotal = adjFedTax + adjStateTax;
+    const adjNet = adjEstate - adjTotal;
+    const adjRate = adjEstate > 0 ? adjTotal / r.grossEstate : 0;
+    const saving = r.totalTax - adjTotal;
+    return `<tr>
+      <td>${s.name}${s.extraNote ? `<br><span style="font-size:.67rem;color:var(--n600)">${s.extraNote}</span>` : ''}</td>
+      <td class="r" style="color:${saving>0?'var(--em6)':'var(--n900)'};">${saving > 0 ? '−' + fmt(saving) : '—'}</td>
+      <td class="r">${fmt(adjNet)}</td>
+      <td class="r">${fmtPct(adjRate)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCharts(r) {
+  // Donut chart
+  const dCtx = document.getElementById('donutChart').getContext('2d');
+  if (donutChart) donutChart.destroy();
+  const heirs = Math.max(0, r.netToHeirs);
+  const fedT = Math.max(0, r.fedTax);
+  const stT = Math.max(0, r.stateTax);
+  const deds = Math.max(0, r.totalDed);
+  donutChart = new Chart(dCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['To Heirs', 'Federal Tax', 'State Tax', 'Deductions'],
+      datasets: [{
+        data: [heirs, fedT, stT, deds],
+        backgroundColor: ['#10b981','#8b5cf6','#f97316','#3b82f6'],
+        borderWidth: 2,
+        borderColor: '#fff',
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 10, padding: 8 } },
+        tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.raw) + ' (' + fmtPct(ctx.raw / (r.grossEstate || 1)) + ')' } }
+      },
+      cutout: '60%'
+    }
+  });
+
+  // Rate chart — effective rate as estate grows
+  const rCtx = document.getElementById('rateChart').getContext('2d');
+  if (rateChart) rateChart.destroy();
+  const points = [];
+  const labels = [];
+  const stCode = r.stateCode;
+  for (let e = 500000; e <= Math.max(r.grossEstate * 2, 30000000); e += (e < 5000000 ? 500000 : (e < 20000000 ? 1000000 : 2000000))) {
+    const txbl = Math.max(0, e - FED_EXEMPTION);
+    const ft = calcBracketTax(txbl, FED_BRACKETS).tax;
+    const st2 = calcStateTax(e, stCode).tax;
+    points.push(((ft + st2) / e * 100).toFixed(2));
+    labels.push(e >= 1e6 ? '$' + (e/1e6).toFixed(1) + 'M' : '$' + (e/1e3).toFixed(0) + 'k');
+  }
+  rateChart = new Chart(rCtx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{ label: 'Effective Rate', data: points, borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,.08)', fill: true, tension: 0.3, pointRadius: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { ticks: { font: { size: 9 }, maxTicksLimit: 8 }, grid: { display: false } },
+        y: { ticks: { font: { size: 9 }, callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,.04)' } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' Effective rate: ' + ctx.raw + '%' } }
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tp-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MATH PANEL
+// ═══════════════════════════════════════════════════════════
+
+function toggleMath() {
+  const isOpen = document.getElementById('mp').classList.contains('open');
+  if (isOpen) closeMath(); else openMath();
+}
+function closeMath() {
+  document.getElementById('mp').classList.remove('open');
+  document.getElementById('mp-overlay').classList.remove('open');
+  document.querySelector('.math-btn').textContent = '🔍 Show Math';
+}
+function openMath() {
+  document.getElementById('mp').classList.add('open');
+  document.getElementById('mp-overlay').classList.add('open');
+  document.querySelector('.math-btn').textContent = '🔍 Hide Math';
+  renderMath();
+}
+function renderMath() {
+  const r = lastResult;
+  const body = document.getElementById('mp-body');
+  const row = (label, val, cls='') =>
+    `<div class="mf"><span class="ml">${label}</span><span class="mv ${cls}">${val}</span></div>`;
+  const div = (t) => `<div class="mf-div"></div>`;
+  body.innerHTML = `
+  <div class="ms2"><div class="ms2-hdr">Estate Composition</div>
+    <div class="mfb">
+      ${row('Gross Estate', fmt(r.grossEstate),'hi')}
+      ${row('− Marital Deduction', fmt(r.maritalDed),'pos')}
+      ${row('− Charitable Deduction', fmt(r.charDed),'pos')}
+      ${row('− Debts & Expenses', fmt(r.debts),'pos')}
+      ${div()}
+      ${row('= Net Taxable Estate', fmt(r.netEstate),'hi')}
+    </div>
+  </div>
+  <div class="ms2"><div class="ms2-hdr">Federal Estate Tax</div>
+    <div class="mfb">
+      ${row('Net Taxable Estate', fmt(r.netEstate))}
+      ${row('− Federal Exemption', fmt(r.fedExemption),'pos')}
+      ${div()}
+      ${row('= Fed. Taxable Estate', fmt(r.fedTaxable),'hi')}
+      ${row('× Tax Rate (progressive)', r.fedTaxable > 0 ? 'up to 40%' : 'N/A')}
+      ${div()}
+      ${row('= Federal Estate Tax', fmt(r.fedTax), r.fedTax > 0 ? 'neg' : 'pos')}
+    </div>
+  </div>
+  ${STATE_ESTATE[r.stateCode] ? `
+  <div class="ms2"><div class="ms2-hdr">State Estate Tax (${STATE_ESTATE[r.stateCode]?.name})</div>
+    <div class="mfb">
+      ${row('Gross Estate', fmt(r.grossEstate))}
+      ${row('State Exemption', fmt(STATE_ESTATE[r.stateCode]?.exemption || 0),'pos')}
+      ${row('State Taxable Estate', fmt(Math.max(0, r.grossEstate - (STATE_ESTATE[r.stateCode]?.exemption||0))),'hi')}
+      ${div()}
+      ${row('= State Tax', fmt(r.stateTax), r.stateTax > 0 ? 'neg' : 'pos')}
+    </div>
+  </div>` : ''}
+  <div class="ms2"><div class="ms2-hdr">Summary</div>
+    <div class="mfb">
+      ${row('Gross Estate', fmt(r.grossEstate))}
+      ${row('− Total Deductions', fmt(r.totalDed),'pos')}
+      ${row('− Federal Estate Tax', fmt(r.fedTax),'neg')}
+      ${row('− State Estate Tax', fmt(r.stateTax),'neg')}
+      ${div()}
+      ${row('= Net to Heirs', fmt(r.netToHeirs),'pos')}
+      ${row('Combined Effective Rate', fmtPct(r.effRate),'hi')}
+      ${row('Tax as % of Gross', fmtPct(r.totalTax / (r.grossEstate || 1)),'neg')}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// URL STATE PERSISTENCE
+// ═══════════════════════════════════════════════════════════
+
+function saveState(){
+  try{
+    const s={};
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{
+      if(el.type==='checkbox') s[el.id]=el.checked;
+      else s[el.id]=el.value;
+    });
+    history.replaceState(null,'','#'+btoa(JSON.stringify(s)));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    if(!location.hash||location.hash.length<4) return false;
+    const s=JSON.parse(atob(location.hash.slice(1)));
+    Object.entries(s).forEach(([id,val])=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      if(el.type==='checkbox') el.checked=val;
+      else el.value=val;
+    });
+    return true;
+  }catch(e){return false;}
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', ()=>{ loadState(); calc(); });
+
+// ── Copy link ──
+function copyLink(){
+  const btn=document.getElementById('copyLinkBtn');
+  const url=location.href;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=url;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  if(btn){btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='🔗 Copy Link';btn.classList.remove('copied');},1800);}
+}
+// ── k/M shorthand ──
+document.addEventListener('keydown',function(e){
+  const el=e.target;
+  if(el.tagName!=='INPUT'||el.type!=='number') return;
+  const v=+el.value; if(!el.value||isNaN(v)||v<=0) return;
+  if((e.key==='k'||e.key==='K')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  } else if((e.key==='m'||e.key==='M')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+});
+
+
+// ── Reset to defaults ──
+function resetDefaults(){
+  if(!confirm('Reset all inputs to defaults?')) return;
+  history.replaceState(null,'',location.pathname);
+  location.reload();
+}
+// ── Input validation ──
+function showErr(id, msg){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.add('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  let em=ig.querySelector('.err-msg');
+  if(!em){em=document.createElement('span');em.className='err-msg';ig.appendChild(em);}
+  em.textContent=msg;
+}
+function clearErr(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.remove('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  const em=ig.querySelector('.err-msg'); if(em) em.remove();
+}
+function clearAllErrs(){
+  document.querySelectorAll('.input-err').forEach(el=>el.classList.remove('input-err'));
+  document.querySelectorAll('.err-msg').forEach(em=>em.remove());
+}
+function validateMinMax(){
+  document.querySelectorAll('input[type="number"]').forEach(el=>{
+    if(!el.id) return;
+    const v=+el.value, mn=el.min!==''?+el.min:null, mx=el.max!==''?+el.max:null;
+    if(mn!==null && v<mn){ showErr(el.id,`Min: ${mn}`); }
+    else if(mx!==null && v>mx){ showErr(el.id,`Max: ${mx}`); }
+    else { clearErr(el.id); }
+  });
+}
+
+</script>
+<div style="position:fixed;bottom:8px;right:12px;font-size:.61rem;color:var(--s400);pointer-events:none;z-index:10;font-family:var(--font);">Updated Apr 2026</div>
+</body>
+</html>

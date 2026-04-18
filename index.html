@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Retirement & Coast FIRE Calculator</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Financial Calculators</title>
 <style>
 :root{
   --n950:#060d1e;--n900:#0f172a;--n800:#1e293b;--n700:#334155;--n600:#475569;
@@ -14,1561 +13,287 @@
   --pr6:#7c3aed;--pr5:#8b5cf6;--pr1:#ede9fe;--pr0:#faf5ff;
   --em6:#059669;--em5:#10b981;--em1:#d1fae5;--em0:#ecfdf5;
   --am6:#d97706;--am5:#f59e0b;--am1:#fef3c7;--am0:#fffbeb;
-  --ro6:#e11d48;--ro5:#f43f5e;--ro1:#ffe4e6;
+  --ro6:#e11d48;--ro5:#f43f5e;--ro1:#ffe4e6;--ro0:#fff1f2;
   --in6:#4f46e5;--in5:#6366f1;--in1:#e0e7ff;--in0:#eef2ff;
+  --cy6:#0e7490;--cy5:#06b6d4;--cy1:#cffafe;--cy0:#ecfeff;
   --font:'Inter','Segoe UI',system-ui,sans-serif;
   --mono:'JetBrains Mono','Fira Code',monospace;
   --rsm:8px;--rmd:12px;--rlg:16px;--rfl:9999px;
   --sh1:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
-  --sh2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+  --sh2:0 4px 12px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.07);
+  --sh3:0 8px 24px rgba(0,0,0,.12),0 4px 8px rgba(0,0,0,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* HEADER */
-.hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
-.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 20% 50%,rgba(99,102,241,.15),transparent),radial-gradient(ellipse 40% 60% at 80% 30%,rgba(139,92,246,.12),transparent);pointer-events:none;}
-.hdr-in{max-width:1300px;margin:0 auto;position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
-.hdr h1{font-size:1.4rem;font-weight:700;color:var(--white);letter-spacing:-.02em;}
-.hdr h1 span{color:var(--bl5);}
-.hdr-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
-.htag{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:var(--rfl);border:1px solid rgba(255,255,255,.1);color:var(--s300);background:rgba(255,255,255,.05);letter-spacing:.03em;}
-.nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:var(--rsm);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
-.nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white);}
-.nav-select{background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid rgba(255,255,255,.2);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 30px 7px 12px;border-radius:var(--rsm);cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;width:auto;max-width:160px;}
-.nav-select:hover{background-color:rgba(255,255,255,.12);color:var(--white);}
-.nav-select option{background:#1e293b;color:#e2e8f0;}
-.hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
+/* ── HEADER ── */
+.hdr{background:var(--n900);padding:32px 28px 28px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(ellipse 50% 120% at 10% 50%,rgba(59,130,246,.12),transparent),
+  radial-gradient(ellipse 40% 80% at 90% 20%,rgba(139,92,246,.08),transparent),
+  radial-gradient(ellipse 30% 60% at 60% 90%,rgba(6,182,212,.06),transparent);
+  pointer-events:none;}
+.hdr-in{max-width:1100px;margin:0 auto;position:relative;}
+.hdr-eyebrow{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--bl5);margin-bottom:10px;}
+.hdr h1{font-size:2.1rem;font-weight:800;color:var(--white);letter-spacing:-.04em;line-height:1.1;margin-bottom:10px;}
+.hdr h1 em{font-style:normal;color:var(--bl5);}
+.hdr-sub{font-size:.95rem;color:var(--s400);max-width:520px;line-height:1.6;}
+.hdr-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;}
+.tag{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--s300);font-size:.69rem;font-weight:600;padding:4px 10px;border-radius:var(--rfl);letter-spacing:.02em;}
 
-/* LAYOUT */
-.layout{display:grid;grid-template-columns:375px 1fr;min-height:calc(100vh - 82px);}
-@media(max-width:960px){.layout{grid-template-columns:1fr;}}
+/* ── MAIN ── */
+.main{max-width:1100px;margin:0 auto;padding:36px 24px 60px;}
 
-/* SIDEBAR */
-.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 82px);}
-.sb::-webkit-scrollbar{width:3px;}
-.sb::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
-.sbh{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
-.sbh::after{content:'';flex:1;height:1px;background:var(--n800);}
-
-/* Partner blocks */
-.pb-block{border-radius:var(--rmd);padding:11px 13px;margin-bottom:9px;border:1px solid var(--n700);}
-.pb-block.pa{border-top:2px solid var(--bl5);background:rgba(59,130,246,.04);}
-.pb-block.pb{border-top:2px solid var(--pr5);background:rgba(139,92,246,.04);}
-.pb-lbl{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:5px;margin-bottom:9px;}
-.pb-lbl.la{color:var(--bl5);}
-.pb-lbl.lb{color:var(--pr5);}
-.pb-dot{width:5px;height:5px;border-radius:50%;}
-.dot-a{background:var(--bl5);}
-.dot-b{background:var(--pr5);}
-
-/* Inputs */
-.ig{margin-bottom:9px;}
-.ig:last-child{margin-bottom:0;}
-.ig label{display:block;font-size:.71rem;font-weight:500;color:var(--s400);margin-bottom:3px;}
-.iw{position:relative;}
-.iw .pre,.iw .suf{position:absolute;top:50%;transform:translateY(-50%);font-size:.75rem;font-weight:600;color:var(--n600);pointer-events:none;z-index:1;}
-.iw .pre{left:9px;}
-.iw .suf{right:9px;}
-input[type="number"]{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;}
-input[type="number"]:focus{outline:none;border-color:var(--bl5);box-shadow:0 0 0 3px rgba(59,130,246,.15);}
-.has-pre input[type="number"]{padding-left:19px;}
-.has-suf input[type="number"]{padding-right:21px;}
-.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-
-/* Sliders */
-input[type="range"]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--n700);border:none;cursor:pointer;padding:0;margin:5px 0 3px;}
-input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--bl5);cursor:pointer;box-shadow:0 0 0 3px rgba(59,130,246,.2);}
-.rrow{display:flex;justify-content:space-between;align-items:center;}
-.rlbl{font-size:.65rem;color:var(--n600);}
-.rval{display:flex;align-items:center;gap:1px;}
-.rval input[type="number"]{width:38px;text-align:center;border:none;background:transparent;font-size:.8rem;font-weight:700;color:var(--bl5);padding:0;}
-.rval span{font-size:.8rem;font-weight:700;color:var(--bl5);}
-
-/* Phase pill */
-.phase-pill{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:var(--rsm);padding:8px 11px;font-size:.71rem;color:var(--s300);line-height:1.55;margin-bottom:12px;}
-.phase-pill strong{color:var(--white);}
-.phase-pill .psep{color:var(--n600);margin:0 4px;}
-
-/* Toggle sections */
-.ts{margin-bottom:7px;}
-.ts-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-radius:var(--rsm);background:var(--n800);border:1px solid var(--n700);cursor:pointer;transition:background .15s;}
-.ts-hdr:hover{background:rgba(255,255,255,.03);}
-.ts-title{font-size:.75rem;font-weight:600;color:var(--s300);display:flex;align-items:center;gap:6px;}
-.ts-body{overflow:hidden;max-height:0;transition:max-height .3s ease;padding:0 1px;}
-.ts-body.open{max-height:700px;}
-.ts-inner{padding:10px 0 4px;display:flex;flex-direction:column;gap:9px;}
-.ts-note{font-size:.69rem;color:var(--s400);line-height:1.5;}
-.ts-note strong{color:var(--s300);}
-
-/* Toggle pill */
-.tpill{position:relative;width:32px;height:18px;flex-shrink:0;}
-.tpill input{opacity:0;width:0;height:0;}
-.tpill .trk{position:absolute;inset:0;background:var(--n700);border-radius:var(--rfl);transition:background .2s;cursor:pointer;}
-.tpill .trk::after{content:'';position:absolute;width:12px;height:12px;left:3px;top:3px;background:white;border-radius:50%;transition:transform .2s;}
-.tpill input:checked + .trk{background:var(--bl5);}
-.tpill input:checked + .trk::after{transform:translateX(14px);}
-
-/* Calc box */
-.cb{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:var(--rsm);padding:9px 11px;}
-.cb-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.71rem;}
-.cb-lbl{color:var(--s400);}
-.cb-val{color:var(--white);font-weight:600;font-family:var(--mono);font-size:.72rem;}
-.cb-div{height:1px;background:rgba(99,102,241,.2);margin:4px 0;}
-.cb-tot{color:#a5b4fc;font-weight:700;}
-
-/* MAIN */
-.main{padding:18px 22px 40px;overflow-y:auto;}
-
-/* Tabs */
-.tabs{display:flex;gap:3px;background:var(--white);border:1px solid var(--s200);border-radius:var(--rfl);padding:4px;margin-bottom:18px;box-shadow:var(--sh1);}
-.tab{flex:1;padding:7px 12px;border:none;border-radius:var(--rfl);font-size:.76rem;font-weight:600;cursor:pointer;background:transparent;color:var(--n600);transition:all .16s;text-align:center;white-space:nowrap;}
-.tab:hover{color:var(--n900);}
-.tab.active{background:var(--n900);color:var(--white);box-shadow:var(--sh1);}
-.tab-panel{display:none;animation:fi .18s ease;}
-.tab-panel.active{display:block;}
-@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
-
-/* Heroes */
-.heroes{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px;}
-.hero{border-radius:var(--rlg);padding:16px 14px;border:1px solid transparent;position:relative;overflow:hidden;}
-.hbl{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;}
-.hgr{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#a7f3d0;}
-.ham{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;}
-.hpu{background:linear-gradient(135deg,#faf5ff,#ede9fe);border-color:#ddd6fe;}
-.hin{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe;}
-.hero .hl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:4px;}
-.hero .hv{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-bottom:3px;}
-.hbl .hv{color:var(--bl6);}
-.hgr .hv{color:var(--em6);}
-.ham .hv{color:var(--am6);}
-.hpu .hv{color:var(--pr6);}
-.hin .hv{color:var(--in6);}
-.hero .hs{font-size:.7rem;color:var(--n600);}
-
-/* Stats */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px;margin-bottom:13px;}
-.stat{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:10px 12px;box-shadow:var(--sh1);transition:box-shadow .15s;}
-.stat:hover{box-shadow:var(--sh2);}
-.stat .sl{font-size:.66rem;color:var(--n600);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
-.stat .sv{font-size:.95rem;font-weight:700;color:var(--n900);font-family:var(--mono);}
-.stat .sv.pos{color:var(--em6);}
-.stat .sv.neg{color:var(--ro6);}
-.stat .sv.neu{color:var(--in6);}
-
-/* Banners */
-.bn{padding:9px 13px;border-radius:var(--rmd);font-size:.8rem;font-weight:500;margin-bottom:12px;line-height:1.5;border:1px solid;}
-.bn strong{font-weight:700;}
-.bn.ok{background:var(--em0);border-color:var(--em1);color:#065f46;}
-.bn.warn{background:var(--am0);border-color:var(--am1);color:#78350f;}
-.bn.info{background:var(--bl0);border-color:var(--bl1);color:#1e3a8a;}
-.bn.ind{background:var(--in0);border-color:var(--in1);color:#312e81;}
-
-/* Progress */
-.pgw{margin:7px 0 13px;}
-.pgl{display:flex;justify-content:space-between;font-size:.7rem;font-weight:600;color:var(--n600);margin-bottom:4px;}
-.pgt{height:7px;background:var(--s200);border-radius:var(--rfl);overflow:hidden;}
-.pgf{height:100%;border-radius:var(--rfl);transition:width .5s cubic-bezier(.4,0,.2,1);}
-.pgf.bl{background:linear-gradient(90deg,var(--bl5),var(--bl6));}
-.pgf.gr{background:linear-gradient(90deg,var(--em5),var(--em6));}
-.pgf.am{background:linear-gradient(90deg,var(--am5),var(--am6));}
-
-/* Section head */
-.sh{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--n600);margin:16px 0 9px;display:flex;align-items:center;gap:8px;}
+/* Section heading */
+.sh{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--n600);margin:0 0 16px;display:flex;align-items:center;gap:10px;}
 .sh::after{content:'';flex:1;height:1px;background:var(--s200);}
 
-/* Info box */
-.ib{background:var(--s50);border-left:3px solid var(--bl5);border-radius:0 var(--rsm) var(--rsm) 0;padding:9px 12px;font-size:.76rem;color:var(--n600);margin-bottom:12px;line-height:1.6;}
-.ib strong{color:var(--n900);}
+/* Calculator grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:40px;}
 
-/* Chart */
-.cw{position:relative;height:215px;margin-top:6px;}
+/* Card */
+.card{background:var(--white);border:1px solid var(--s200);border-radius:var(--rlg);box-shadow:var(--sh1);transition:transform .18s,box-shadow .18s;display:flex;flex-direction:column;overflow:hidden;text-decoration:none;color:inherit;position:relative;}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sh3);}
+.card-accent{height:4px;width:100%;}
+.card-body{padding:20px 20px 16px;flex:1;}
+.card-icon{font-size:1.8rem;margin-bottom:10px;line-height:1;}
+.card-title{font-size:1rem;font-weight:700;color:var(--n900);margin-bottom:5px;letter-spacing:-.01em;}
+.card-desc{font-size:.8rem;color:var(--n600);line-height:1.6;margin-bottom:12px;}
+.card-features{display:flex;flex-direction:column;gap:4px;}
+.card-feat{font-size:.72rem;color:var(--n600);display:flex;align-items:flex-start;gap:6px;line-height:1.4;}
+.card-feat::before{content:'✓';font-weight:700;font-size:.7rem;flex-shrink:0;margin-top:1px;}
+.card-footer{padding:12px 20px;border-top:1px solid var(--s100);display:flex;align-items:center;justify-content:space-between;background:var(--s50);}
+.card-cta{font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:6px;}
+.card-cta-arrow{font-size:.8rem;transition:transform .15s;}
+.card:hover .card-cta-arrow{transform:translateX(3px);}
 
-/* Milestones */
-.mss{margin-top:7px;}
-.ms{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--s100);font-size:.78rem;}
-.ms:last-child{border-bottom:none;}
-.mi{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;flex-shrink:0;}
-.mi.done{background:var(--em1);color:var(--em6);}
-.mi.next{background:var(--s100);color:var(--n600);}
-.mi.house{background:var(--in1);color:var(--in6);}
-.mi.star{background:var(--pr1);color:var(--pr6);}
-.ma{font-weight:700;min-width:78px;font-size:.72rem;color:var(--bl6);font-family:var(--mono);}
-.md{flex:1;color:var(--n600);}
+/* Color themes */
+.c-am .card-accent{background:linear-gradient(90deg,var(--am5),var(--am6));}
+.c-am .card-feat::before{color:var(--am6);}
+.c-am .card-cta{color:var(--am6);}
 
-/* Table */
-table{width:100%;border-collapse:collapse;font-size:.77rem;}
-th{background:var(--s50);padding:7px 9px;text-align:left;font-weight:700;color:var(--n600);font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--s200);}
-td{padding:7px 9px;border-bottom:1px solid var(--s100);}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--s50);}
-.tg{color:var(--em6);font-weight:700;}
-.to{color:var(--am6);font-weight:700;}
-.tb{color:var(--ro6);font-weight:700;}
+.c-pr .card-accent{background:linear-gradient(90deg,var(--pr5),var(--pr6));}
+.c-pr .card-feat::before{color:var(--pr6);}
+.c-pr .card-cta{color:var(--pr6);}
 
-/* Tooltip */
-#ttip{position:fixed;z-index:9999;background:var(--n800);border:1px solid var(--n700);color:var(--s300);font-size:.73rem;line-height:1.55;padding:9px 12px;border-radius:var(--rmd);max-width:270px;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.35);opacity:0;transition:opacity .15s;word-break:normal;white-space:normal;left:-9999px;top:-9999px;}
-#ttip.show{opacity:1;}
+.c-ro .card-accent{background:linear-gradient(90deg,var(--ro5),var(--ro6));}
+.c-ro .card-feat::before{color:var(--ro6);}
+.c-ro .card-cta{color:var(--ro6);}
 
-/* Salary Requirements */
-.sal-wrap{margin-bottom:14px;}
-.sal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:7px;margin:8px 0 10px;}
-.sal-card{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:9px 11px;box-shadow:var(--sh1);}
-.sal-card .sc-rate{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--n600);margin-bottom:3px;}
-.sal-card .sc-val{font-size:.9rem;font-weight:700;color:var(--n900);font-family:var(--mono);}
-.sal-card .sc-val.ok{color:var(--em6);}
-.sal-card .sc-note{font-size:.62rem;color:var(--n600);margin-top:2px;}
-.sal-divider{height:1px;background:var(--s200);margin:10px 0;}
-.mort-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:.76rem;border-bottom:1px solid var(--s100);}
-.mort-row:last-child{border-bottom:none;}
-.mort-lbl{color:var(--n600);}
-.mort-val{font-weight:700;color:var(--n900);font-family:var(--mono);}
-.mort-val.ok{color:var(--em6);}
-.mort-val.warn{color:var(--am6);}
+.c-in .card-accent{background:linear-gradient(90deg,var(--in5),var(--in6));}
+.c-in .card-feat::before{color:var(--in6);}
+.c-in .card-cta{color:var(--in6);}
 
-/* Math Inspector Panel */
-.math-btn{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.4);color:#a5b4fc;font-size:.74rem;font-weight:600;padding:6px 14px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;letter-spacing:.01em;white-space:nowrap;}
-.math-btn:hover{background:rgba(99,102,241,.3);color:var(--white);}
-.mp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
-.mp-overlay.open{opacity:1;pointer-events:auto;}
-.mp{position:fixed;top:0;right:0;height:100vh;width:560px;max-width:100vw;background:var(--n950);border-left:1px solid var(--n700);z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,.4);}
-.mp.open{transform:translateX(0);}
-.mp-hdr{padding:16px 20px;border-bottom:1px solid var(--n700);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--n900);}
-.mp-hdr h2{font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-.01em;}
-.mp-hdr h2 span{color:var(--bl5);}
-.mp-close{background:var(--n800);border:1px solid var(--n700);color:var(--s400);font-size:.76rem;font-weight:600;padding:5px 12px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;}
-.mp-close:hover{color:var(--white);border-color:var(--s400);}
-.mp-body{overflow-y:auto;flex:1;padding:16px 18px;}
-.mp-body::-webkit-scrollbar{width:4px;}
-.mp-body::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
-.mp-formulas{background:var(--n800);border:1px solid var(--n700);border-radius:var(--rmd);padding:13px 15px;margin-bottom:16px;line-height:1.75;}
-.mf-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:10px;}
-.mf-row{font-size:.72rem;color:var(--s400);margin:3px 0;}
-.mf-row strong{color:var(--s300);}
-.mf-row code{font-family:var(--mono);color:#a5b4fc;font-size:.71rem;}
-.mp-tbl-wrap{overflow-x:auto;}
-.mp-tbl{width:100%;border-collapse:collapse;font-size:.68rem;}
-.mp-tbl th{background:var(--n800);padding:5px 8px;text-align:right;font-weight:700;color:var(--n600);font-size:.59rem;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--n700);white-space:nowrap;position:sticky;top:0;z-index:1;}
-.mp-tbl th:nth-child(1),.mp-tbl th:nth-child(4),.mp-tbl th:last-child{text-align:left;}
-.mp-tbl td{padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.035);font-family:var(--mono);text-align:right;color:var(--s400);}
-.mp-tbl td.tl{text-align:left;}
-.mp-tbl td.yr{color:var(--s300);font-weight:700;}
-.mp-tbl td.phase{color:var(--n600);font-size:.6rem;white-space:nowrap;}
-.mp-tbl td.pos{color:#34d399;}
-.mp-tbl td.neg{color:#f87171;}
-.mp-tbl td.neu{color:var(--n600);}
-.mp-tbl td.bld{color:var(--white);font-weight:700;}
-.mp-tbl td.note{color:#fbbf24;font-size:.62rem;white-space:nowrap;}
-.mp-tbl tr.ms-row td{background:rgba(99,102,241,.09);}
-.mp-tbl tr.ev-row td{background:rgba(245,158,11,.06);}
-.mp-tbl tr:last-child td{border-bottom:none;}
+.c-em .card-accent{background:linear-gradient(90deg,var(--em5),var(--em6));}
+.c-em .card-feat::before{color:var(--em6);}
+.c-em .card-cta{color:var(--em6);}
 
-/* Home impact */
-.hig{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px;}
-.hic{border-radius:var(--rmd);padding:11px 13px;border:1px solid;}
-.hic.wo{background:var(--em0);border-color:var(--em1);}
-.hic.wi{background:var(--ro1);border-color:#fda4af;}
-.hic .il{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
-.hic.wo .il{color:var(--em6);}
-.hic.wi .il{color:var(--ro6);}
-.hic .iv{font-size:1.15rem;font-weight:800;font-family:var(--mono);}
-.hic.wo .iv{color:var(--em6);}
-.hic.wi .iv{color:var(--ro6);}
-.hic .is{font-size:.68rem;color:var(--n600);margin-top:2px;}
+.c-bl .card-accent{background:linear-gradient(90deg,var(--bl5),var(--bl6));}
+.c-bl .card-feat::before{color:var(--bl6);}
+.c-bl .card-cta{color:var(--bl6);}
 
-/* ── MOBILE RESPONSIVE ─────────────────────────────────────── */
+.c-cy .card-accent{background:linear-gradient(90deg,var(--cy5),var(--cy6));}
+.c-cy .card-feat::before{color:var(--cy6);}
+.c-cy .card-cta{color:var(--cy6);}
+
+.c-gr2 .card-accent{background:linear-gradient(90deg,#14b8a6,#0d9488);}
+.c-gr2 .card-feat::before{color:#0d9488;}
+.c-gr2 .card-cta{color:#0d9488;}
+
+/* Info strip */
+.info-strip{background:var(--n900);border-radius:var(--rlg);padding:22px 26px;display:flex;align-items:center;gap:20px;margin-bottom:32px;border:1px solid var(--n800);}
+.info-strip-icon{font-size:1.8rem;flex-shrink:0;}
+.info-strip-text h3{font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:3px;}
+.info-strip-text p{font-size:.78rem;color:var(--s400);line-height:1.5;}
+
+/* Footer */
+.footer{text-align:center;padding:24px;font-size:.7rem;color:var(--s400);border-top:1px solid var(--s200);}
+
+/* Mobile */
 @media(max-width:700px){
-  /* Header */
-  .hdr{padding:12px 14px 11px;}
-  .hdr-in{flex-wrap:wrap;gap:8px;}
-  .hdr h1{font-size:1.05rem;}
-  .hdr-tags{display:none;}
-  .hdr-actions{margin-top:0;gap:6px;}
-  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
-  .math-btn{font-size:.7rem;padding:7px 12px;min-height:36px;}
-
-  /* Layout — stack sidebar above main */
-  .layout{grid-template-columns:1fr;min-height:unset;}
-
-  /* Sidebar — not sticky on mobile */
-  .sb{position:static;height:auto;max-height:none;padding:14px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
-
-  /* Inputs — 16px prevents iOS auto-zoom */
-  input[type="number"]{font-size:1rem !important;padding:10px 10px;}
-  .has-pre input[type="number"]{padding-left:22px;}
-  .has-suf input[type="number"]{padding-right:24px;}
-  .rval input[type="number"]{font-size:.95rem !important;width:48px;padding:0;}
-  .iw .pre{left:8px;font-size:.8rem;}
-  .iw .suf{right:8px;font-size:.8rem;}
-
-  /* Labels */
-  .ig label{font-size:.78rem;}
-  .sbh{font-size:.67rem;margin:15px 0 8px;}
-
-  /* Sliders — bigger touch targets */
-  input[type="range"]{height:5px;margin:9px 0 5px;}
-  input[type="range"]::-webkit-slider-thumb{width:20px;height:20px;}
-
-  /* Toggle sections */
-  .ts-hdr{padding:11px 12px;min-height:44px;}
-  .ts-title{font-size:.78rem;}
-  .tpill{width:36px;height:20px;}
-  .tpill .trk::after{width:14px;height:14px;}
-  .tpill input:checked + .trk::after{transform:translateX(16px);}
-
-  /* r2 stays 2-col on most phones (both columns narrow but workable) */
-  .r2{grid-template-columns:1fr 1fr;}
-
-  /* Phase pill */
-  .phase-pill{font-size:.74rem;}
-
-  /* Main area */
-  .main{padding:13px 12px 30px;}
-
-  /* Tabs — horizontal scroll */
-  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 5px;}
-  .tabs::-webkit-scrollbar{display:none;}
-  .tab{flex:0 0 auto;padding:9px 13px;font-size:.74rem;min-height:38px;}
-
-  /* Hero cards — 2 col */
-  .heroes{grid-template-columns:1fr 1fr;gap:8px;}
-  .hero{padding:12px 11px;}
-  .hero .hv{font-size:1.2rem;}
-  .hero .hs{font-size:.66rem;}
-
-  /* Stats */
-  .stats{grid-template-columns:1fr 1fr;gap:7px;}
-  .stat .sv{font-size:.85rem;}
-
-  /* Charts shorter */
-  .cw{height:175px;}
-
-  /* Salary table wrapper */
-  .sal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-
-  /* Home impact grid */
-  .hig{grid-template-columns:1fr 1fr;}
-
-  /* Math Inspector panel — full-width on mobile, comes from bottom */
-  .mp{width:100vw;max-width:100vw;height:90vh;top:auto;bottom:0;right:0;border-left:none;border-top:1px solid var(--n700);border-radius:var(--rlg) var(--rlg) 0 0;transform:translateY(100%);}
-  .mp.open{transform:translateY(0);}
-  .mp-hdr{padding:14px 16px;border-radius:var(--rlg) var(--rlg) 0 0;}
-  .mp-hdr h2{font-size:.9rem;}
-  .mp-body{padding:13px 13px;}
-  .mp-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .mp-tbl{min-width:700px;}
-  .mf-row{font-size:.73rem;}
-
-  /* Info/banner */
-  .bn{font-size:.76rem;}
-  .ib{font-size:.74rem;}
-  .sh{font-size:.63rem;}
-}
-
-/* Extra-small phones */
-@media(max-width:399px){
-  .heroes{grid-template-columns:1fr;}
-  .hero .hv{font-size:1.4rem;}
-  .r2{grid-template-columns:1fr;}
-  .hig{grid-template-columns:1fr;}
-  .stats{grid-template-columns:1fr 1fr;}
+  .hdr{padding:22px 16px 20px;}
+  .hdr h1{font-size:1.5rem;}
+  .main{padding:22px 14px 40px;}
+  .grid{grid-template-columns:1fr;gap:12px;}
+  .info-strip{flex-direction:column;gap:12px;text-align:center;}
 }
 </style>
 </head>
 <body>
 
-<div class="hdr">
+<header class="hdr">
   <div class="hdr-in">
-    <div>
-      <h1>🔥 Retirement &amp; <span>Coast FIRE</span> Calculator</h1>
-      <div class="hdr-tags" style="display:none">
-        <span class="htag">Two Partners</span>
-        <span class="htag">Post-Retirement Savings</span>
-        <span class="htag">Home Purchase Impact</span>
-        <span class="htag">Coast FIRE</span>
-        <span class="htag">Traditional FIRE</span>
-        <span class="htag">Barista FIRE</span>
-        <span class="htag">Withdrawal Analysis</span>
-      </div>
-    </div>
-    <div class="hdr-actions">
-      <select class="nav-select" onchange="if(this.value)window.location=this.value">
-        <option value="retirement_calculator.html" selected>🔥 Retirement</option>
-        <option value="mortgage_calculator.html">🏡 Mortgage</option>
-        <option value="college_calculator.html">🎓 529 College</option>
-        <option value="interest_calculator.html">💰 Interest</option>
-      </select>
-      <button class="math-btn" onclick="toggleMath()" title="Show year-by-year math breakdown">🔍 Show Math</button>
+    <div class="hdr-eyebrow">Personal Finance Tools</div>
+    <h1>Financial <em>Calculators</em></h1>
+    <p class="hdr-sub">Eight precision tools for tax planning, retirement, mortgages, estate strategy, Social Security, and more. All calculations run locally — nothing is sent to a server.</p>
+    <div class="hdr-tags">
+      <span class="tag">2026 Tax Brackets</span>
+      <span class="tag">Mobile-Friendly</span>
+      <span class="tag">Shareable Links</span>
+      <span class="tag">No Sign-up</span>
     </div>
   </div>
-</div>
-
-<div class="layout">
-<aside class="sb">
-
-  <div class="sbh">Partners</div>
-  <div class="pb-block pa">
-    <div class="pb-lbl la"><span class="pb-dot dot-a"></span>Partner A</div>
-    <div class="r2">
-      <div class="ig"><label>Current Age</label>
-        <div class="iw has-suf"><input type="number" id="ageA" value="32" min="18" max="80" oninput="calc()"><span class="suf">yr</span></div></div>
-      <div class="ig"><label>Retirement Age</label>
-        <div class="iw has-suf"><input type="number" id="retireA" value="55" min="25" max="85" oninput="calc()"><span class="suf">yr</span></div></div>
-    </div>
-    <div class="ig" style="margin-top:7px"><label>Annual Gross Salary</label>
-      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="salaryA" value="120000" min="0" step="5000" oninput="calc()"></div></div>
-  </div>
-  <div class="pb-block pb">
-    <div class="pb-lbl lb"><span class="pb-dot dot-b"></span>Partner B</div>
-    <div class="r2">
-      <div class="ig"><label>Current Age</label>
-        <div class="iw has-suf"><input type="number" id="ageB" value="30" min="18" max="80" oninput="calc()"><span class="suf">yr</span></div></div>
-      <div class="ig"><label>Retirement Age</label>
-        <div class="iw has-suf"><input type="number" id="retireB" value="60" min="25" max="85" oninput="calc()"><span class="suf">yr</span></div></div>
-    </div>
-    <div class="ig" style="margin-top:7px"><label>Annual Gross Salary</label>
-      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="salaryB" value="80000" min="0" step="5000" oninput="calc()"></div></div>
-  </div>
-  <div id="phaseInfo" class="phase-pill"></div>
-
-  <div class="sbh">Joint Finances</div>
-  <div class="ig"><label>Combined Portfolio (today)</label>
-    <div class="iw has-pre"><span class="pre">$</span><input type="number" id="currentSavings" value="120000" min="0" oninput="calc()"></div></div>
-  <div class="ig"><label>Joint Annual Contributions <span style="color:var(--n600)">(stops at first retirement)</span></label>
-    <div class="iw has-pre"><span class="pre">$</span><input type="number" id="annualContrib" value="30000" min="0" oninput="calc()"></div></div>
-  <div class="ig"><label>Annual Retirement Expenses (today's $)</label>
-    <div class="iw has-pre"><span class="pre">$</span><input type="number" id="annualExpenses" value="60000" min="1000" oninput="calc()"></div></div>
-
-  <div class="sbh">Returns &amp; Rates</div>
-  <div class="ig"><label>Pre-Retirement Return</label>
-    <input type="range" id="preSlider" min="1" max="15" step="0.5" value="7" oninput="syncS('preReturn','preSlider');calc()">
-    <div class="rrow">
-      <span class="rlbl">1%</span>
-      <span class="rval"><input type="number" id="preReturn" value="7" min="1" max="15" step="0.5" oninput="syncI('preReturn','preSlider');calc()"><span>%</span></span>
-      <span class="rlbl">15%</span>
-    </div>
-  </div>
-  <div class="ig"><label>Post-Retirement Return</label>
-    <input type="range" id="postSlider" min="1" max="12" step="0.5" value="5" oninput="syncS('postReturn','postSlider');calc()">
-    <div class="rrow">
-      <span class="rlbl">1%</span>
-      <span class="rval"><input type="number" id="postReturn" value="5" min="1" max="12" step="0.5" oninput="syncI('postReturn','postSlider');calc()"><span>%</span></span>
-      <span class="rlbl">12%</span>
-    </div>
-  </div>
-  <div class="r2">
-    <div class="ig"><label>Inflation</label>
-      <div class="iw has-suf"><input type="number" id="inflation" value="3" min="0" max="10" step="0.5" oninput="calc()"><span class="suf">%</span></div></div>
-    <div class="ig"><label>Safe Withdrawal</label>
-      <div class="iw has-suf"><input type="number" id="swr" value="4" min="1" max="8" step="0.25" oninput="calc()"><span class="suf">%</span></div></div>
-  </div>
-
-  <div class="sbh" style="margin-top:14px">Current Monthly Expenses</div>
-  <div style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.18);border-radius:var(--rmd);padding:11px 13px;margin-bottom:10px;">
-    <div class="ts-note" style="margin-bottom:9px">Break down your <strong>current</strong> spending so the home purchase model can swap old housing costs for new ones instead of stacking them.</div>
-    <div class="ig"><label>Current Housing Cost <span style="color:var(--n600)">(rent or existing mortgage/mo)</span></label>
-      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="currentRent" value="3500" min="0" step="100" oninput="calc()"></div></div>
-    <div class="ig"><label>Other Monthly Expenses <span style="color:var(--n600)">(food, transport, etc.)</span></label>
-      <div class="iw has-pre"><span class="pre">$</span><input type="number" id="otherExpenses" value="1500" min="0" step="100" oninput="calc()"></div></div>
-    <div id="expBreakdown" style="margin-top:8px;font-size:.69rem;color:var(--s400);line-height:1.7;border-top:1px solid rgba(99,102,241,.15);padding-top:7px;"></div>
-  </div>
-
-  <div class="sbh" style="margin-top:2px">Optional Features</div>
-
-  <!-- Post-Retirement Savings -->
-  <div class="ts" style="margin-bottom:7px">
-    <div class="ts-hdr" onclick="toggleSec('prBody','prToggle')">
-      <span class="ts-title">💼 Post-Retirement Savings</span>
-      <label class="tpill" onclick="event.stopPropagation()">
-        <input type="checkbox" id="prToggle" onchange="toggleSec('prBody','prToggle');calc()">
-        <span class="trk"></span>
-      </label>
-    </div>
-    <div class="ts-body" id="prBody">
-      <div class="ts-inner">
-        <div class="ts-note">After the <strong>first partner retires</strong>, they may continue contributing to the portfolio (e.g. consulting, part-time savings, severance investing).</div>
-        <div class="ig"><label>Annual Contribution Amount</label>
-          <div class="iw has-pre"><span class="pre">$</span><input type="number" id="prContrib" value="10000" min="0" oninput="calc()"></div></div>
-        <div class="ig"><label>Duration after first retirement</label>
-          <div class="iw has-suf"><input type="number" id="prDuration" value="5" min="1" max="40" oninput="calc()"><span class="suf">yrs</span></div></div>
-        <div id="prNote" style="font-size:.68rem;color:var(--n600);font-style:italic;padding:2px 0"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Home Purchase -->
-  <div class="ts" style="margin-bottom:7px">
-    <div class="ts-hdr" onclick="toggleSec('hmBody','hmToggle')">
-      <span class="ts-title">🏡 Home Purchase Impact</span>
-      <label class="tpill" onclick="event.stopPropagation()">
-        <input type="checkbox" id="hmToggle" onchange="toggleSec('hmBody','hmToggle');calc()">
-        <span class="trk"></span>
-      </label>
-    </div>
-    <div class="ts-body" id="hmBody">
-      <div class="ts-inner">
-        <div class="ig"><label>Home Value</label>
-          <div class="iw has-pre"><span class="pre">$</span><input type="number" id="hmValue" value="3000000" min="0" step="50000" oninput="calc()"></div></div>
-        <div class="r2">
-          <div class="ig"><label>Down Payment</label>
-            <div class="iw has-suf"><input type="number" id="hmDown" value="20" min="5" max="100" oninput="calc()"><span class="suf">%</span></div></div>
-          <div class="ig"><label>Partner A Age at Purchase</label>
-            <div class="iw has-suf"><input type="number" id="hmAgeA" value="40" min="18" max="80" oninput="calc()"><span class="suf">yr</span></div></div>
-        </div>
-        <div class="r2">
-          <div class="ig"><label>Mortgage Rate</label>
-            <div class="iw has-suf"><input type="number" id="hmRate" value="6.5" min="1" max="15" step="0.1" oninput="calc()"><span class="suf">%</span></div></div>
-          <div class="ig"><label>Mortgage Term</label>
-            <div class="iw has-suf"><input type="number" id="hmTerm" value="30" min="10" max="30" step="5" oninput="calc()"><span class="suf">yr</span></div></div>
-        </div>
-        <div class="ig"><label>Property Tax + Maintenance (%/yr of home value)</label>
-          <div class="iw has-suf"><input type="number" id="hmTax" value="1.2" min="0" max="5" step="0.1" oninput="calc()"><span class="suf">%</span></div></div>
-        <div class="cb" id="hmCalcBox"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Barista -->
-  <div class="ts">
-    <div class="ts-hdr" onclick="toggleSec('brBody','brToggle')">
-      <span class="ts-title">☕ Barista / Part-Time Income</span>
-      <label class="tpill" onclick="event.stopPropagation()">
-        <input type="checkbox" id="brToggle" onchange="toggleSec('brBody','brToggle');calc()">
-        <span class="trk"></span>
-      </label>
-    </div>
-    <div class="ts-body" id="brBody">
-      <div class="ts-inner">
-        <div class="ts-note">Part-time retirement income covering a portion of expenses, reducing the required portfolio size.</div>
-        <div class="ig"><label>Annual Part-Time Income (today's $)</label>
-          <div class="iw has-pre"><span class="pre">$</span><input type="number" id="brIncome" value="20000" min="0" oninput="calc()"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Social Security -->
-  <div class="ts">
-    <div class="ts-hdr" onclick="toggleSec('ssBody','ssToggle')">
-      <span class="ts-title">🏛️ Social Security</span>
-      <label class="tpill" onclick="event.stopPropagation()">
-        <input type="checkbox" id="ssToggle" onchange="toggleSec('ssBody','ssToggle');calc()">
-        <span class="trk"></span>
-      </label>
-    </div>
-    <div class="ts-body" id="ssBody">
-      <div class="ts-inner">
-        <div class="ts-note">SS kicks in at your start age and reduces how much the portfolio needs to cover — lowering your effective withdrawal rate and extending portfolio life.</div>
-        <div class="r2">
-          <div class="ig"><label>Partner A Monthly Benefit</label>
-            <div class="iw has-pre"><span class="pre">$</span><input type="number" id="ssA" value="2200" min="0" step="100" oninput="calc()"></div></div>
-          <div class="ig"><label>Partner B Monthly Benefit</label>
-            <div class="iw has-pre"><span class="pre">$</span><input type="number" id="ssB" value="1800" min="0" step="100" oninput="calc()"></div></div>
-        </div>
-        <div class="r2">
-          <div class="ig"><label>A starts collecting (age)</label>
-            <div class="iw has-suf"><input type="number" id="ssAgeA" value="67" min="62" max="70" step="1" oninput="calc()"><span class="suf">age</span></div></div>
-          <div class="ig"><label>B starts collecting (age)</label>
-            <div class="iw has-suf"><input type="number" id="ssAgeB" value="67" min="62" max="70" step="1" oninput="calc()"><span class="suf">age</span></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</aside>
+</header>
 
 <main class="main">
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab(this,'coast')">🏖️ Coast FIRE</button>
-    <button class="tab" onclick="switchTab(this,'fire')">🔥 Traditional FIRE</button>
-    <button class="tab" onclick="switchTab(this,'barista')">☕ Barista FIRE</button>
-    <button class="tab" onclick="switchTab(this,'swr')">📊 Withdrawal</button>
+
+  <div class="info-strip">
+    <div class="info-strip-icon">🔗</div>
+    <div class="info-strip-text">
+      <h3>Shareable scenarios</h3>
+      <p>Every calculator encodes your inputs into the URL — bookmark your scenario or share it with a financial advisor, partner, or accountant. No account needed.</p>
+    </div>
   </div>
 
-  <!-- COAST FIRE -->
-  <div id="tab-coast" class="tab-panel active">
-    <div class="ib"><strong>Coast FIRE</strong>: the portfolio needed <em>today</em> to grow — without further contributions — to your full FIRE number by full retirement. Two-phase: joint contributions until first retirement, then portfolio coasts.</div>
-    <div id="cBanner" class="bn info"></div>
-    <div id="cHomeBn" class="bn ind" style="display:none"></div>
-    <div class="heroes">
-      <div class="hero hbl"><div class="hl">Coast FIRE Number</div><div class="hv" id="coastNum">—</div><div class="hs">Needed today to coast</div></div>
-      <div class="hero hgr"><div class="hl">Full FIRE Number</div><div class="hv" id="fireNumC">—</div><div class="hs">Target at full retirement</div></div>
-    </div>
-    <div class="pgw">
-      <div class="pgl"><span>Progress to Coast FIRE</span><span id="cPct">0%</span></div>
-      <div class="pgt"><div class="pgf bl" id="cBar" style="width:0%"></div></div>
-    </div>
-    <div class="stats" id="cStats"></div>
-    <div id="cSalaryBox"></div>
-    <div class="sh">Two-Phase Portfolio Projection (real $)</div>
-    <div class="cw"><canvas id="coastChart"></canvas></div>
-    <div class="sh">Milestones</div>
-    <div class="mss" id="cMs"></div>
+  <div class="sh">Tax &amp; Income</div>
+  <div class="grid">
+
+    <a class="card c-am" href="tax_calculator.html">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon">💸</div>
+        <div class="card-title">Income Tax Calculator</div>
+        <div class="card-desc">Federal income tax, FICA, and effective rate for 2026 — updated for IRS Rev. Proc. 2025-32 and the One Big Beautiful Bill brackets.</div>
+        <div class="card-features">
+          <div class="card-feat">2026 federal brackets (all four filing statuses)</div>
+          <div class="card-feat">FICA: Social Security + Medicare with NIIT</div>
+          <div class="card-feat">Standard deduction, marginal vs. effective rate</div>
+          <div class="card-feat">Full tax waterfall breakdown</div>
+        </div>
+      </div>
+      <div class="card-footer"><span class="card-cta">Open calculator <span class="card-cta-arrow">→</span></span><span style="font-size:.68rem;color:var(--s400);">Updated Apr 2026</span></div>
+    </a>
+
+    <a class="card c-pr" href="estate_calculator.html">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon">🏛️</div>
+        <div class="card-title">Estate Tax Calculator</div>
+        <div class="card-desc">Federal estate tax with portability (DSUE), plus state estate taxes for all 12 states + DC that levy them — including New York's cliff rule.</div>
+        <div class="card-features">
+          <div class="card-feat">$13.61M federal exemption, 40% flat rate</div>
+          <div class="card-feat">DSUE portability for surviving spouses</div>
+          <div class="card-feat">12 state estate taxes + NY cliff rule</div>
+          <div class="card-feat">Estate waterfall visualization</div>
+        </div>
+      </div>
+      <div class="card-footer"><span class="card-cta">Open calculator <span class="card-cta-arrow">→</span></span><span style="font-size:.68rem;color:var(--s400);">Updated Apr 2026</span></div>
+    </a>
+
+    <a class="card c-bl" href="col_calculator.html">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon">🌆</div>
+        <div class="card-title">Cost of Living Comparison</div>
+        <div class="card-desc">Compare 56 US cities across six spending categories — with a full after-tax adjustment that accounts for each state's and city's income tax burden.</div>
+        <div class="card-features">
+          <div class="card-feat">Raw CoL equivalency + after-tax adjusted salary</div>
+          <div class="card-feat">State income tax for all 50 states + DC</div>
+          <div class="card-feat">Local tax: NYC, Philly, Detroit, and more</div>
+          <div class="card-feat">Custom category weights (housing, food, etc.)</div>
+        </div>
+      </div>
+      <div class="card-footer"><span class="card-cta">Open calculator <span class="card-cta-arrow">→</span></span><span style="font-size:.68rem;color:var(--s400);">Updated Apr 2026</span></div>
+    </a>
+
   </div>
 
-  <!-- TRADITIONAL FIRE -->
-  <div id="tab-fire" class="tab-panel">
-    <div class="ib"><strong>Traditional FIRE</strong>: Build a portfolio large enough to cover all expenses via SWR withdrawals. Contributions stop at first retirement — the two-phase growth curve shows the full journey.</div>
-    <div id="fBanner" class="bn info"></div>
-    <div id="fHomeBn" class="bn ind" style="display:none"></div>
-    <div class="heroes">
-      <div class="hero hbl"><div class="hl">FIRE Number</div><div class="hv" id="fireNumF">—</div><div class="hs">Portfolio target</div></div>
-      <div class="hero hgr"><div class="hl">Years to FIRE</div><div class="hv" id="yToFire">—</div><div class="hs" id="fSub">—</div></div>
-    </div>
-    <div class="pgw">
-      <div class="pgl"><span>Progress to FIRE</span><span id="fPct">0%</span></div>
-      <div class="pgt"><div class="pgf gr" id="fBar" style="width:0%"></div></div>
-    </div>
-    <div class="stats" id="fStats"></div>
-    <div id="fSalaryBox"></div>
-    <div id="fHomeImpact" style="display:none">
-      <div class="sh">Home Purchase Impact</div>
-      <div class="hig" id="fHIG"></div>
-    </div>
-    <div class="sh">Portfolio Projection (real $)</div>
-    <div class="cw"><canvas id="fireChart"></canvas></div>
-    <div class="sh">Key Milestones</div>
-    <div class="mss" id="fMs"></div>
+  <div class="sh">Retirement &amp; Benefits</div>
+  <div class="grid">
+
+    <a class="card c-in" href="retirement_calculator.html">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon">🔥</div>
+        <div class="card-title">Retirement Calculator</div>
+        <div class="card-desc">FIRE / traditional retirement planner for couples or individuals — models contributions, growth, withdrawals, and whether your nest egg lasts.</div>
+        <div class="card-features">
+          <div class="card-feat">401(k), IRA, Roth, and taxable accounts</div>
+          <div class="card-feat">Two-partner support with independent timelines</div>
+          <div class="card-feat">Year-by-year portfolio projection</div>
+          <div class="card-feat">Inflation-adjusted withdrawal modeling</div>
+        </div>
+      </div>
+      <div class="card-footer"><span class="card-cta">Open calculator <span class="card-cta-arrow">→</span></span><span style="font-size:.68rem;color:var(--s400);">Updated Apr 2026</span></div>
+    </a>
+
+    <a class="card c-cy" href="social_security_calculator.html">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon">🔒</div>
+        <div class="card-title">Social Security Optimizer</div>
+        <div class="card-desc">Find your optimal claiming age by modeling monthly benefits, lifetime totals, breakeven ages, and spousal coordination — all in one view.</div>
+        <div class="card-features">
+          <div class="card-feat">FRA by birth year (1943–1960+)</div>
+          <div class="card-feat">Early reduction and delayed credit formulas</div>
+          <div class="card-feat">Spousal benefit with 50% coordination rule</div>
+          <div class="card-feat">Breakeven and cumulative lifetime charts</div>
+        </div>
+      </div>
+      <div class="card-footer"><span class="card-cta">Open calculator <span class="card-cta-arrow">→</span></span><span style="font-size:.68rem;color:var(--s400);">Updated Apr 2026</span></div>
+    </a>
+
+    <a class="card c-gr2" href="interest_calculator.html">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon">💰</div>
+        <div class="card-title">Compound Interest Calculator</div>
+        <div class="card-desc">Model savings and investment growth with compound interest — visualize the effect of rate, time, contributions, and compounding frequency.</div>
+        <div class="card-features">
+          <div class="card-feat">Lump sum + periodic contributions</div>
+          <div class="card-feat">Multiple compounding frequencies</div>
+          <div class="card-feat">Growth chart with contribution breakdown</div>
+          <div class="card-feat">Inflation-adjusted real return toggle</div>
+        </div>
+      </div>
+      <div class="card-footer"><span class="card-cta">Open calculator <span class="card-cta-arrow">→</span></span><span style="font-size:.68rem;color:var(--s400);">Updated Apr 2026</span></div>
+    </a>
+
   </div>
 
-  <!-- BARISTA FIRE -->
-  <div id="tab-barista" class="tab-panel">
-    <div class="ib"><strong>Barista FIRE</strong>: Semi-retire with part-time income covering part of expenses. Portfolio only needs to cover the gap — dramatically lowering the required nest egg.</div>
-    <div id="bBanner" class="bn info"></div>
-    <div class="heroes">
-      <div class="hero ham"><div class="hl">Barista FIRE Number</div><div class="hv" id="bNum">—</div><div class="hs">Covers expense gap</div></div>
-      <div class="hero hpu"><div class="hl">Years to Barista FIRE</div><div class="hv" id="yToBar">—</div><div class="hs" id="bSub">—</div></div>
-    </div>
-    <div class="pgw">
-      <div class="pgl"><span>Progress to Barista FIRE</span><span id="bPct">0%</span></div>
-      <div class="pgt"><div class="pgf am" id="bBar" style="width:0%"></div></div>
-    </div>
-    <div class="stats" id="bStats"></div>
-    <div class="sh">Portfolio vs Targets</div>
-    <div class="cw"><canvas id="baristaChart"></canvas></div>
-    <div class="sh">FIRE Spectrum</div>
-    <div class="stats" id="bVariants"></div>
+  <div class="sh">Home &amp; Education</div>
+  <div class="grid">
+
+    <a class="card c-ro" href="mortgage_calculator.html">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon">🏡</div>
+        <div class="card-title">Mortgage Calculator</div>
+        <div class="card-desc">Full mortgage payment breakdown with amortization schedule, PMI, refinance analysis, and extra-payment payoff modeling.</div>
+        <div class="card-features">
+          <div class="card-feat">P&amp;I, taxes, insurance, HOA, PMI all-in payment</div>
+          <div class="card-feat">PMI auto-removal at 80% LTV</div>
+          <div class="card-feat">Extra payment payoff and interest savings</div>
+          <div class="card-feat">Refinance break-even analysis</div>
+        </div>
+      </div>
+      <div class="card-footer"><span class="card-cta">Open calculator <span class="card-cta-arrow">→</span></span><span style="font-size:.68rem;color:var(--s400);">Updated Apr 2026</span></div>
+    </a>
+
+    <a class="card c-em" href="college_calculator.html">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon">🎓</div>
+        <div class="card-title">529 College Savings</div>
+        <div class="card-desc">Project 529 plan growth, estimate future college costs with tuition inflation, and see how much you need to save each month to hit your goal.</div>
+        <div class="card-features">
+          <div class="card-feat">Tax-free growth on contributions</div>
+          <div class="card-feat">Tuition inflation modeling (2–8%)</div>
+          <div class="card-feat">Savings gap and monthly contribution needed</div>
+          <div class="card-feat">Year-by-year plan balance projection</div>
+        </div>
+      </div>
+      <div class="card-footer"><span class="card-cta">Open calculator <span class="card-cta-arrow">→</span></span><span style="font-size:.68rem;color:var(--s400);">Updated Apr 2026</span></div>
+    </a>
+
   </div>
 
-  <!-- SWR -->
-  <div id="tab-swr" class="tab-panel">
-    <div class="ib"><strong>Withdrawal Phase</strong>: Portfolio longevity under different withdrawal rates, based on your projected balance at full retirement.</div>
-    <div class="heroes">
-      <div class="hero hbl"><div class="hl">Portfolio at Full Retirement</div><div class="hv" id="swrPort">—</div><div class="hs">Today's dollars</div></div>
-      <div class="hero hgr"><div class="hl">Annual Withdrawal</div><div class="hv" id="swrAnn">—</div><div class="hs" id="swrSub">—</div></div>
-    </div>
-    <div class="sh">Portfolio Longevity by Withdrawal Rate</div>
-    <div class="cw" style="height:185px"><canvas id="swrChart"></canvas></div>
-    <div class="sh">Withdrawal Rate Comparison</div>
-    <div style="overflow-x:auto"><table><thead><tr><th>Rate</th><th>Annual</th><th>Monthly</th><th>Portfolio Life</th><th>Safety</th></tr></thead><tbody id="swrBody"></tbody></table></div>
-    <div class="sh">Retirement Income Sources</div>
-    <div class="cw" style="height:185px"><canvas id="incomeChart"></canvas></div>
-    <div class="sh">Portfolio Drawdown Over Retirement</div>
-    <div class="ib" id="drawdownNote" style="margin-bottom:10px"></div>
-    <div class="cw" style="height:220px"><canvas id="drawdownChart"></canvas></div>
-  </div>
 </main>
 
-<!-- Math Inspector overlay + drawer -->
-<div class="mp-overlay" id="mpOverlay" onclick="toggleMath()"></div>
-<div class="mp" id="mathPanel">
-  <div class="mp-hdr">
-    <h2>🔍 Math <span>Inspector</span></h2>
-    <button class="mp-close" onclick="toggleMath()">✕ Close</button>
-  </div>
-  <div class="mp-body">
-    <div class="mp-formulas" id="mpFormulas">
-      <div class="mf-title">Adjust inputs to populate the math inspector</div>
-    </div>
-    <div class="mp-tbl-wrap">
-      <table class="mp-tbl">
-        <thead>
-          <tr>
-            <th style="text-align:left">Yr</th>
-            <th>Age A</th>
-            <th>Age B</th>
-            <th style="text-align:left">Phase</th>
-            <th>Start Value</th>
-            <th>× Growth</th>
-            <th>+ Contrib</th>
-            <th>− Net Housing Δ</th>
-            <th>− Down Pmt</th>
-            <th>= End Value</th>
-            <th style="text-align:left">Milestones</th>
-          </tr>
-        </thead>
-        <tbody id="mpBody"><tr><td colspan="11" style="text-align:center;color:var(--n600);padding:20px">Click "Show Math" then adjust inputs to populate the table.</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+<footer class="footer">
+  Built with plain HTML/CSS/JS — no frameworks, no tracking, no data collection. &nbsp;·&nbsp; Updated Apr 2026
+</footer>
 
-</div>
-
-<div id="ttip"></div>
-<script>
-// ── Charts ────────────────────────────────────────────────────
-const CH = {};
-function dc(id){ if(CH[id]){ CH[id].destroy(); delete CH[id]; } }
-
-// ── Format ────────────────────────────────────────────────────
-const fmt  = n => n==null?'—':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n).toLocaleString();
-const fmtY = y => { if(y<=0)return'Done!'; if(!isFinite(y))return'∞'; if(y<1)return Math.round(y*12)+'mo'; return y.toFixed(1)+' yrs'; };
-
-function syncS(a,b){ document.getElementById(a).value=document.getElementById(b).value; }
-function syncI(a,b){ document.getElementById(b).value=document.getElementById(a).value; }
-
-function toggleSec(bodyId,toggleId){
-  const b=document.getElementById(bodyId), c=document.getElementById(toggleId);
-  b.classList.toggle('open',c.checked);
-}
-
-function switchTab(btn,name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
-  calc();
-}
-
-// ── Financial math ────────────────────────────────────────────
-function mthlyMortgage(P,annRate,termYrs){
-  const r=annRate/12, n=termYrs*12;
-  if(r===0) return P/n;
-  return P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
-}
-function portLife(port,annW,r){
-  if(annW<=0) return Infinity;
-  if(r<=0) return port/annW;
-  const inner=1-port*r/annW;
-  if(inner<=0) return Infinity;
-  return -Math.log(inner)/Math.log(1+r);
-}
-
-// ── Read inputs ───────────────────────────────────────────────
-function getInputs(){
-  const ageA=+document.getElementById('ageA').value||32;
-  const retA=+document.getElementById('retireA').value||55;
-  const ageB=+document.getElementById('ageB').value||30;
-  const retB=+document.getElementById('retireB').value||60;
-  const yA=Math.max(0,retA-ageA), yB=Math.max(0,retB-ageB);
-  const yFirst=Math.min(yA,yB), yFull=Math.max(yA,yB);
-  const fw=yA<=yB?'A':'B';
-  const fAge=fw==='A'?retA:retB, sAge=fw==='A'?retB:retA;
-
-  const preR  =+document.getElementById('preReturn').value/100||.07;
-  const postR =+document.getElementById('postReturn').value/100||.05;
-  const inf   =+document.getElementById('inflation').value/100||.03;
-  const realPre =(1+preR)/(1+inf)-1;
-  const realPost=(1+postR)/(1+inf)-1;
-  const swr   =+document.getElementById('swr').value/100||.04;
-
-  // Post-retire savings
-  const prOn  =document.getElementById('prToggle').checked;
-  const prAmt =+document.getElementById('prContrib').value||0;
-  const prDur =+document.getElementById('prDuration').value||0;
-
-  // Current expenses
-  const currentRentMo=+document.getElementById('currentRent').value||0;
-  const otherExpMo   =+document.getElementById('otherExpenses').value||0;
-  const currentHousingAnn=currentRentMo*12;
-  // Expense breakdown display
-  const totalMoExp=currentRentMo+otherExpMo;
-  document.getElementById('expBreakdown').innerHTML=
-    `<span style="color:var(--s300);font-weight:600">Housing:</span> ${fmt(currentRentMo)}/mo (${fmt(currentHousingAnn)}/yr)` +
-    `<br><span style="color:var(--s300);font-weight:600">Other:</span> ${fmt(otherExpMo)}/mo (${fmt(otherExpMo*12)}/yr)` +
-    `<br><span style="color:#a5b4fc;font-weight:700">Total:</span> ${fmt(totalMoExp)}/mo ≈ <span style="color:#a5b4fc;font-weight:700">${fmt(totalMoExp*12)}/yr</span>` +
-    (Math.abs(totalMoExp*12-(+document.getElementById('annualExpenses').value||60000))>500?
-      `<br><span style="color:var(--am5)">⚠ Note: retirement expenses input is ${fmt(+document.getElementById('annualExpenses').value||60000)}/yr — update to match if needed.</span>`:'');
-
-  // Home purchase
-  const hmOn  =document.getElementById('hmToggle').checked;
-  const hmVal =+document.getElementById('hmValue').value||0;
-  const hmDownPct=+document.getElementById('hmDown').value||20;
-  const hmAgeA=+document.getElementById('hmAgeA').value||40;
-  const hmRateN=+document.getElementById('hmRate').value||6.5;
-  const hmTerm=+document.getElementById('hmTerm').value||30;
-  const hmTaxPct=+document.getElementById('hmTax').value||1.2;
-  const dp    =hmOn?hmVal*hmDownPct/100:0;
-  const loan  =hmOn?hmVal-dp:0;
-  const mthly =hmOn?mthlyMortgage(loan,hmRateN/100,hmTerm):0;
-  const annMort=mthly*12;
-  const annTM =hmOn?hmVal*hmTaxPct/100:0;
-  const annCarry=annMort+annTM;
-  const netAnnCarry=annCarry-currentHousingAnn;   // NEW: net cost vs current housing
-  const hmYear=hmOn?Math.max(0,Math.round(hmAgeA-ageA)):-1;
-
-  // Update mortgage calc box
-  if(hmOn){
-    const netDir=netAnnCarry>=0?'+':'-';
-    const netColor=netAnnCarry>=0?'#f87171':'#34d399';
-    document.getElementById('hmCalcBox').innerHTML=`
-      <div class="cb-row"><span class="cb-lbl">Down payment</span><span class="cb-val">${fmt(dp)}</span></div>
-      <div class="cb-row"><span class="cb-lbl">Loan amount</span><span class="cb-val">${fmt(loan)}</span></div>
-      <div class="cb-row"><span class="cb-lbl">Monthly payment (P&amp;I)</span><span class="cb-val">${fmt(mthly)}/mo</span></div>
-      <div class="cb-row"><span class="cb-lbl">Annual mortgage</span><span class="cb-val">${fmt(annMort)}/yr</span></div>
-      <div class="cb-row"><span class="cb-lbl">Tax + maintenance (${hmTaxPct}%)</span><span class="cb-val">${fmt(annTM)}/yr</span></div>
-      <div class="cb-div"></div>
-      <div class="cb-row"><span class="cb-lbl cb-tot">Total carrying cost</span><span class="cb-val cb-tot">${fmt(annCarry)}/yr</span></div>
-      <div class="cb-row"><span class="cb-lbl" style="color:var(--s400)">− Current housing cost</span><span class="cb-val" style="color:#94a3b8">−${fmt(currentHousingAnn)}/yr</span></div>
-      <div class="cb-div"></div>
-      <div class="cb-row"><span class="cb-lbl cb-tot" style="color:${netColor}">Net cash-flow change</span><span class="cb-val" style="color:${netColor}">${netDir}${fmt(Math.abs(netAnnCarry))}/yr</span></div>`;
-  }
-
-  // Update post-retire note
-  if(prOn){
-    const fa=ageA+yFirst, ta=fa+prDur;
-    document.getElementById('prNote').textContent=`Partner ${fw} age ${Math.round(fa)} → ${Math.round(ta)} (${prDur} yr${prDur!==1?'s':''} of extra contributions)`;
-  }
-
-  // Partner salaries
-  const salaryA=+document.getElementById('salaryA').value||0;
-  const salaryB=+document.getElementById('salaryB').value||0;
-
-  // Barista
-  const brOn  =document.getElementById('brToggle').checked;
-  const brInc =+document.getElementById('brIncome').value||0;
-
-  // Social Security
-  const ssOn   =document.getElementById('ssToggle').checked;
-  const ssA    =+document.getElementById('ssA').value||0;
-  const ssB    =+document.getElementById('ssB').value||0;
-  const ssAgeA =+document.getElementById('ssAgeA').value||67;
-  const ssAgeB =+document.getElementById('ssAgeB').value||67;
-  // Annual SS income in today's dollars
-  const ssAnnA = ssOn ? ssA*12 : 0;
-  const ssAnnB = ssOn ? ssB*12 : 0;
-  const ssTotal= ssAnnA + ssAnnB; // combined when both collecting
-
-  return {
-    ageA,retA,ageB,retB,yFirst,yFull,fw,fAge,sAge,
-    salaryA,salaryB,
-    savings:+document.getElementById('currentSavings').value||0,
-    contrib:+document.getElementById('annualContrib').value||0,
-    expenses:+document.getElementById('annualExpenses').value||60000,
-    preR,postR,inf,realPre,realPost,swr,
-    prOn,prAmt,prDur,
-    hmOn,hmVal,hmDownPct,hmAgeA,hmRateN,hmTerm,hmTaxPct,
-    dp,loan,mthly,annMort,annTM,annCarry,netAnnCarry,hmYear,
-    currentRentMo,currentHousingAnn,
-    brOn,brInc,
-    ssOn,ssA,ssB,ssAgeA,ssAgeB,ssAnnA,ssAnnB,ssTotal
-  };
-}
-
-// ── Projection engine (real $) ────────────────────────────────
-// netHousingCost(i,y): how much MORE (or less) this year costs vs. before home purchase
-// During mortgage: new carrying cost minus what they were paying in rent/old mortgage
-// Post-mortgage: only tax+maintenance remains, still saving vs. old rent
-function netHousingCost(i,y){
-  if(!i.hmOn||i.hmYear<0||y<i.hmYear) return 0;
-  const inMort=y<i.hmYear+i.hmTerm;
-  return inMort?(i.annCarry-i.currentHousingAnn):(i.annTM-i.currentHousingAnn);
-}
-
-function project(i,nYrs,noHome){
-  const useHome=i.hmOn&&!noHome;
-  const vals=[];
-  let v=i.savings;
-  for(let y=0;y<=nYrs;y++){
-    if(useHome&&y===i.hmYear){ v=Math.max(0,v-i.dp); }
-    vals.push(+v.toFixed(0));
-    let c=0;
-    if(y<i.yFirst) c=i.contrib;
-    else if(i.prOn&&y<i.yFirst+i.prDur) c=i.prAmt;
-    if(useHome) c-=netHousingCost(i,y);
-    v=v*(1+i.realPre)+c;
-    v=Math.max(0,v);
-  }
-  return vals;
-}
-
-function yToTarget(i,target,noHome){
-  if(i.savings>=target) return 0;
-  const useHome=i.hmOn&&!noHome;
-  let v=i.savings;
-  for(let y=0;y<500;y++){
-    if(useHome&&y===i.hmYear){ v=Math.max(0,v-i.dp); }
-    let c=0;
-    if(y<i.yFirst) c=i.contrib;
-    else if(i.prOn&&y<i.yFirst+i.prDur) c=i.prAmt;
-    if(useHome) c-=netHousingCost(i,y);
-    v=v*(1+i.realPre)+c;
-    v=Math.max(0,v);
-    if(v>=target) return y+1;
-  }
-  return Infinity;
-}
-
-// ── Vertical line plugin ──────────────────────────────────────
-function vlines(anns){
-  return{id:'vl',afterDraw(ch){
-    const{ctx,chartArea:{top,bottom},scales:{x}}=ch;
-    anns.forEach(({idx,color,label})=>{
-      if(idx<0||idx>=ch.data.labels.length) return;
-      const xp=x.getPixelForValue(idx);
-      ctx.save();
-      ctx.setLineDash([5,4]);ctx.strokeStyle=color;ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.moveTo(xp,top);ctx.lineTo(xp,bottom);ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle=color;ctx.font='600 9px Inter,system-ui,sans-serif';
-      ctx.textAlign='center';ctx.fillText(label,xp,top-4);
-      ctx.restore();
-    });
-  }};
-}
-
-const cOpts=(xtitle)=>({
-  responsive:true,maintainAspectRatio:false,
-  plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
-  scales:{
-    x:{grid:{display:false},ticks:{maxTicksLimit:9,font:{size:9.5}},title:{display:true,text:xtitle,font:{size:9.5}}},
-    y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}
-  }
-});
-
-// ── MAIN CALC ─────────────────────────────────────────────────
-function calc(){
-  const i=getInputs();
-  if(i.yFull<=0) return;
-
-  // Phase banner
-  const fl=i.fw==='A'?'Partner A':'Partner B';
-  const sl=i.fw==='A'?'Partner B':'Partner A';
-  const prExtra=i.prOn?` <span style="color:#a5b4fc">+ ${fl} saves ${fmt(i.prAmt)}/yr for ${i.prDur} more yr${i.prDur!==1?'s':''}</span>`:'';
-  document.getElementById('phaseInfo').innerHTML=
-    `<strong>Phase 1:</strong> ${i.yFirst} yr joint contributions until <strong>${fl}</strong> retires at ${i.fAge}${prExtra}<span class="psep">·</span><strong>Phase 2:</strong> ${i.yFull-i.yFirst} yr coast until <strong>${sl}</strong> retires at ${i.sAge}`;
-
-  const fireNum=i.expenses/i.swr;
-  const coastNum=fireNum/Math.pow(1+i.realPre,i.yFull);
-  const realAtFull=project(i,i.yFull)[i.yFull];
-
-  const yCoast =yToTarget(i,coastNum);
-  const yFIRE  =yToTarget(i,fireNum);
-  const yFIREnh=i.hmOn?yToTarget(i,fireNum,true):yFIRE;
-  const bGap   =Math.max(0,i.expenses-(i.brOn?i.brInc:0));
-  const bNum   =bGap/i.swr;
-  const yBar   =yToTarget(i,bNum);
-
-  doCoast(i,fireNum,coastNum,yCoast,yFIRE,realAtFull);
-  doFire(i,fireNum,yFIRE,yFIREnh,realAtFull);
-  doBarista(i,fireNum,bNum,bGap,yBar,yFIRE,realAtFull);
-  doSWR(i,realAtFull);
-  doSalary(i,fireNum,coastNum);
-  renderMathPanel(i,fireNum,coastNum);
-  saveState();
-}
-
-// ── Annotation helper ─────────────────────────────────────────
-function anns(i){ 
-  const a=[{idx:i.yFirst,color:'#94a3b8',label:'↑ Contribs stop'}];
-  if(i.hmOn&&i.hmYear>=0) a.push({idx:i.hmYear,color:'#6366f1',label:'🏡 Purchase'});
-  if(i.prOn) a.push({idx:i.yFirst+i.prDur,color:'#94a3b8',label:'↑ Extra end'});
-  return a;
-}
-
-// ── COAST FIRE ────────────────────────────────────────────────
-function doCoast(i,fireNum,coastNum,yCoast,yFIRE,realAtFull){
-  const raw=(i.savings/coastNum*100), pct=Math.min(100,raw).toFixed(1);
-  document.getElementById('coastNum').textContent=fmt(coastNum);
-  document.getElementById('fireNumC').textContent=fmt(fireNum);
-  document.getElementById('cPct').textContent=raw.toFixed(1)+'%';
-  document.getElementById('cBar').style.width=pct+'%';
-
-  const sb=document.getElementById('cBanner');
-  if(i.savings>=coastNum){
-    sb.className='bn ok';sb.innerHTML=`✅ <strong>Already coasting!</strong> Portfolio grows to ${fmt(fireNum)} by age ${i.sAge} without any new contributions.`;
-  } else if(isFinite(yCoast)){
-    sb.className='bn info';sb.innerHTML=`📈 Coast FIRE in <strong>${fmtY(yCoast)}</strong> — A: <strong>age ${Math.round(i.ageA+yCoast)}</strong>, B: <strong>age ${Math.round(i.ageB+yCoast)}</strong>. Then no more contributions needed.`;
-  } else {
-    sb.className='bn warn';sb.innerHTML='⚠️ Coast FIRE unreachable at current rates — consider increasing contributions.';
-  }
-
-  const hb=document.getElementById('cHomeBn');
-  if(i.hmOn){hb.style.display='';hb.innerHTML=`🏡 Home purchase (A age ${i.hmAgeA}): <strong>${fmt(i.dp)} down</strong> + <strong>${fmt(i.annCarry)}/yr</strong> carrying costs.`;}
-  else hb.style.display='none';
-
-  const gap=Math.max(0,coastNum-i.savings);
-  document.getElementById('cStats').innerHTML=`
-    <div class="stat"><div class="sl">Current Portfolio</div><div class="sv">${fmt(i.savings)}</div></div>
-    <div class="stat"><div class="sl">Gap to Coast FIRE</div><div class="sv ${gap===0?'pos':'neg'}">${gap===0?'✓ Done':fmt(gap)}</div></div>
-    <div class="stat"><div class="sl">Projected at Retire</div><div class="sv pos">${fmt(realAtFull)}</div></div>
-    <div class="stat"><div class="sl">Contributions end</div><div class="sv neu">Yr ${i.yFirst} · age ${i.fAge}</div></div>
-    ${i.prOn?`<div class="stat"><div class="sl">Extra savings phase</div><div class="sv">${fmt(i.prAmt)}/yr × ${i.prDur} yrs</div></div>`:''}
-    ${i.hmOn?`<div class="stat"><div class="sl">Down payment (yr ${i.hmYear})</div><div class="sv neg">-${fmt(i.dp)}</div></div>`:''}`;
-
-  const tot=Math.max(i.yFull+10,35);
-  const lbls=Array.from({length:tot+1},(_,y)=>Math.round(i.ageA+y));
-  const withC=project(i,tot);
-  const noC=project({...i,contrib:0,prOn:false,prAmt:0},tot);
-
-  dc('coastChart');
-  CH['coastChart']=new Chart(document.getElementById('coastChart').getContext('2d'),{
-    type:'line',plugins:[vlines(anns(i))],
-    data:{labels:lbls,datasets:[
-      {label:'With Contributions',data:withC,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.07)',fill:true,tension:.35,pointRadius:0,borderWidth:2},
-      {label:'Coast Only',data:noC,borderColor:'#10b981',borderDash:[6,4],backgroundColor:'transparent',tension:.35,pointRadius:0,borderWidth:1.5},
-      {label:'Coast Target',data:Array(tot+1).fill(+coastNum.toFixed(0)),borderColor:'#f59e0b',borderDash:[3,3],borderWidth:1.5,backgroundColor:'transparent',pointRadius:0},
-      {label:'Full FIRE',data:Array(tot+1).fill(+fireNum.toFixed(0)),borderColor:'#f43f5e',borderDash:[3,3],borderWidth:1.5,backgroundColor:'transparent',pointRadius:0},
-    ]},options:cOpts('Partner A Age')
-  });
-
-  const ms=[];
-  if(i.hmOn) ms.push({aA:i.hmAgeA,aB:i.ageB+i.hmYear,txt:'🏡 Home purchase — '+fmt(i.dp)+' down payment',cls:'house'});
-  if(isFinite(yCoast)) ms.push({aA:i.ageA+yCoast,aB:i.ageB+yCoast,txt:'Hit Coast FIRE — contributions no longer required',cls:'next'});
-  ms.push({aA:i.fAge,aB:i.ageB+i.yFirst,txt:`Partner ${i.fw} retires — joint contributions end`,cls:'star'});
-  if(i.prOn) ms.push({aA:i.ageA+i.yFirst+i.prDur,aB:i.ageB+i.yFirst+i.prDur,txt:`Post-retirement savings end (${fmt(i.prAmt)}/yr × ${i.prDur} yrs)`,cls:'next'});
-  ms.push({aA:i.fw==='A'?i.retA+(i.yFull-i.yFirst):i.ageA+i.yFull,aB:i.fw==='B'?i.retB:i.ageB+i.yFull,txt:`Partner ${i.fw==='A'?'B':'A'} retires — full retirement`,cls:'star'});
-  if(isFinite(yFIRE)) ms.push({aA:i.ageA+yFIRE,aB:i.ageB+yFIRE,txt:'Hit Full FIRE Number',cls:'done'});
-  ms.sort((a,b)=>a.aA-b.aA);
-  document.getElementById('cMs').innerHTML=ms.map(m=>`
-    <div class="ms"><div class="mi ${m.cls}">${m.cls==='done'?'✓':m.cls==='house'?'⌂':m.cls==='star'?'★':'→'}</div>
-    <span class="ma">A:${Math.round(m.aA)} / B:${Math.round(m.aB)}</span>
-    <span class="md">${m.txt}</span></div>`).join('');
-}
-
-// ── TRADITIONAL FIRE ──────────────────────────────────────────
-function doFire(i,fireNum,yFIRE,yFIREnh,realAtFull){
-  const raw=(i.savings/fireNum*100),pct=Math.min(100,raw).toFixed(1);
-  document.getElementById('fireNumF').textContent=fmt(fireNum);
-  document.getElementById('yToFire').textContent=fmtY(yFIRE);
-  document.getElementById('fPct').textContent=raw.toFixed(1)+'%';
-  document.getElementById('fBar').style.width=pct+'%';
-  const fy=new Date().getFullYear()+Math.round(yFIRE);
-  document.getElementById('fSub').textContent=isFinite(yFIRE)?`A: age ${Math.round(i.ageA+yFIRE)} · B: age ${Math.round(i.ageB+yFIRE)} · ${fy}`:'Increase contributions';
-
-  const sb=document.getElementById('fBanner');
-  if(i.savings>=fireNum){sb.className='bn ok';sb.innerHTML='🎉 <strong>Already financially independent!</strong>';}
-  else if(isFinite(yFIRE)){sb.className='bn info';sb.innerHTML=`🎯 Full FIRE in <strong>${fmtY(yFIRE)}</strong> — A: <strong>age ${Math.round(i.ageA+yFIRE)}</strong>, B: <strong>age ${Math.round(i.ageB+yFIRE)}</strong>, year <strong>${fy}</strong>.`;}
-  else{sb.className='bn warn';sb.innerHTML='⚠️ FIRE may not be reachable at current rates — consider higher savings or adjusted timeline.';}
-
-  const sur=realAtFull-fireNum;
-  document.getElementById('fStats').innerHTML=`
-    <div class="stat"><div class="sl">Projected at Retire</div><div class="sv pos">${fmt(realAtFull)}</div></div>
-    <div class="stat"><div class="sl">Surplus / Deficit</div><div class="sv ${sur>=0?'pos':'neg'}">${sur>=0?'+':''}${fmt(sur)}</div></div>
-    <div class="stat"><div class="sl">Monthly Need</div><div class="sv">${fmt(i.expenses/12)}/mo</div></div>
-    <div class="stat"><div class="sl">Contribution phase</div><div class="sv neu">${i.yFirst} yrs</div></div>
-    ${i.prOn?`<div class="stat"><div class="sl">Extra savings</div><div class="sv">${fmt(i.prAmt)}/yr × ${i.prDur}yr</div></div>`:''}
-    ${i.hmOn?`<div class="stat"><div class="sl">Annual carrying cost</div><div class="sv neg">${fmt(i.annCarry)}/yr</div></div>`:''}`;
-
-  const hb=document.getElementById('fHomeBn'),hi=document.getElementById('fHomeImpact');
-  if(i.hmOn){
-    const delay=isFinite(yFIRE)&&isFinite(yFIREnh)?(yFIRE-yFIREnh).toFixed(1):'—';
-    hb.style.display='';hb.innerHTML=`🏡 Home purchase delays FIRE by approximately <strong>${delay} years</strong>.`;
-    hi.style.display='';
-    document.getElementById('fHIG').innerHTML=`
-      <div class="hic wo"><div class="il">Without Home</div><div class="iv">${isFinite(yFIREnh)?fmtY(yFIREnh):'∞'}</div><div class="is">A: age ${Math.round(i.ageA+yFIREnh)} · B: age ${Math.round(i.ageB+yFIREnh)}</div></div>
-      <div class="hic wi"><div class="il">With Home Purchase</div><div class="iv">${isFinite(yFIRE)?fmtY(yFIRE):'∞'}</div><div class="is">${isFinite(yFIRE)?`A: age ${Math.round(i.ageA+yFIRE)} · B: age ${Math.round(i.ageB+yFIRE)}`:'Delayed significantly'}</div></div>`;
-  } else { hb.style.display='none'; hi.style.display='none'; }
-
-  const tot=Math.min(80,Math.ceil(isFinite(yFIRE)?yFIRE+8:i.yFull+15));
-  const lbls=Array.from({length:tot+1},(_,y)=>Math.round(i.ageA+y));
-  const vals=project(i,tot);
-  dc('fireChart');
-  CH['fireChart']=new Chart(document.getElementById('fireChart').getContext('2d'),{
-    type:'line',plugins:[vlines(anns(i))],
-    data:{labels:lbls,datasets:[
-      {label:'Portfolio (real $)',data:vals,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.07)',fill:true,tension:.35,pointRadius:0,borderWidth:2},
-      {label:'FIRE Target',data:Array(tot+1).fill(+fireNum.toFixed(0)),borderColor:'#f43f5e',borderDash:[4,3],borderWidth:1.5,backgroundColor:'transparent',pointRadius:0},
-    ]},options:cOpts('Partner A Age')
-  });
-
-  document.getElementById('fMs').innerHTML=[.1,.25,.5,.75,1].map(p=>{
-    const t=fireNum*p,y=yToTarget(i,t),r=i.savings>=t;
-    return`<div class="ms"><div class="mi ${r?'done':'next'}">${r?'✓':'→'}</div>
-    <span class="ma">${r?'Done':fmtY(y)}</span>
-    <span class="md">${(p*100).toFixed(0)}% of FIRE · ${fmt(t)}</span></div>`;
-  }).join('');
-}
-
-// ── BARISTA FIRE ──────────────────────────────────────────────
-function doBarista(i,fireNum,bNum,bGap,yBar,yFIRE,realAtFull){
-  const bInc=i.brOn?i.brInc:0;
-  const raw=(i.savings/Math.max(1,bNum)*100),pct=Math.min(100,raw).toFixed(1);
-  document.getElementById('bNum').textContent=fmt(bNum);
-  document.getElementById('yToBar').textContent=fmtY(yBar);
-  document.getElementById('bPct').textContent=raw.toFixed(1)+'%';
-  document.getElementById('bBar').style.width=pct+'%';
-  const by=new Date().getFullYear()+Math.round(yBar);
-  document.getElementById('bSub').textContent=isFinite(yBar)?`A: age ${Math.round(i.ageA+yBar)} · B: age ${Math.round(i.ageB+yBar)} · ${by}`:'';
-
-  const sb=document.getElementById('bBanner');
-  if(!i.brOn){sb.className='bn warn';sb.innerHTML='☝️ Enable <strong>Barista / Part-Time Income</strong> in the sidebar to see your Barista FIRE number.';}
-  else if(i.savings>=bNum){sb.className='bn ok';sb.innerHTML=`✅ <strong>Already at Barista FIRE!</strong> ${fmt(bInc)}/yr + portfolio covers all expenses.`;}
-  else{const s=(isFinite(yFIRE)&&isFinite(yBar))?(yFIRE-yBar).toFixed(1):'—';sb.className='bn info';sb.innerHTML=`☕ Barista FIRE in <strong>${fmtY(yBar)}</strong> — <strong>${s} years</strong> sooner than full FIRE.`;}
-
-  document.getElementById('bStats').innerHTML=`
-    <div class="stat"><div class="sl">Part-Time Income</div><div class="sv">${fmt(bInc)}/yr</div></div>
-    <div class="stat"><div class="sl">Annual Gap</div><div class="sv neg">${fmt(bGap)}/yr</div></div>
-    <div class="stat"><div class="sl">Portfolio Reduction</div><div class="sv pos">-${fmt(fireNum-bNum)}</div></div>
-    <div class="stat"><div class="sl">Years Saved</div><div class="sv pos">${isFinite(yFIRE)&&isFinite(yBar)?(yFIRE-yBar).toFixed(1):'—'} yrs</div></div>`;
-
-  const tot=Math.min(65,Math.ceil(isFinite(yFIRE)?yFIRE+8:i.yFull+15));
-  const lbls=Array.from({length:tot+1},(_,y)=>Math.round(i.ageA+y));
-  const vals=project(i,tot);
-  dc('baristaChart');
-  CH['baristaChart']=new Chart(document.getElementById('baristaChart').getContext('2d'),{
-    type:'line',plugins:[vlines(anns(i))],
-    data:{labels:lbls,datasets:[
-      {label:'Portfolio (real $)',data:vals,borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,.07)',fill:true,tension:.35,pointRadius:0,borderWidth:2},
-      {label:'Barista FIRE',data:Array(tot+1).fill(+bNum.toFixed(0)),borderColor:'#f59e0b',borderDash:[5,3],borderWidth:2,backgroundColor:'transparent',pointRadius:0},
-      {label:'Full FIRE',data:Array(tot+1).fill(+fireNum.toFixed(0)),borderColor:'#f43f5e',borderDash:[3,3],borderWidth:1.5,backgroundColor:'transparent',pointRadius:0},
-    ]},options:cOpts('Partner A Age')
-  });
-
-  document.getElementById('bVariants').innerHTML=[
-    {n:'Lean FIRE',f:.6,d:'~60% of expenses'},
-    {n:'Regular FIRE',f:1,d:'Current expenses'},
-    {n:'Fat FIRE',f:1.5,d:'~150% of expenses'},
-    {n:'Chubby FIRE',f:2,d:'~200% of expenses'},
-  ].map(v=>{
-    const num=(i.expenses*v.f)/i.swr,y=yToTarget(i,num);
-    return`<div class="stat"><div class="sl">${v.n}</div><div class="sv">${fmt(num)}</div>
-    <div style="font-size:.67rem;color:var(--n600);margin-top:2px">${v.d} · ${fmt(i.expenses*v.f)}/yr</div>
-    <div style="font-size:.7rem;color:var(--bl6);margin-top:3px;font-weight:700">${isFinite(y)?fmtY(y):'∞'}</div></div>`;
-  }).join('');
-}
-
-// ── SWR ───────────────────────────────────────────────────────
-function doSWR(i,realAtFull){
-  const swrA=realAtFull*i.swr;
-  document.getElementById('swrPort').textContent=fmt(realAtFull);
-  document.getElementById('swrAnn').textContent=fmt(swrA);
-  document.getElementById('swrSub').textContent=`${(i.swr*100).toFixed(2)}% SWR · $${Math.round(swrA/12).toLocaleString()}/mo`;
-
-  // Net expense = total expenses - SS income (when both collecting)
-  const ssAnnual = i.ssTotal; // total SS when fully in payment
-  const netExpenses = Math.max(0, i.expenses - ssAnnual);
-  const netWithdrawal = Math.max(0, swrA - ssAnnual);
-
-  const rates=[2.5,3,3.5,4,4.5,5,5.5,6];
-  document.getElementById('swrBody').innerHTML=rates.map(r=>{
-    const a=realAtFull*(r/100),mo=a/12;
-    const netA = Math.max(0, a - ssAnnual);
-    const life=portLife(realAtFull,netA,i.realPost);
-    const ls=life===Infinity?'∞ perpetual':life>200?'>200 yrs':life.toFixed(0)+' yrs';
-    const cls=life>40?'tg':life>25?'to':'tb';
-    const saf=life>40?'✅ Safe':life>25?'⚠️ Moderate':'❌ Risky';
-    const hi=Math.abs(r-i.swr*100)<.01;
-    return`<tr ${hi?'style="background:var(--bl0)"':''}><td><strong>${r}%</strong>${hi?' ← you':''}</td><td>${fmt(a)}</td><td>$${Math.round(mo).toLocaleString()}</td><td class="${cls}">${ls}</td><td>${saf}</td></tr>`;
-  }).join('');
-
-  const lifes=rates.map(r=>{const a=realAtFull*(r/100);const netA=Math.max(0,a-ssAnnual);const l=portLife(realAtFull,netA,i.realPost);return l>100?100:+l.toFixed(1);});
-  dc('swrChart');
-  CH['swrChart']=new Chart(document.getElementById('swrChart').getContext('2d'),{
-    type:'bar',
-    data:{labels:rates.map(r=>r+'%'),datasets:[{label:'Portfolio Life (yrs)',data:lifes,backgroundColor:lifes.map(y=>y>=40?'#10b981':y>=25?'#f59e0b':'#f43f5e'),borderRadius:5}]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+(c.raw>=100?'+':'')+' years'}}},
-      scales:{x:{grid:{display:false},title:{display:true,text:'Withdrawal Rate',font:{size:10}}},
-              y:{max:105,ticks:{font:{size:9.5},callback:v=>v>=100?'100+':v},title:{display:true,text:'Years',font:{size:10}}}}}
-  });
-
-  const bInc=i.brOn?i.brInc:0;
-  const unc=Math.max(0,i.expenses-swrA-bInc-ssAnnual);
-  const incLabels=['Portfolio Withdrawals'];
-  const incData=[Math.max(0,Math.round(netWithdrawal))];
-  const incColors=['#3b82f6'];
-  if(bInc>0){incLabels.push('Part-Time Income');incData.push(Math.round(bInc));incColors.push('#f59e0b');}
-  if(ssAnnual>0){incLabels.push('Social Security');incData.push(Math.round(ssAnnual));incColors.push('#10b981');}
-  if(unc>0){incLabels.push('Uncovered Gap');incData.push(Math.round(unc));incColors.push('#e2e8f0');}
-  dc('incomeChart');
-  CH['incomeChart']=new Chart(document.getElementById('incomeChart').getContext('2d'),{
-    type:'doughnut',
-    data:{labels:incLabels,datasets:[{data:incData,backgroundColor:incColors,borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
-      plugins:{legend:{position:'right',labels:{boxWidth:11,font:{size:10}}},
-               tooltip:{callbacks:{label:c=>c.label+': '+fmt(c.raw)+'/yr'}}}}
-  });
-
-  // ── Drawdown simulation ────────────────────────────────────
-  // Simulate year-by-year portfolio in retirement for up to 50 years
-  // SS kicks in at specified ages; before that, full withdrawal from portfolio
-  const retireAgeA = i.retA, retireAgeB = i.retB;
-  const drawYrs = 50;
-  let port = realAtFull;
-  const drawData=[], drawLabels=[];
-  const drawDataNoSS=[];
-  let portNoSS = realAtFull;
-  let depleteYr=-1, depleteYrNoSS=-1;
-  for(let y=0;y<drawYrs;y++){
-    const ageA_now = retireAgeA + y;
-    const ageB_now = retireAgeB + y;
-    const ssThisYr = i.ssOn
-      ? (ageA_now>=i.ssAgeA?i.ssAnnA:0)+(ageB_now>=i.ssAgeB?i.ssAnnB:0)
-      : 0;
-    const baristaThisYr = i.brOn ? i.brInc : 0;
-    const netDraw = Math.max(0, i.expenses - ssThisYr - baristaThisYr);
-    const netDrawNoSS = Math.max(0, i.expenses - baristaThisYr);
-    drawLabels.push(`Age ${ageA_now}`);
-    drawData.push(depleteYr>=0 ? 0 : +port.toFixed(0));
-    drawDataNoSS.push(depleteYrNoSS>=0 ? 0 : +portNoSS.toFixed(0));
-    port = port*(1+i.realPost) - netDraw;
-    portNoSS = portNoSS*(1+i.realPost) - netDrawNoSS;
-    if(port<=0 && depleteYr<0) depleteYr=y;
-    if(portNoSS<=0 && depleteYrNoSS<0) depleteYrNoSS=y;
-    port=Math.max(0,port);
-    portNoSS=Math.max(0,portNoSS);
-  }
-  const noteEl=document.getElementById('drawdownNote');
-  const ssNote = i.ssOn&&ssAnnual>0 ? ` SS (${fmt(ssAnnual)}/yr) kicks in at age A:${i.ssAgeA}/B:${i.ssAgeB}.` : '';
-  if(depleteYr<0){
-    noteEl.textContent=`Portfolio is projected to last the full 50-year simulation.${ssNote}`;
-  } else {
-    noteEl.textContent=`⚠️ Portfolio depletes after ~${depleteYr} years (age ${retireAgeA+depleteYr}).${ssNote} Reduce spending or delay retirement to extend.`;
-  }
-  const drawDatasets=[{label:'Portfolio Balance',data:drawData,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.3,pointRadius:0,borderWidth:2}];
-  if(i.ssOn && ssAnnual>0){
-    drawDatasets.push({label:'Without Social Security',data:drawDataNoSS,borderColor:'#f43f5e',backgroundColor:'transparent',borderDash:[5,4],tension:.3,pointRadius:0,borderWidth:1.5});
-  }
-  dc('drawdownChart');
-  CH['drawdownChart']=new Chart(document.getElementById('drawdownChart').getContext('2d'),{
-    type:'line',data:{labels:drawLabels,datasets:drawDatasets},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
-      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
-              y:{min:0,ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
-  });
-}
-
-// ── Salary Requirements ───────────────────────────────────────
-function doSalary(i, fireNum, coastNum) {
-  const combined = i.salaryA + i.salaryB;
-  const savingsRate = combined > 0 ? i.contrib / combined : 0;
-
-  // Required contribution to hit coastNum in yFirst years (FV formula)
-  let reqCoast = 0;
-  if (i.savings < coastNum && i.yFirst > 0) {
-    const cf = Math.pow(1 + i.realPre, i.yFirst);
-    reqCoast = i.realPre === 0
-      ? (coastNum - i.savings) / i.yFirst
-      : (coastNum - i.savings * cf) * i.realPre / (cf - 1);
-    reqCoast = Math.max(0, reqCoast);
-  }
-
-  // Required contribution to hit fireNum in yFull years
-  let reqFIRE = 0;
-  if (i.savings < fireNum && i.yFull > 0) {
-    const ff = Math.pow(1 + i.realPre, i.yFull);
-    reqFIRE = i.realPre === 0
-      ? (fireNum - i.savings) / i.yFull
-      : (fireNum - i.savings * ff) * i.realPre / (ff - 1);
-    reqFIRE = Math.max(0, reqFIRE);
-  }
-
-  const rates = [0.10, 0.15, 0.20, 0.25, 0.30, 0.40];
-
-  function salaryCard(rate, neededContrib) {
-    const needed = neededContrib <= 0 ? 0 : neededContrib / rate;
-    const surplus = combined - needed;
-    const done = neededContrib <= 0;
-    return `<div class="sal-card">
-      <div class="sc-rate">${(rate*100).toFixed(0)}% saved</div>
-      <div class="sc-val ${done ? 'ok' : ''}">${done ? '✓ On track' : fmt(needed)}</div>
-      <div class="sc-note">${done ? 'Already coasting' : surplus >= 0 ? `+${fmt(surplus)} surplus` : `${fmt(surplus)} short`}</div>
-    </div>`;
-  }
-
-  // Income breakdown row
-  const incomeRow = (combined > 0) ? `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-      <div class="sal-card" style="border-top:2px solid var(--bl5)">
-        <div class="sc-rate" style="color:var(--bl5)">Partner A</div>
-        <div class="sc-val">${fmt(i.salaryA)}</div>
-        <div class="sc-note">${fmt(i.salaryA/12)}/mo</div>
-      </div>
-      <div class="sal-card" style="border-top:2px solid var(--pr5)">
-        <div class="sc-rate" style="color:var(--pr5)">Partner B</div>
-        <div class="sc-val">${fmt(i.salaryB)}</div>
-        <div class="sc-note">${fmt(i.salaryB/12)}/mo</div>
-      </div>
-      <div class="sal-card" style="border-top:2px solid var(--em5)">
-        <div class="sc-rate" style="color:var(--em6)">Combined</div>
-        <div class="sc-val">${fmt(combined)}</div>
-        <div class="sc-note">Saving ${(savingsRate*100).toFixed(1)}% now</div>
-      </div>
-    </div>` : '';
-
-  // Mortgage section
-  let mortHTML = '';
-  if (i.hmOn) {
-    const need28 = i.annMort / 0.28;          // 28% housing rule (mortgage only)
-    const need36 = i.annCarry / 0.36;         // 36% DTI (total carrying cost)
-    const need43 = i.annCarry / 0.43;         // 43% max DTI (lenient)
-    const s28 = combined > 0 ? combined - need28 : null;
-    const s36 = combined > 0 ? combined - need36 : null;
-    mortHTML = `
-      <div class="sal-divider"></div>
-      <div class="sh" style="margin-top:10px">🏡 Mortgage Affordability</div>
-      <div class="ib" style="margin-bottom:10px">Based on <strong>${fmt(i.annMort)}/yr</strong> mortgage payment and <strong>${fmt(i.annCarry)}/yr</strong> total carrying cost.</div>
-      <div class="mort-row">
-        <span class="mort-lbl">28% housing rule <span style="font-size:.65rem">(mortgage ≤ 28% gross)</span></span>
-        <span class="mort-val ${combined >= need28 ? 'ok' : 'warn'}">${fmt(need28)}/yr ${combined > 0 ? (combined >= need28 ? '✓' : '↑') : ''}</span>
-      </div>
-      <div class="mort-row">
-        <span class="mort-lbl">36% DTI rule <span style="font-size:.65rem">(total carrying ≤ 36%)</span></span>
-        <span class="mort-val ${combined >= need36 ? 'ok' : 'warn'}">${fmt(need36)}/yr ${combined > 0 ? (combined >= need36 ? '✓' : '↑') : ''}</span>
-      </div>
-      <div class="mort-row">
-        <span class="mort-lbl">43% max DTI <span style="font-size:.65rem">(carrying ≤ 43% gross)</span></span>
-        <span class="mort-val ${combined >= need43 ? 'ok' : 'warn'}">${fmt(need43)}/yr ${combined > 0 ? (combined >= need43 ? '✓' : '↑') : ''}</span>
-      </div>
-      ${combined > 0 ? `<div class="mort-row" style="margin-top:4px;border-top:1px solid var(--s200);padding-top:6px">
-        <span class="mort-lbl" style="font-weight:600">Your combined income</span>
-        <span class="mort-val ${combined >= need36 ? 'ok' : 'warn'}">${fmt(combined)}/yr ${combined >= need28 ? '✅' : combined >= need43 ? '⚠️' : '❌'}</span>
-      </div>` : ''}`;
-  }
-
-  const coastHTML = `
-    <div class="sal-wrap">
-      <div class="sh">💰 Income & Salary Requirements</div>
-      ${incomeRow}
-      <div class="ib" style="margin-bottom:8px">
-        Salary needed to generate the <strong>${fmt(i.savings >= coastNum ? 0 : reqCoast)}/yr contribution</strong> required to hit Coast FIRE
-        by Partner ${i.fw}'s retirement (age ${i.fAge}), at various household savings rates:
-      </div>
-      <div class="sal-grid">${rates.map(r => salaryCard(r, reqCoast)).join('')}</div>
-      ${mortHTML}
-    </div>`;
-
-  const fireHTML = `
-    <div class="sal-wrap">
-      <div class="sh">💰 Income & Salary Requirements</div>
-      ${incomeRow}
-      <div class="ib" style="margin-bottom:8px">
-        Salary needed to generate the <strong>${fmt(i.savings >= fireNum ? 0 : reqFIRE)}/yr contribution</strong> required to hit Full FIRE
-        in ${i.yFull} years (by age ${i.sAge}), at various household savings rates:
-      </div>
-      <div class="sal-grid">${rates.map(r => salaryCard(r, reqFIRE)).join('')}</div>
-      ${mortHTML}
-    </div>`;
-
-  document.getElementById('cSalaryBox').innerHTML = coastHTML;
-  document.getElementById('fSalaryBox').innerHTML = fireHTML;
-}
-
-// ── Math Inspector ────────────────────────────────────────────
-function toggleMath(){
-  const p=document.getElementById('mathPanel'),o=document.getElementById('mpOverlay');
-  const opening=!p.classList.contains('open');
-  p.classList.toggle('open');
-  o.classList.toggle('open');
-  document.querySelector('.math-btn').textContent=opening?'🔍 Hide Math':'🔍 Show Math';
-}
-
-function renderMathPanel(i,fireNum,coastNum){
-  // Formulas section
-  const rPrePct=(i.realPre*100).toFixed(2);
-  const rPostPct=(i.realPost*100).toFixed(2);
-  document.getElementById('mpFormulas').innerHTML=`
-    <div class="mf-title">⚙️ Formulas &amp; Rates Used in This Projection</div>
-    <div class="mf-row"><strong>Real pre-retire return:</strong> <code>(1+${(i.preR*100).toFixed(1)}%) &divide; (1+${(i.inf*100).toFixed(1)}% inflation) &minus; 1 = <span style="color:#c4b5fd">${rPrePct}%/yr</span></code></div>
-    <div class="mf-row"><strong>Real post-retire return:</strong> <code>(1+${(i.postR*100).toFixed(1)}%) &divide; (1+${(i.inf*100).toFixed(1)}%) &minus; 1 = <span style="color:#c4b5fd">${rPostPct}%/yr</span></code></div>
-    <div class="mf-row"><strong>FIRE Number:</strong> <code>${fmt(i.expenses)}/yr &divide; ${(i.swr*100).toFixed(2)}% SWR = <span style="color:#f87171">${fmt(fireNum)}</span></code></div>
-    <div class="mf-row"><strong>Coast FIRE Number:</strong> <code>${fmt(fireNum)} &divide; (1+${rPrePct}%)^${i.yFull}yrs = <span style="color:#60a5fa">${fmt(coastNum)}</span></code></div>
-    <div style="margin:7px 0 5px;padding:7px 9px;background:rgba(255,255,255,.04);border-radius:6px;font-family:var(--mono);font-size:.7rem;color:#a5b4fc;line-height:1.8">
-      <span style="color:#e2e8f0;font-weight:700">Each year step:</span><br>
-      1. If purchase year → subtract down payment first<br>
-      2. end = after_dp &times; (1 + <span style="color:#c4b5fd">${rPrePct}%</span>) + contribution − net_housing_Δ<br>
-      3. Net housing Δ = new_carry − current_rent (can be negative = savings)
-    </div>
-    ${i.hmOn?`<div class="mf-row"><strong>🏡 Down payment:</strong> <code>${fmt(i.hmVal)} &times; ${i.hmDownPct}% = <span style="color:#f87171">${fmt(i.dp)}</span> at yr ${i.hmYear} (A age ${i.hmAgeA})</code></div>
-    <div class="mf-row"><strong>Full carrying cost:</strong> <code>${fmt(i.annMort)}/yr mortgage + ${fmt(i.annTM)}/yr tax+maint = ${fmt(i.annCarry)}/yr</code></div>
-    <div class="mf-row"><strong>Current housing replaced:</strong> <code>&minus; ${fmt(i.currentHousingAnn)}/yr (${fmt(i.currentRentMo)}/mo &times; 12)</code></div>
-    <div class="mf-row"><strong style="color:${i.netAnnCarry>=0?'#f87171':'#34d399'}">Net housing Δ (mortgage active):</strong> <code><span style="color:${i.netAnnCarry>=0?'#f87171':'#34d399'}">${i.netAnnCarry>=0?'+':''}${fmt(i.netAnnCarry)}/yr</span></code></div>
-    <div class="mf-row"><strong style="color:${i.annTM-i.currentHousingAnn>=0?'#f87171':'#34d399'}">Net housing Δ (post-mortgage):</strong> <code><span style="color:${i.annTM-i.currentHousingAnn>=0?'#f87171':'#34d399'}">${i.annTM-i.currentHousingAnn>=0?'+':''}${fmt(i.annTM-i.currentHousingAnn)}/yr</span> (tax+maint only)</code></div>`:''}
-    ${i.prOn?`<div class="mf-row"><strong>💼 Post-retire savings:</strong> <code>${fmt(i.prAmt)}/yr for ${i.prDur} yrs starting yr ${i.yFirst} (Partner ${i.fw})</code></div>`:''}
-    <div class="mf-row" style="margin-top:6px;color:var(--n600);font-size:.66rem">All values in real (inflation-adjusted) dollars — $1 today = ${fmt(Math.pow(1+i.inf,i.yFull))} nominal at retirement in ${i.yFull} yrs.</div>`;
-
-  // Year-by-year table
-  const nYrs=i.yFull+10;
-  let v=i.savings;
-  const rows=[];
-  for(let y=0;y<=nYrs;y++){
-    const startV=v;
-    let dpThisYr=0;
-    if(i.hmOn&&y===i.hmYear){ dpThisYr=Math.min(v,i.dp); v=Math.max(0,v-dpThisYr); }
-    const afterDP=v;
-
-    let contrib=0, phaseLabel='';
-    if(y<i.yFirst){ contrib=i.contrib; phaseLabel='Phase 1 — joint saving'; }
-    else if(i.prOn&&y<i.yFirst+i.prDur){ contrib=i.prAmt; phaseLabel='Phase 2A — post-retire save'; }
-    else { contrib=0; phaseLabel='Phase 2B — full coast'; }
-
-    const carryThisYr=netHousingCost(i,y); // net housing cost change this year
-    const netContrib=contrib-carryThisYr;
-
-    const growth=afterDP*i.realPre;
-    const endV=Math.max(0,afterDP*(1+i.realPre)+netContrib);
-    v=endV;
-
-    const notes=[];
-    if(y===0) notes.push('Start');
-    if(dpThisYr>0) notes.push('🏡 Down pmt applied');
-    if(y===i.yFirst) notes.push(`Partner ${i.fw} retires`);
-    if(i.prOn&&y===i.yFirst+i.prDur) notes.push('Extra savings end');
-    if(y===i.yFull) notes.push('⭐ Full retirement');
-    if(startV<coastNum&&endV>=coastNum) notes.push('🏖️ Hit Coast FIRE');
-    if(startV<fireNum&&endV>=fireNum) notes.push('🔥 Hit FIRE Number');
-
-    const isMilestone=y===i.yFirst||y===i.yFull||(i.prOn&&y===i.yFirst+i.prDur);
-    const isEvent=dpThisYr>0;
-
-    rows.push({y,ageA:Math.round(i.ageA+y),ageB:Math.round(i.ageB+y),phaseLabel,
-      startV,dpThisYr,growth,contrib,carryThisYr,netContrib,endV,notes,isMilestone,isEvent});
-  }
-
-  const fmtS=n=>n==null?'—':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1000?'$'+Math.round(n).toLocaleString():'$'+Math.round(n);
-
-  document.getElementById('mpBody').innerHTML=rows.map(r=>{
-    const cls=r.isMilestone?'ms-row':r.isEvent?'ev-row':'';
-    const growthStr='+'+fmtS(r.growth);
-    const contribStr=r.contrib>0?'+'+fmtS(r.contrib):r.contrib<0?fmtS(r.contrib):'—';
-    const carryStr=r.carryThisYr>0?'-'+fmtS(r.carryThisYr):'—';
-    const dpStr=r.dpThisYr>0?'-'+fmtS(r.dpThisYr):'—';
-    return`<tr class="${cls}">
-      <td class="yr tl">${r.y}</td>
-      <td>${r.ageA}</td>
-      <td>${r.ageB}</td>
-      <td class="phase tl">${r.phaseLabel}</td>
-      <td class="bld">${fmtS(r.startV)}</td>
-      <td class="pos">${growthStr}</td>
-      <td class="${r.contrib>0?'pos':r.contrib<0?'neg':'neu'}">${contribStr}</td>
-      <td class="${r.carryThisYr>0?'neg':'neu'}">${carryStr}</td>
-      <td class="${r.dpThisYr>0?'neg':'neu'}">${dpStr}</td>
-      <td class="bld">${fmtS(r.endV)}</td>
-      <td class="note tl">${r.notes.join(' · ')}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ── URL state ─────────────────────────────────────────────────
-function saveState(){
-  try{
-    const s={};
-    document.querySelectorAll('input[id],select[id]').forEach(el=>{
-      if(el.type==='checkbox') s[el.id]=el.checked;
-      else if(el.type!=='range') s[el.id]=el.value;
-    });
-    history.replaceState(null,'','#'+btoa(JSON.stringify(s)));
-  }catch(e){}
-}
-function loadState(){
-  try{
-    if(!location.hash||location.hash.length<4) return false;
-    const s=JSON.parse(atob(location.hash.slice(1)));
-    Object.entries(s).forEach(([id,val])=>{
-      const el=document.getElementById(id);
-      if(!el) return;
-      if(el.type==='checkbox'){el.checked=val;const bd=el.closest('.ts')?.querySelector('.ts-body');if(bd)bd.style.display=val?'':'none';}
-      else if(el.type!=='range') el.value=val;
-    });
-    return true;
-  }catch(e){return false;}
-}
-loadState();
-calc();
-
-// ── Tooltips ─────────────────────────────────────────────────
-const TIPS = {
-  // Partner A
-  ageA:        "Partner A's current age. Used to calculate years to retirement and all timeline projections.",
-  retireA:     "Age Partner A plans to stop working full-time. Joint contributions stop when the first partner retires — whichever partner that is.",
-  salaryA:     "Partner A's annual gross (pre-tax) salary. Combined with Partner B's to show your household income vs. what each goal requires.",
-  // Partner B
-  ageB:        "Partner B's current age. Used alongside Partner A's age to project the full joint contribution timeline.",
-  retireB:     "Age Partner B plans to retire. Full retirement — the FIRE target date — is when the last partner stops working.",
-  salaryB:     "Partner B's annual gross (pre-tax) salary. Combined with Partner A's to calculate savings rates and income gap analysis.",
-  // Joint finances
-  currentSavings: "Total combined investment portfolio today — 401(k)s, IRAs, brokerage accounts, etc. Don't include your emergency fund or home equity.",
-  annualContrib:  "Total annual amount both partners invest together each year. This stops automatically when the first partner reaches retirement age.",
-  annualExpenses: "How much you plan to spend per year in retirement, in today's dollars. Your FIRE Number = Annual Expenses ÷ Safe Withdrawal Rate.",
-  // Returns
-  preReturn:   "Expected nominal annual investment return before retirement. 7% is a widely used historical average for a diversified stock-heavy portfolio.",
-  preSlider:   "Expected nominal annual investment return before retirement. 7% is a widely used historical average for a diversified stock-heavy portfolio.",
-  postReturn:  "Expected nominal return during retirement. Often set lower than pre-retirement (more bonds/cash) to guard against sequence-of-returns risk in early retirement years.",
-  postSlider:  "Expected nominal return during retirement. Often set lower than pre-retirement (more bonds/cash) to guard against sequence-of-returns risk in early retirement years.",
-  inflation:   "Expected average annual inflation rate. All dollar amounts are shown in today's purchasing power — returns are deflated by this rate throughout.",
-  swr:         "Safe Withdrawal Rate: the % of your portfolio you withdraw annually in retirement. The classic '4% rule' (Trinity Study) suggests portfolios survive 30+ years. Lower is more conservative.",
-  // Post-retirement savings
-  prContrib:   "Annual amount the first-retired partner continues to invest after they stop working — e.g. from consulting, severance, or part-time income. Compounds at the pre-retirement return rate.",
-  prDuration:  "How many years after the first partner's retirement they keep contributing. After this phase ends, the portfolio coasts on growth alone.",
-  // Home purchase
-  hmValue:     "Full purchase price of the home. Used to compute the down payment hit to your portfolio and ongoing property tax + maintenance costs.",
-  hmDown:      "Down payment as a percentage of home value. This lump sum is deducted from your portfolio in the purchase year before compounding.",
-  hmAgeA:      "Partner A's age when you buy the home. Determines which projection year the down payment and mortgage carrying costs start.",
-  hmRate:      "Annual interest rate on the mortgage loan. Combined with the term to compute the standard amortized monthly payment.",
-  hmTerm:      "Mortgage length in years. Longer terms lower monthly payments but increase total interest paid. Carrying costs drop to tax + maintenance after the term ends.",
-  hmTax:       "Annual property tax plus ongoing maintenance as a percentage of home value. Typical range is 1–2% depending on location and property age.",
-  // Barista
-  brIncome:    "Annual income from part-time or 'barista' work during semi-retirement. Reduces the expense gap your portfolio needs to cover, lowering the required nest egg significantly.",
-};
-
-// Apply data-tip to each input's .ig container (wider hover target)
-Object.entries(TIPS).forEach(([id, tip]) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const ig = el.closest('.ig') || el.closest('.rrow') || el;
-  ig.setAttribute('data-tip', tip);
-});
-
-// Apply to hero cards (static)
-const HERO_TIPS = {
-  coastNum:  "The portfolio value you need RIGHT NOW so it grows — with zero future contributions — to your full FIRE Number by the time the last partner retires. Formula: FIRE Number ÷ (1 + real return)^years to full retirement.",
-  fireNumC:  "Annual retirement expenses ÷ Safe Withdrawal Rate. The total nest egg needed so portfolio withdrawals cover all spending indefinitely.",
-  fireNumF:  "Annual retirement expenses ÷ Safe Withdrawal Rate. Build to this number and investment returns sustain your lifestyle forever without depleting the portfolio.",
-  yToFire:   "Years from today until your portfolio is projected to reach the Full FIRE Number, following your two-phase plan (joint contributions → coast).",
-  bNum:      "A reduced FIRE Number sized only to cover the expense gap (annual expenses minus part-time income). Requires far less than full FIRE — often 40–60% less.",
-  yToBar:    "Years until your portfolio reaches the Barista FIRE number — typically several years sooner than full FIRE because the target is much smaller.",
-  swrPort:   "Your projected portfolio value at full retirement, expressed in today's purchasing-power (inflation-adjusted) dollars — what it's worth in real terms.",
-  swrAnn:    "Annual portfolio withdrawal = projected portfolio × your chosen SWR. This is your investment 'paycheck' in retirement, before any other income sources.",
-};
-Object.entries(HERO_TIPS).forEach(([id, tip]) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const hero = el.closest('.hero');
-  if (hero) hero.setAttribute('data-tip', tip);
-});
-
-// Tooltip engine — follows cursor, appears only on hover
-const tt = document.getElementById('ttip');
-let ttTO, ttCurrent = null;
-
-function ttPos(x, y) {
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const tw = tt.offsetWidth || 270, th = tt.offsetHeight || 60;
-  let lx = x + 15, ly = y + 18;
-  if (lx + tw > vw - 8) lx = x - tw - 12;
-  if (ly + th > vh - 8) ly = y - th - 12;
-  tt.style.left = lx + 'px';
-  tt.style.top  = ly + 'px';
-}
-
-document.addEventListener('mouseover', e => {
-  const el = e.target.closest('[data-tip]');
-  if (!el) return;
-  clearTimeout(ttTO);
-  if (el !== ttCurrent) {
-    ttCurrent = el;
-    tt.textContent = el.dataset.tip;
-  }
-  ttPos(e.clientX, e.clientY);
-  tt.classList.add('show');
-});
-
-document.addEventListener('mouseout', e => {
-  const el = e.target.closest('[data-tip]');
-  if (!el) return;
-  // Only hide when leaving the [data-tip] zone entirely (not moving to a child)
-  if (el.contains(e.relatedTarget)) return;
-  clearTimeout(ttTO);
-  ttTO = setTimeout(() => { tt.classList.remove('show'); ttCurrent = null; }, 100);
-});
-
-document.addEventListener('mousemove', e => {
-  if (!tt.classList.contains('show')) return;
-  ttPos(e.clientX, e.clientY);
-});
-</script>
 </body>
 </html>

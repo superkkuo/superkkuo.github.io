@@ -45,10 +45,10 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .math-btn:hover{background:rgba(59,130,246,.3);color:var(--white);}
 
 /* LAYOUT */
-.layout{display:grid;grid-template-columns:350px 1fr;min-height:calc(100vh - 78px);}
+.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 78px);}
 
 /* SIDEBAR */
-.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;}
+.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 78px);}
 .sb::-webkit-scrollbar{width:3px;}
 .sb::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
 .sbh{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
@@ -59,7 +59,7 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .iw .pre,.iw .suf{position:absolute;top:50%;transform:translateY(-50%);font-size:.75rem;font-weight:600;color:var(--n600);pointer-events:none;z-index:1;}
 .iw .pre{left:9px;} .iw .suf{right:9px;}
 input[type="number"],select{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
-input[type="number"]:focus,select:focus{outline:none;border-color:var(--bl5);box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+input[type="number"]:focus,select:focus{outline:none;border-color:var(--bl5);box-shadow:0 0 0 3px rgba(59,130,246,.15);}input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}input[type="number"]{-moz-appearance:textfield;}
 .has-pre input[type="number"]{padding-left:19px;}
 .has-suf input[type="number"]{padding-right:21px;}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -298,6 +298,41 @@ tr.hi td{background:rgba(59,130,246,.04);}
   .stats{grid-template-columns:1fr 1fr;}
   .r2{grid-template-columns:1fr;}
 }
+
+/* ── Breadcrumb ── */
+.hdr-bc{font-size:.63rem;font-weight:600;margin-bottom:7px;}
+.hdr-bc a{color:var(--n600);text-decoration:none;letter-spacing:.02em;transition:color .15s;}
+.hdr-bc a:hover{color:var(--s300);}
+/* ── Copy-link button ── */
+.copy-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--s300);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+.copy-btn.copied{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);color:#6ee7b7;}
+/* ── Mobile scroll pill ── */
+.sb-scroll-hint{display:none;padding:12px 0 4px;text-align:center;}
+.sb-scroll-pill{background:linear-gradient(135deg,var(--cy5),var(--cy6));color:var(--n950);font-size:.8rem;font-weight:700;padding:10px 28px;border-radius:var(--rfl);border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 4px 14px rgba(6,182,212,.35);}
+@media(max-width:700px){.sb-scroll-hint{display:block;}}
+/* ── Smooth hero-value transitions ── */
+.hv{transition:all .35s cubic-bezier(.4,0,.2,1);}
+/* ── Print styles ── */
+.print-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.print-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+@media print{
+  .sb,.hdr-actions{display:none!important;}
+  .wrap{grid-template-columns:1fr!important;}
+  .main{padding:20px!important;}
+  body{background:white!important;color:black!important;}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;}
+  .math-panel{display:block!important;position:static!important;transform:none!important;}
+}
+
+
+/* ── Reset button ── */
+.reset-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.reset-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+/* ── Input validation ── */
+.input-err{border-color:var(--ro5) !important;box-shadow:0 0 0 3px rgba(244,63,94,.15) !important;}
+.err-msg{font-size:.66rem;color:#fca5a5;margin-top:3px;padding-left:2px;display:block;}
+
 </style>
 </head>
 <body>
@@ -305,7 +340,8 @@ tr.hi td{background:rgba(59,130,246,.04);}
 <header class="hdr">
   <div class="hdr-in">
     <div>
-      <h1>💰 <span>Compound</span> & Simple Interest</h1>
+      <div class="hdr-bc"><a href="index.html">← All Calculators</a></div>
+        <h1>💰 <span>Compound</span> & Simple Interest</h1>
       <div class="hdr-tags" style="display:none">
         <span class="htag">Investment Growth</span>
         <span class="htag">Power of Compounding</span>
@@ -317,10 +353,17 @@ tr.hi td{background:rgba(59,130,246,.04);}
       <select class="nav-select" onchange="if(this.value)window.location=this.value">
         <option value="interest_calculator.html" selected>💰 Interest</option>
         <option value="mortgage_calculator.html">🏡 Mortgage</option>
-        <option value="index.html">🔥 Retirement</option>
+        <option value="retirement_calculator.html">🔥 Retirement</option>
         <option value="college_calculator.html">🎓 529 College</option>
+        <option value="tax_calculator.html">💸 Tax</option>
+        <option value="estate_calculator.html">🏛️ Estate Tax</option>
+        <option value="social_security_calculator.html">🔒 Social Security</option>
+        <option value="col_calculator.html">🌆 Cost of Living</option>
       </select>
-      <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
+      <button class="reset-btn" onclick="resetDefaults()" title="Reset all inputs to defaults">&#8635; Reset</button>
+        <button class="copy-btn" id="copyLinkBtn" onclick="copyLink()">🔗 Copy Link</button>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+        <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
     </div>
   </div>
 </header>
@@ -401,6 +444,9 @@ tr.hi td{background:rgba(59,130,246,.04);}
 
   <div class="cb" id="summaryBox"></div>
 
+<div class="sb-scroll-hint">
+  <button class="sb-scroll-pill" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">See Results ↓</button>
+</div>
 </aside>
 
 <main class="main">
@@ -598,6 +644,9 @@ function calc(){
   doScenarios(i);
   doSchedule(C, S, i);
   doMath(C, S, i, ioi, afterTax, realValue);
+
+  // Cross-field validation
+  clearAllErrs(); validateMinMax();
   saveState();
 }
 
@@ -1104,6 +1153,67 @@ function loadState(){
 // ── Init ─────────────────────────────────────────────────────
 loadState();
 calc();
+
+// ── Copy link ──
+function copyLink(){
+  const btn=document.getElementById('copyLinkBtn');
+  const url=location.href;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=url;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  if(btn){btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='🔗 Copy Link';btn.classList.remove('copied');},1800);}
+}
+// ── k/M shorthand ──
+document.addEventListener('keydown',function(e){
+  const el=e.target;
+  if(el.tagName!=='INPUT'||el.type!=='number') return;
+  const v=+el.value; if(!el.value||isNaN(v)||v<=0) return;
+  if((e.key==='k'||e.key==='K')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  } else if((e.key==='m'||e.key==='M')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+});
+
+
+// ── Reset to defaults ──
+function resetDefaults(){
+  if(!confirm('Reset all inputs to defaults?')) return;
+  history.replaceState(null,'',location.pathname);
+  location.reload();
+}
+// ── Input validation ──
+function showErr(id, msg){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.add('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  let em=ig.querySelector('.err-msg');
+  if(!em){em=document.createElement('span');em.className='err-msg';ig.appendChild(em);}
+  em.textContent=msg;
+}
+function clearErr(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.remove('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  const em=ig.querySelector('.err-msg'); if(em) em.remove();
+}
+function clearAllErrs(){
+  document.querySelectorAll('.input-err').forEach(el=>el.classList.remove('input-err'));
+  document.querySelectorAll('.err-msg').forEach(em=>em.remove());
+}
+function validateMinMax(){
+  document.querySelectorAll('input[type="number"]').forEach(el=>{
+    if(!el.id) return;
+    const v=+el.value, mn=el.min!==''?+el.min:null, mx=el.max!==''?+el.max:null;
+    if(mn!==null && v<mn){ showErr(el.id,`Min: ${mn}`); }
+    else if(mx!==null && v>mx){ showErr(el.id,`Max: ${mx}`); }
+    else { clearErr(el.id); }
+  });
+}
+
 </script>
+<div style="position:fixed;bottom:8px;right:12px;font-size:.61rem;color:var(--s400);pointer-events:none;z-index:10;font-family:var(--font);">Updated Apr 2026</div>
 </body>
 </html>

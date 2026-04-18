@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💸 Marginal Tax Rate Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --n950:#060d1e;--n900:#0f172a;--n800:#1e293b;--n700:#334155;--n600:#475569;
+  --s400:#94a3b8;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc;
+  --white:#ffffff;
+  --bl6:#2563eb;--bl5:#3b82f6;--bl1:#dbeafe;--bl0:#eff6ff;
+  --pr6:#7c3aed;--pr5:#8b5cf6;--pr1:#ede9fe;--pr0:#faf5ff;
+  --em6:#059669;--em5:#10b981;--em1:#d1fae5;--em0:#ecfdf5;
+  --am6:#d97706;--am5:#f59e0b;--am1:#fef3c7;--am0:#fffbeb;
+  --ro6:#e11d48;--ro5:#f43f5e;--ro1:#ffe4e6;--ro0:#fff1f2;
+  --in6:#4f46e5;--in5:#6366f1;--in1:#e0e7ff;--in0:#eef2ff;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --rsm:8px;--rmd:12px;--rlg:16px;--rfl:9999px;
+  --sh1:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --sh2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── HEADER ──────────────────────────────────────────────── */
+.hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 80% at 15% 50%,rgba(245,158,11,.14),transparent),radial-gradient(ellipse 40% 60% at 85% 30%,rgba(217,119,6,.08),transparent);pointer-events:none;}
+.hdr-in{max-width:1300px;margin:0 auto;position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.hdr h1{font-size:1.4rem;font-weight:700;color:var(--white);letter-spacing:-.02em;}
+.hdr h1 span{color:var(--am5);}
+.hdr-tags{display:none;}
+.nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:var(--rsm);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.nav-btn:hover{background:rgba(255,255,255,.12);color:var(--white);}
+.nav-select{background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid rgba(255,255,255,.2);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 30px 7px 12px;border-radius:var(--rsm);cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;width:auto;max-width:160px;}
+.nav-select:hover{background-color:rgba(255,255,255,.12);color:var(--white);}
+.nav-select option{background:#1e293b;color:#e2e8f0;}
+.hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
+.math-btn{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#fcd34d;font-size:.74rem;font-weight:600;padding:6px 14px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;letter-spacing:.01em;white-space:nowrap;}
+.math-btn:hover{background:rgba(245,158,11,.3);color:var(--white);}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 78px);}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 78px);}
+.sb::-webkit-scrollbar{width:3px;}
+.sb::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.sbh{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
+.sbh::after{content:'';flex:1;height:1px;background:var(--n800);}
+.sbh:first-child{margin-top:0;}
+
+/* Inputs */
+.ig{margin-bottom:9px;}
+.ig:last-child{margin-bottom:0;}
+.ig label{display:block;font-size:.71rem;font-weight:500;color:var(--s400);margin-bottom:3px;}
+.ig label em{font-style:normal;color:var(--n600);font-size:.66rem;}
+.iw{position:relative;}
+.iw .pre,.iw .suf{position:absolute;top:50%;transform:translateY(-50%);font-size:.75rem;font-weight:600;color:var(--n600);pointer-events:none;z-index:1;}
+.iw .pre{left:9px;} .iw .suf{right:9px;}
+input[type="number"],select{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+input[type="text"]{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;}
+input[type="number"]:focus,input[type="text"]:focus,select:focus{outline:none;border-color:var(--am5);box-shadow:0 0 0 3px rgba(245,158,11,.15);}
+input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
+.has-pre input{padding-left:19px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+select{cursor:pointer;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23475569'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:8px;}
+
+/* Toggle rows */
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.tog-row:last-child{border-bottom:none;}
+.tog-lbl{font-size:.71rem;color:var(--s400);flex:1;padding-right:10px;line-height:1.4;}
+.tog-lbl em{display:block;font-style:normal;font-size:.63rem;color:var(--n600);margin-top:1px;}
+.ck-wrap{display:flex;align-items:center;flex-shrink:0;}
+input[type="checkbox"]{width:15px;height:15px;accent-color:var(--am5);cursor:pointer;flex-shrink:0;}
+
+/* Detected location pill */
+.loc-pill{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--rsm);padding:6px 10px;font-size:.69rem;color:#fcd34d;margin-top:5px;line-height:1.4;display:none;}
+.loc-pill strong{color:var(--am5);}
+
+/* Calc summary box */
+.cb{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:var(--rsm);padding:9px 11px;margin-top:10px;}
+.cb-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.71rem;}
+.cb-lbl{color:var(--s400);}
+.cb-val{color:var(--white);font-weight:600;font-family:var(--mono);font-size:.72rem;}
+.cb-div{height:1px;background:rgba(245,158,11,.2);margin:5px 0;}
+.cb-tot{color:#fcd34d;font-weight:700;}
+
+/* ── MAIN ────────────────────────────────────────────────── */
+.main{padding:18px 22px 40px;overflow-y:auto;}
+
+/* Tabs */
+.tabs{display:flex;gap:3px;background:var(--white);border:1px solid var(--s200);border-radius:var(--rfl);padding:4px;margin-bottom:18px;box-shadow:var(--sh1);}
+.tab{flex:1;padding:7px 12px;border:none;border-radius:var(--rfl);font-size:.76rem;font-weight:600;cursor:pointer;background:transparent;color:var(--n600);transition:all .16s;text-align:center;white-space:nowrap;}
+.tab:hover{color:var(--n900);}
+.tab.active{background:var(--n900);color:var(--white);box-shadow:var(--sh1);}
+.tab-panel{display:none;animation:fi .18s ease;}
+.tab-panel.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+
+/* Hero cards */
+.heroes{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px;margin-bottom:14px;}
+.heroes2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px;}
+.hero{border-radius:var(--rlg);padding:16px 14px;border:1px solid transparent;position:relative;overflow:hidden;}
+.hbl{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;}
+.hgr{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#a7f3d0;}
+.ham{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;}
+.hpu{background:linear-gradient(135deg,#faf5ff,#ede9fe);border-color:#ddd6fe;}
+.hin{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe;}
+.hro{background:linear-gradient(135deg,#fff1f2,#ffe4e6);border-color:#fda4af;}
+.hcy{background:linear-gradient(135deg,#ecfeff,#cffafe);border-color:#a5f3fc;}
+.hero .hl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:4px;}
+.hero .hv{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-bottom:3px;}
+.hbl .hv{color:var(--bl6);}
+.hgr .hv{color:var(--em6);}
+.ham .hv{color:var(--am6);}
+.hpu .hv{color:var(--pr6);}
+.hin .hv{color:var(--in6);}
+.hro .hv{color:var(--ro6);}
+.hcy .hv{color:#0e7490;}
+.hero .hs{font-size:.7rem;color:var(--n600);}
+
+/* Section heading */
+.sh{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--n600);margin:16px 0 9px;display:flex;align-items:center;gap:8px;}
+.sh::after{content:'';flex:1;height:1px;background:var(--s200);}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:13px;}
+.stat{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:10px 12px;box-shadow:var(--sh1);}
+.stat .sl{font-size:.66rem;color:var(--n600);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.stat .sv{font-size:.92rem;font-weight:700;color:var(--n900);font-family:var(--mono);}
+.stat .sv.pos{color:var(--em6);}
+.stat .sv.neg{color:var(--ro6);}
+.stat .sv.warn{color:var(--am6);}
+.stat .sv.blu{color:var(--bl6);}
+.stat .sv.pur{color:var(--pr6);}
+
+/* Banners */
+.bn{padding:9px 13px;border-radius:var(--rmd);font-size:.8rem;font-weight:500;margin-bottom:12px;line-height:1.5;border:1px solid;}
+.bn strong{font-weight:700;}
+.bn.ok{background:var(--em0);border-color:var(--em1);color:#065f46;}
+.bn.warn{background:var(--am0);border-color:var(--am1);color:#78350f;}
+.bn.info{background:var(--bl0);border-color:var(--bl1);color:#1e3a8a;}
+
+/* Info box */
+.ib{background:var(--s50);border-left:3px solid var(--am5);border-radius:0 var(--rsm) var(--rsm) 0;padding:9px 12px;font-size:.76rem;color:var(--n600);margin-bottom:12px;line-height:1.6;}
+.ib strong{color:var(--n900);}
+
+/* Chart wrapper */
+.cw{position:relative;height:220px;margin-bottom:6px;}
+.cw2{position:relative;height:180px;margin-bottom:6px;}
+
+/* Marginal breakdown bar-list */
+.marg-list{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);overflow:hidden;margin-bottom:13px;box-shadow:var(--sh1);}
+.marg-row{display:flex;align-items:center;gap:12px;padding:9px 13px;border-bottom:1px solid var(--s100);font-size:.77rem;}
+.marg-row:last-child{border-bottom:none;background:var(--s50);}
+.marg-lbl{width:90px;font-weight:600;color:var(--n700);flex-shrink:0;}
+.marg-bar-wrap{flex:1;height:9px;background:var(--s200);border-radius:4px;overflow:hidden;}
+.marg-bar{height:100%;border-radius:4px;transition:width .3s;}
+.marg-pct{width:56px;text-align:right;font-family:var(--mono);font-weight:700;font-size:.74rem;flex-shrink:0;}
+.marg-note{width:55px;text-align:right;font-size:.67rem;color:var(--n600);flex-shrink:0;}
+
+/* Bracket table */
+.btbl-wrap{overflow-x:auto;margin-bottom:13px;}
+table.btbl{width:100%;border-collapse:collapse;font-size:.77rem;}
+table.btbl th{background:var(--s50);padding:7px 10px;text-align:left;font-weight:700;color:var(--n600);font-size:.63rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--s200);}
+table.btbl th.r{text-align:right;}
+table.btbl td{padding:8px 10px;border-bottom:1px solid var(--s100);font-size:.76rem;}
+table.btbl td.r{text-align:right;font-family:var(--mono);}
+table.btbl td.muted{color:var(--n600);}
+table.btbl tr:last-child td{border-bottom:none;}
+table.btbl tr.active-row td{background:rgba(245,158,11,.06);}
+table.btbl tr.active-row td:first-child{border-left:3px solid var(--am5);padding-left:7px;}
+table.btbl tr:hover:not(.active-row) td{background:var(--s50);}
+.mini-bar{height:7px;background:var(--s200);border-radius:3px;overflow:hidden;min-width:60px;}
+.mini-fill{height:100%;border-radius:3px;transition:width .3s;}
+
+/* Total footer for tables */
+.tbl-foot{display:flex;justify-content:flex-end;align-items:center;padding:8px 12px;font-size:.77rem;color:var(--n600);border-top:1px solid var(--s200);}
+.tbl-foot strong{color:var(--n900);font-family:var(--mono);margin-left:6px;}
+
+/* Donut / rates chart container */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.chart-box{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:16px;box-shadow:var(--sh1);}
+.chart-box .ch{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--n600);margin-bottom:12px;}
+
+/* FICA breakdown cards */
+.fica-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.fica-card{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:13px 14px;box-shadow:var(--sh1);}
+.fica-card .fc-lbl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--n600);margin-bottom:6px;}
+.fica-card .fc-val{font-size:1.15rem;font-weight:800;font-family:var(--mono);color:var(--n900);margin-bottom:2px;}
+.fica-card .fc-sub{font-size:.68rem;color:var(--n600);}
+
+/* ── MATH INSPECTOR (slide-in panel) ─────────────────────── */
+.mp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+.mp-overlay.open{opacity:1;pointer-events:auto;}
+.mp{position:fixed;top:0;right:0;height:100vh;width:580px;max-width:100vw;background:var(--n950);border-left:1px solid var(--n700);z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,.4);}
+.mp.open{transform:translateX(0);}
+.mp-hdr{padding:16px 20px;border-bottom:1px solid var(--n700);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--n900);}
+.mp-hdr h2{font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-.01em;}
+.mp-hdr h2 span{color:var(--am5);}
+.mp-close{background:var(--n800);border:1px solid var(--n700);color:var(--s400);font-size:.76rem;font-weight:600;padding:5px 12px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;}
+.mp-close:hover{color:var(--white);border-color:var(--s400);}
+.mp-body{overflow-y:auto;flex:1;padding:16px 18px;}
+.mp-body::-webkit-scrollbar{width:4px;}
+.mp-body::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.ms2{margin-bottom:20px;}
+.ms2-hdr{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--am5);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--n800);}
+.mfb{background:var(--n900);border:1px solid var(--n800);border-radius:var(--rmd);padding:12px 15px;margin-bottom:8px;}
+.mfb .ft{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:7px;}
+.mf{display:flex;align-items:flex-start;gap:10px;margin-bottom:5px;font-size:.76rem;line-height:1.6;}
+.mf:last-child{margin-bottom:0;}
+.ml{color:var(--s400);white-space:nowrap;min-width:175px;flex-shrink:0;font-size:.73rem;}
+.mv{color:var(--white);font-family:var(--mono);font-size:.73rem;}
+.mv.hi{color:var(--am5);}
+.mv.pos{color:var(--em5);}
+.mv.neg{color:#f87171;}
+.mf-div{height:1px;background:var(--n800);margin:7px 0;}
+
+/* ── MOBILE ───────────────────────────────────────────────── */
+@media(max-width:960px){
+  .layout{grid-template-columns:1fr;}
+  .heroes{grid-template-columns:1fr 1fr;}
+  .chart-row{grid-template-columns:1fr;}
+  .fica-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:700px){
+  /* Header */
+  .hdr{padding:13px 15px 11px;}
+  .hdr-in{flex-wrap:wrap;gap:8px;}
+  .hdr h1{font-size:1.05rem;}
+  .hdr-tags{display:none;}
+  .hdr-actions{margin-top:0;gap:6px;}
+  .nav-btn{font-size:.67rem;padding:5px 9px;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
+
+  /* Layout */
+  .layout{grid-template-columns:1fr;min-height:unset;}
+  .sb{position:static;height:auto;max-height:none;padding:15px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
+
+  /* Inputs — 16px to prevent iOS auto-zoom */
+  input[type="number"],input[type="text"],select{font-size:1rem !important;padding:10px 10px;}
+  .has-pre input{padding-left:22px;}
+
+  /* Labels */
+  .ig label{font-size:.78rem;}
+  .sbh{font-size:.68rem;margin:16px 0 9px;}
+
+  /* Main */
+  .main{padding:13px 12px 30px;}
+
+  /* Tabs — horizontal scroll */
+  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 5px;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex:0 0 auto;padding:9px 14px;font-size:.75rem;min-height:38px;}
+
+  /* Heroes — 2 col */
+  .heroes,.heroes2{grid-template-columns:1fr 1fr;gap:8px;}
+  .hero{padding:12px 11px;}
+  .hero .hv{font-size:1.1rem;}
+  .hero .hs{font-size:.66rem;}
+
+  /* Stats */
+  .stats{grid-template-columns:1fr 1fr;gap:7px;}
+  .stat .sv{font-size:.85rem;}
+
+  /* Charts */
+  .cw{height:180px;}
+  .cw2{height:150px;}
+
+  /* FICA grid */
+  .fica-grid{grid-template-columns:1fr 1fr;}
+
+  /* Marginal breakdown — hide note col */
+  .marg-note{display:none;}
+
+  /* Bracket table */
+  .btbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.btbl{min-width:480px;}
+  table.btbl th,table.btbl td{padding:6px 8px;font-size:.72rem;}
+
+  /* Math Inspector — slide up from bottom on mobile */
+  .mp{width:100vw;max-width:100vw;height:90vh;top:auto;bottom:0;right:0;border-left:none;border-top:1px solid var(--n700);border-radius:var(--rlg) var(--rlg) 0 0;transform:translateY(100%);}
+  .mp.open{transform:translateY(0);}
+  .mp-hdr{border-radius:var(--rlg) var(--rlg) 0 0;padding:14px 16px;}
+  .mp-body{padding:13px;}
+  .mf{flex-direction:column;gap:2px;}
+  .ml{min-width:unset;font-size:.72rem;}
+  .mv{font-size:.72rem;}
+}
+@media(max-width:399px){
+  .heroes,.heroes2{grid-template-columns:1fr 1fr;}
+  .hero .hv{font-size:1.2rem;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .fica-grid{grid-template-columns:1fr;}
+}
+
+/* ── Breadcrumb ── */
+.hdr-bc{font-size:.63rem;font-weight:600;margin-bottom:7px;}
+.hdr-bc a{color:var(--n600);text-decoration:none;letter-spacing:.02em;transition:color .15s;}
+.hdr-bc a:hover{color:var(--s300);}
+/* ── Copy-link button ── */
+.copy-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--s300);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+.copy-btn.copied{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);color:#6ee7b7;}
+/* ── Mobile scroll pill ── */
+.sb-scroll-hint{display:none;padding:12px 0 4px;text-align:center;}
+.sb-scroll-pill{background:linear-gradient(135deg,var(--cy5),var(--cy6));color:var(--n950);font-size:.8rem;font-weight:700;padding:10px 28px;border-radius:var(--rfl);border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 4px 14px rgba(6,182,212,.35);}
+@media(max-width:700px){.sb-scroll-hint{display:block;}}
+/* ── Smooth hero-value transitions ── */
+.hv{transition:all .35s cubic-bezier(.4,0,.2,1);}
+/* ── Print styles ── */
+.print-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.print-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+@media print{
+  .sb,.hdr-actions{display:none!important;}
+  .wrap{grid-template-columns:1fr!important;}
+  .main{padding:20px!important;}
+  body{background:white!important;color:black!important;}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;}
+  .math-panel{display:block!important;position:static!important;transform:none!important;}
+}
+
+
+/* ── Reset button ── */
+.reset-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.reset-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+/* ── Input validation ── */
+.input-err{border-color:var(--ro5) !important;box-shadow:0 0 0 3px rgba(244,63,94,.15) !important;}
+.err-msg{font-size:.66rem;color:#fca5a5;margin-top:3px;padding-left:2px;display:block;}
+
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+<header class="hdr">
+  <div class="hdr-in">
+    <div>
+      <div class="hdr-bc"><a href="index.html">← All Calculators</a></div>
+        <h1>💸 <span>Marginal Tax</span> Rate Calculator</h1>
+      <div class="hdr-tags" style="display:none"></div>
+    </div>
+    <div class="hdr-actions">
+      <select class="nav-select" onchange="if(this.value)window.location=this.value">
+        <option value="tax_calculator.html" selected>💸 Tax</option>
+        <option value="mortgage_calculator.html">🏡 Mortgage</option>
+        <option value="retirement_calculator.html">🔥 Retirement</option>
+        <option value="college_calculator.html">🎓 529 College</option>
+        <option value="interest_calculator.html">💰 Interest</option>
+        <option value="estate_calculator.html">🏛️ Estate Tax</option>
+        <option value="social_security_calculator.html">🔒 Social Security</option>
+        <option value="col_calculator.html">🌆 Cost of Living</option>
+      </select>
+      <button class="reset-btn" onclick="resetDefaults()" title="Reset all inputs to defaults">&#8635; Reset</button>
+        <button class="copy-btn" id="copyLinkBtn" onclick="copyLink()">🔗 Copy Link</button>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+        <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<!-- ═══ SIDEBAR ══════════════════════════════════════════════ -->
+<div class="sb">
+
+  <div class="sbh">Income</div>
+  <div class="ig">
+    <label>Gross Annual Income</label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="income" value="100000" min="0" max="10000000" step="1000" oninput="calc()">
+    </div>
+  </div>
+  <div class="ig">
+    <label>Filing Status</label>
+    <select id="filing" onchange="calc()">
+      <option value="single">Single</option>
+      <option value="mfj">Married Filing Jointly</option>
+      <option value="mfs">Married Filing Separately</option>
+      <option value="hoh">Head of Household</option>
+    </select>
+  </div>
+
+  <div class="sbh">Location</div>
+  <div class="ig">
+    <label>Zip Code</label>
+    <input type="text" id="zipcode" value="10001" maxlength="5" placeholder="e.g. 90210" oninput="calc()">
+    <div class="loc-pill" id="loc-pill"></div>
+  </div>
+  <div class="ig">
+    <label>State <em>(auto-detected, or override)</em></label>
+    <select id="stateOvr" onchange="calc()">
+      <option value="">— auto from zip —</option>
+    </select>
+  </div>
+
+  <div class="sbh">Options</div>
+  <div class="tog-row">
+    <span class="tog-lbl">Self-Employed
+      <em>Pay both sides of FICA (×2)</em>
+    </span>
+    <span class="ck-wrap"><input type="checkbox" id="selfEmp" onchange="calc()"></span>
+  </div>
+  <div class="tog-row">
+    <span class="tog-lbl">Include Local / City Tax</span>
+    <span class="ck-wrap"><input type="checkbox" id="inclLocal" checked onchange="calc()"></span>
+  </div>
+  <div class="tog-row">
+    <span class="tog-lbl">Itemized Deduction</span>
+    <span class="ck-wrap"><input type="checkbox" id="itemize" onchange="onItemizeToggle()"></span>
+  </div>
+  <div id="itemize-row" style="display:none;margin-top:6px">
+    <div class="ig">
+      <label>Itemized Amount</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="itemizeDed" value="20000" min="0" step="500" oninput="calc()">
+      </div>
+    </div>
+  </div>
+  <div class="tog-row">
+    <span class="tog-lbl">Pre-Tax Contributions
+      <em>401k / HSA / 403b reduces taxable income</em>
+    </span>
+    <span class="ck-wrap"><input type="checkbox" id="inclPre" onchange="onPreToggle()"></span>
+  </div>
+  <div id="pre-row" style="display:none;margin-top:6px">
+    <div class="ig">
+      <label>Pre-Tax Amount</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="preAmt" value="23000" min="0" step="500" oninput="calc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick summary box -->
+  <div class="cb" id="cb-summary" style="margin-top:14px;">
+    <div class="cb-row"><span class="cb-lbl">Gross Income</span><span class="cb-val" id="cb-gross">—</span></div>
+    <div class="cb-row"><span class="cb-lbl">Total Taxes</span><span class="cb-val" id="cb-taxes">—</span></div>
+    <div class="cb-div"></div>
+    <div class="cb-row"><span class="cb-lbl">Take-Home</span><span class="cb-tot" id="cb-home">—</span></div>
+  </div>
+
+<div class="sb-scroll-hint"><button class="sb-scroll-pill" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">See Results ↓</button></div>
+</div><!-- end sidebar -->
+
+<!-- ═══ MAIN ═════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- Hero cards -->
+  <div class="heroes">
+    <div class="hero ham">
+      <div class="hl">Federal Marginal</div>
+      <div class="hv" id="h-fedmarg">—</div>
+      <div class="hs">Top federal bracket</div>
+    </div>
+    <div class="hero hro">
+      <div class="hl">Total Marginal Rate</div>
+      <div class="hv" id="h-totmarg">—</div>
+      <div class="hs">Fed + State + FICA on next $1</div>
+    </div>
+    <div class="hero hin">
+      <div class="hl">Effective Total Rate</div>
+      <div class="hv" id="h-effrate">—</div>
+      <div class="hs">All taxes ÷ gross income</div>
+    </div>
+    <div class="hero hgr">
+      <div class="hl">Annual Take-Home</div>
+      <div class="hv" id="h-takehome">—</div>
+      <div class="hs">After all taxes</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this,'summary')">Summary</button>
+    <button class="tab" onclick="switchTab(this,'federal')">Federal Brackets</button>
+    <button class="tab" onclick="switchTab(this,'state')">State &amp; Local</button>
+    <button class="tab" onclick="switchTab(this,'fica')">FICA</button>
+  </div>
+
+  <!-- ── SUMMARY TAB ──────────────────────────────────────── -->
+  <div id="tp-summary" class="tab-panel active">
+
+    <div class="chart-row">
+      <div class="chart-box">
+        <div class="ch">Where Your Income Goes</div>
+        <div class="cw"><canvas id="c-donut"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="ch">Marginal vs Effective Rate by Tax Type</div>
+        <div class="cw"><canvas id="c-rates"></canvas></div>
+      </div>
+    </div>
+
+    <div class="sh">Every additional dollar you earn keeps…</div>
+    <div class="marg-list" id="marg-list"></div>
+
+    <div class="sh">Tax Summary</div>
+    <div class="stats" id="summary-stats"></div>
+
+    <div class="sh">Deduction &amp; Taxable Income</div>
+    <div class="stats" id="ded-stats"></div>
+
+    <div class="ib" style="margin-top:4px;">
+      <strong>⚠️ 2026 rates — educational estimate only.</strong> Uses 2026 federal brackets (IRS Rev. Proc. 2025-32 as amended by OBBB) and representative state rates. Does not account for AMT, tax credits (EITC, child tax credit, etc.), capital gains, investment income, state-specific deductions, or phase-outs. Consult a tax professional for accurate planning.
+    </div>
+  </div>
+
+  <!-- ── FEDERAL BRACKETS TAB ─────────────────────────────── -->
+  <div id="tp-federal" class="tab-panel">
+
+    <div class="chart-box" style="margin-bottom:14px;">
+      <div class="ch">Tax Collected per Bracket</div>
+      <div class="cw2"><canvas id="c-brackets"></canvas></div>
+    </div>
+
+    <div class="sh">2026 Federal Income Tax Brackets</div>
+    <div class="btbl-wrap">
+      <table class="btbl">
+        <thead><tr>
+          <th>Rate</th>
+          <th>Bracket Range</th>
+          <th class="r">Income in Bracket</th>
+          <th class="r">Tax in Bracket</th>
+          <th style="min-width:80px">Amount</th>
+        </tr></thead>
+        <tbody id="tbody-fed"></tbody>
+      </table>
+      <div class="tbl-foot">Total federal income tax: <strong id="fed-total">—</strong></div>
+    </div>
+
+    <div class="ib">Brackets applied to <strong>taxable income</strong> (gross income minus deduction). Your active bracket is highlighted — only income <em>within</em> that bracket is taxed at that rate.</div>
+  </div>
+
+  <!-- ── STATE & LOCAL TAB ────────────────────────────────── -->
+  <div id="tp-state" class="tab-panel">
+
+    <div id="state-banner" style="display:none;margin-bottom:12px;"></div>
+
+    <div class="sh">State Income Tax Brackets</div>
+    <div class="btbl-wrap">
+      <table class="btbl">
+        <thead><tr>
+          <th>Rate</th>
+          <th>Bracket Range</th>
+          <th class="r">Income in Bracket</th>
+          <th class="r">Tax in Bracket</th>
+          <th style="min-width:80px">Amount</th>
+        </tr></thead>
+        <tbody id="tbody-state"></tbody>
+      </table>
+      <div class="tbl-foot">Total state income tax: <strong id="state-total">—</strong></div>
+    </div>
+
+    <div id="local-banner" style="display:none;margin-top:4px;"></div>
+
+    <div class="ib" style="margin-top:12px;">State brackets are applied to <strong>gross income</strong> as a simplified estimate. Actual state taxable income may differ based on state-specific deductions, exemptions, and rules. Many states also offer MFJ brackets that differ from single filer brackets shown here.</div>
+  </div>
+
+  <!-- ── FICA TAB ─────────────────────────────────────────── -->
+  <div id="tp-fica" class="tab-panel">
+
+    <div class="fica-grid" id="fica-cards"></div>
+
+    <div class="chart-box" style="margin-bottom:14px;">
+      <div class="ch">FICA Breakdown</div>
+      <div class="cw2"><canvas id="c-fica"></canvas></div>
+    </div>
+
+    <div class="sh">FICA Detail</div>
+    <div class="stats" id="fica-stats"></div>
+
+    <div class="ib">
+      <strong>2026 FICA:</strong> Social Security is <strong>6.2%</strong> on wages up to <strong>$180,900</strong> (est.). Medicare is <strong>1.45%</strong> on all wages, plus an additional <strong>0.9%</strong> on wages above $200k (single/HOH/MFS) or $250k (MFJ). Self-employed pay both employee &amp; employer shares (<strong>15.3%</strong>) but may deduct half as a business expense.
+    </div>
+  </div>
+
+</div><!-- end main -->
+</div><!-- end layout -->
+
+<!-- ═══ MATH INSPECTOR PANEL ═════════════════════════════════ -->
+<div class="mp-overlay" id="mp-overlay" onclick="closeMath()"></div>
+<div class="mp" id="mp">
+  <div class="mp-hdr">
+    <h2>📐 <span>Step-by-Step</span> Tax Calculation</h2>
+    <button class="mp-close" onclick="closeMath()">✕ Close</button>
+  </div>
+  <div class="mp-body" id="mp-body"></div>
+</div>
+
+<script>
+// ═══ 2026 TAX DATA ════════════════════════════════════════════
+// Source: IRS Rev. Proc. 2025-32 as amended by One Big Beautiful Bill (OBBB)
+// Brackets effective for tax year 2026 (returns filed in 2027)
+const FED = {
+  single:[[12400,.10],[50400,.12],[105700,.22],[201775,.24],[256225,.32],[640600,.35],[Infinity,.37]],
+  mfj:   [[24800,.10],[100800,.12],[211400,.22],[403550,.24],[512450,.32],[768700,.35],[Infinity,.37]],
+  mfs:   [[12400,.10],[50400,.12],[105700,.22],[201775,.24],[256225,.32],[384350,.35],[Infinity,.37]],
+  hoh:   [[17000,.10],[64850,.12],[103350,.22],[197300,.24],[250500,.32],[626350,.35],[Infinity,.37]]
+};
+const STD_DED  = {single:16100,mfj:32200,mfs:16100,hoh:24150};
+const SS_BASE  = 180900; // estimated 2026 wage base (~2.7% increase from $176,100)
+const ADDL_MED = {single:200000,mfj:250000,mfs:125000,hoh:200000};
+
+const STATES = {
+  AL:{name:'Alabama',       brackets:[[500,.02],[3000,.04],[Infinity,.05]]},
+  AK:{name:'Alaska',        brackets:null},
+  AZ:{name:'Arizona',       brackets:[[28653,.025],[Infinity,.029]]},
+  AR:{name:'Arkansas',      brackets:[[4300,.02],[8500,.04],[Infinity,.049]]},
+  CA:{name:'California',    brackets:[[10412,.01],[24684,.02],[38959,.04],[54081,.06],[68350,.08],[349137,.093],[418961,.103],[698274,.113],[1000000,.123],[Infinity,.133]]},
+  CO:{name:'Colorado',      flat:.044},
+  CT:{name:'Connecticut',   brackets:[[10000,.02],[50000,.045],[100000,.055],[200000,.06],[250000,.065],[500000,.069],[Infinity,.0699]]},
+  DE:{name:'Delaware',      brackets:[[2000,0],[5000,.022],[10000,.039],[20000,.048],[25000,.052],[60000,.055],[Infinity,.066]]},
+  DC:{name:'Dist. of Columbia',brackets:[[10000,.04],[40000,.06],[60000,.065],[250000,.085],[500000,.0925],[1000000,.0975],[Infinity,.1075]]},
+  FL:{name:'Florida',       brackets:null},
+  GA:{name:'Georgia',       flat:.0549},
+  HI:{name:'Hawaii',        brackets:[[2400,.014],[4800,.032],[9600,.055],[14400,.064],[19200,.068],[24000,.072],[36000,.076],[48000,.079],[150000,.0825],[175000,.09],[200000,.1],[Infinity,.11]]},
+  ID:{name:'Idaho',         brackets:[[4844,.01],[Infinity,.058]]},
+  IL:{name:'Illinois',      flat:.0495},
+  IN:{name:'Indiana',       flat:.0305},
+  IA:{name:'Iowa',          brackets:[[6000,.044],[30000,.048],[75000,.057],[Infinity,.06]]},
+  KS:{name:'Kansas',        brackets:[[15000,.031],[30000,.0525],[Infinity,.057]]},
+  KY:{name:'Kentucky',      flat:.04},
+  LA:{name:'Louisiana',     brackets:[[12500,.0185],[50000,.035],[Infinity,.0425]]},
+  ME:{name:'Maine',         brackets:[[24500,.058],[58050,.0675],[Infinity,.0715]]},
+  MD:{name:'Maryland',      brackets:[[1000,.02],[2000,.03],[3000,.04],[100000,.0475],[125000,.05],[150000,.0525],[250000,.055],[Infinity,.0575]]},
+  MA:{name:'Massachusetts', flat:.05},
+  MI:{name:'Michigan',      flat:.0425},
+  MN:{name:'Minnesota',     brackets:[[30070,.0535],[98760,.068],[183340,.0785],[Infinity,.0985]]},
+  MS:{name:'Mississippi',   brackets:[[10000,0],[Infinity,.047]]},
+  MO:{name:'Missouri',      brackets:[[1121,.015],[2242,.02],[3363,.025],[4484,.03],[5605,.035],[6726,.04],[7847,.045],[8968,.05],[Infinity,.054]]},
+  MT:{name:'Montana',       brackets:[[3100,.01],[5500,.02],[8400,.03],[11300,.04],[14500,.05],[18700,.06],[Infinity,.069]]},
+  NE:{name:'Nebraska',      brackets:[[3700,.0246],[22170,.0351],[Infinity,.0664]]},
+  NV:{name:'Nevada',        brackets:null},
+  NH:{name:'New Hampshire', brackets:null},
+  NJ:{name:'New Jersey',    brackets:[[20000,.014],[35000,.0175],[40000,.035],[75000,.05525],[500000,.0637],[1000000,.0897],[Infinity,.1075]]},
+  NM:{name:'New Mexico',    brackets:[[5500,.017],[11000,.032],[16000,.047],[210000,.049],[Infinity,.059]]},
+  NY:{name:'New York',      brackets:[[17150,.04],[23600,.045],[27900,.0525],[161550,.0585],[323200,.0625],[2155350,.0685],[5000000,.0965],[25000000,.103],[Infinity,.109]]},
+  NC:{name:'North Carolina',flat:.0475},
+  ND:{name:'North Dakota',  brackets:[[44725,.011],[225975,.0204],[Infinity,.029]]},
+  OH:{name:'Ohio',          brackets:[[26050,0],[100000,.02765],[115300,.03226],[Infinity,.0399]]},
+  OK:{name:'Oklahoma',      brackets:[[1000,.0025],[2500,.0075],[3750,.0175],[4900,.0275],[7200,.0375],[Infinity,.0475]]},
+  OR:{name:'Oregon',        brackets:[[10000,.0475],[25000,.0675],[125000,.0875],[Infinity,.099]]},
+  PA:{name:'Pennsylvania',  flat:.0307},
+  RI:{name:'Rhode Island',  brackets:[[77450,.0375],[176050,.0475],[Infinity,.0599]]},
+  SC:{name:'South Carolina',brackets:[[3200,0],[16040,.03],[Infinity,.065]]},
+  SD:{name:'South Dakota',  brackets:null},
+  TN:{name:'Tennessee',     brackets:null},
+  TX:{name:'Texas',         brackets:null},
+  UT:{name:'Utah',          flat:.0465},
+  VT:{name:'Vermont',       brackets:[[45400,.0335],[110050,.066],[229550,.076],[Infinity,.0875]]},
+  VA:{name:'Virginia',      brackets:[[3000,.02],[5000,.03],[17000,.05],[Infinity,.0575]]},
+  WA:{name:'Washington',    brackets:null},
+  WV:{name:'West Virginia', brackets:[[10000,.0236],[25000,.032],[40000,.0432],[60000,.05],[Infinity,.065]]},
+  WI:{name:'Wisconsin',     brackets:[[13810,.035],[27630,.044],[304170,.053],[Infinity,.0765]]},
+  WY:{name:'Wyoming',       brackets:null}
+};
+
+const CITY_TAX = {
+  nyc:        {rate:.03876, label:'New York City',   desc:'NYC resident income tax (up to 3.876%)'},
+  yonkers:    {rate:.016,   label:'Yonkers',         desc:'Yonkers income tax surcharge (~1.6% effective)'},
+  philly:     {rate:.0375,  label:'Philadelphia',    desc:'Philadelphia wage tax — residents (3.75%)'},
+  detroit:    {rate:.024,   label:'Detroit',         desc:'Detroit city income tax — residents (2.4%)'},
+  columbus:   {rate:.025,   label:'Columbus',        desc:'Columbus city income tax (2.5%)'},
+  cleveland:  {rate:.025,   label:'Cleveland',       desc:'Cleveland city income tax (2.5%)'},
+  louisville: {rate:.0228,  label:'Louisville',      desc:'Louisville Metro occupational tax (2.28%)'},
+  kansascity: {rate:.01,    label:'Kansas City',     desc:'Kansas City earnings tax (1%)'},
+  stlouis:    {rate:.01,    label:'St. Louis',       desc:'St. Louis earnings tax (1%)'}
+};
+
+// ═══ ZIP LOOKUPS ══════════════════════════════════════════════
+function zipToState(zip) {
+  if (!zip || zip.length < 3) return null;
+  const z = parseInt(zip.substring(0,3));
+  if (z===5||(z>=100&&z<=149)) return 'NY';
+  if (z>=10&&z<=27) return 'MA';
+  if (z>=28&&z<=29) return 'RI';
+  if (z>=30&&z<=38) return 'NH';
+  if (z>=39&&z<=49) return 'ME';
+  if (z>=50&&z<=59) return 'VT';
+  if (z>=60&&z<=69) return 'CT';
+  if (z>=70&&z<=89) return 'NJ';
+  if (z>=150&&z<=196) return 'PA';
+  if (z>=197&&z<=199) return 'DE';
+  if (z>=200&&z<=205) return 'DC';
+  if ((z>=206&&z<=212)||(z>=214&&z<=219)) return 'MD';
+  if (z>=220&&z<=246) return 'VA';
+  if ((z>=247&&z<=249)||(z>=250&&z<=268)) return 'WV';
+  if (z>=270&&z<=289) return 'NC';
+  if (z>=290&&z<=299) return 'SC';
+  if ((z>=300&&z<=319)||(z>=398&&z<=399)) return 'GA';
+  if (z>=320&&z<=349) return 'FL';
+  if (z>=350&&z<=369) return 'AL';
+  if (z>=370&&z<=385) return 'TN';
+  if (z>=386&&z<=397) return 'MS';
+  if (z>=400&&z<=427) return 'KY';
+  if (z>=430&&z<=459) return 'OH';
+  if (z>=460&&z<=479) return 'IN';
+  if (z>=480&&z<=499) return 'MI';
+  if (z>=500&&z<=528) return 'IA';
+  if ((z>=530&&z<=532)||(z>=534&&z<=549)) return 'WI';
+  if (z>=550&&z<=567) return 'MN';
+  if (z>=570&&z<=577) return 'SD';
+  if (z>=580&&z<=588) return 'ND';
+  if (z>=590&&z<=599) return 'MT';
+  if ((z>=600&&z<=620)||z===632) return 'IL';
+  if ((z>=622&&z<=631)||(z>=640&&z<=641)) return 'MO';
+  if ((z>=633&&z<=639)||(z>=642&&z<=658)||(z>=680&&z<=693)) return 'NE';
+  if (z>=660&&z<=679) return 'KS';
+  if (z>=700&&z<=714) return 'LA';
+  if (z>=716&&z<=729) return 'AR';
+  if (z>=730&&z<=749) return 'OK';
+  if ((z>=750&&z<=799)||z===885) return 'TX';
+  if (z>=800&&z<=816) return 'CO';
+  if (z>=820&&z<=831) return 'WY';
+  if (z>=832&&z<=838) return 'ID';
+  if (z>=840&&z<=847) return 'UT';
+  if (z>=850&&z<=865) return 'AZ';
+  if (z>=870&&z<=884) return 'NM';
+  if ((z>=889&&z<=891)||(z>=893&&z<=898)) return 'NV';
+  if (z>=900&&z<=961) return 'CA';
+  if (z>=967&&z<=968) return 'HI';
+  if (z>=970&&z<=979) return 'OR';
+  if (z>=980&&z<=994) return 'WA';
+  if (z>=995&&z<=999) return 'AK';
+  return null;
+}
+
+function zipToCity(zip) {
+  if (!zip || zip.length < 5) return null;
+  const z = parseInt(zip);
+  if ((z>=10001&&z<=10282)||(z>=10301&&z<=10314)||(z>=10451&&z<=10475)||(z>=11001&&z<=11697)) return 'nyc';
+  if (z>=10701&&z<=10710) return 'yonkers';
+  if (z>=19101&&z<=19154) return 'philly';
+  if (z>=48201&&z<=48288) return 'detroit';
+  if (z>=43001&&z<=43299) return 'columbus';
+  if (z>=44101&&z<=44199) return 'cleveland';
+  if (z>=40201&&z<=40299) return 'louisville';
+  if (z>=64101&&z<=64199) return 'kansascity';
+  if (z>=63101&&z<=63199) return 'stlouis';
+  return null;
+}
+
+// ═══ CALCULATIONS ═════════════════════════════════════════════
+function calcTax(income, brackets) {
+  if (!brackets || income <= 0) return {tax:0, marginal:brackets?brackets[0][1]:0, rows:[]};
+  let tax=0, prev=0, marginal=brackets[0][1], rows=[];
+  for (const [max, rate] of brackets) {
+    const rowMin=prev;
+    const top = max===Infinity ? income : Math.min(income, max);
+    const amount = Math.max(0, top-rowMin);
+    tax += amount*rate;
+    if (income>rowMin) marginal=rate;
+    rows.push({min:rowMin, max, rate, amount, bracketTax:amount*rate, active:income>rowMin&&(max===Infinity||income<=max)});
+    prev = max===Infinity ? income : max;
+    if (income<=max) break;
+  }
+  return {tax, marginal, rows};
+}
+
+function allRows(income, brackets) {
+  if (!brackets) return [];
+  let prev=0;
+  return brackets.map(([max,rate])=>{
+    const rowMin=prev;
+    const top = max===Infinity ? income : Math.min(income,max);
+    const amount = Math.max(0, top-rowMin);
+    const bracketTax = amount*rate;
+    const active = income>rowMin&&(max===Infinity||income<=max);
+    prev = max===Infinity ? income : max;
+    return {min:rowMin, max, rate, amount, bracketTax, active};
+  });
+}
+
+function calcFICA(income, filing, selfEmp) {
+  const mult = selfEmp ? 2 : 1;
+  const ssWages = Math.min(income, SS_BASE);
+  const ssTax = ssWages * 0.062 * mult;
+  const medTax = income * 0.0145 * mult;
+  const addlThresh = ADDL_MED[filing]||200000;
+  const addlMed = Math.max(0, income-addlThresh)*0.009;
+  const total = ssTax+medTax+addlMed;
+  let marginal = (income<SS_BASE ? 0.062*mult : 0) + 0.0145*mult;
+  if (income>=addlThresh) marginal+=0.009;
+  return {ssTax, medTax, addlMed, total, marginal, ssWages, mult};
+}
+
+// ═══ HELPERS ══════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const fmt  = n => '$'+Math.round(n).toLocaleString();
+const pct  = n => (n*100).toFixed(2)+'%';
+const pct1 = n => (n*100).toFixed(1)+'%';
+
+function populateStates() {
+  const sel = $('stateOvr');
+  Object.entries(STATES).sort((a,b)=>a[1].name.localeCompare(b[1].name)).forEach(([code,{name}])=>{
+    const o=document.createElement('option');
+    o.value=code; o.textContent=`${name} (${code})`; sel.appendChild(o);
+  });
+}
+
+// ═══ CHARTS ═══════════════════════════════════════════════════
+function mkChart(id, type, data, opts={}) {
+  const ctx=$(id); if(!ctx)return;
+  const ex=Chart.getChart(ctx); if(ex)ex.destroy();
+  return new Chart(ctx,{type,data,options:opts});
+}
+const CHART_DEFAULTS = {
+  plugins:{legend:{labels:{color:'#475569',font:{size:11},padding:10,boxWidth:12}}},
+  scales:{
+    x:{ticks:{color:'#64748b'},grid:{color:'rgba(0,0,0,.04)'}},
+    y:{ticks:{color:'#64748b'},grid:{color:'rgba(0,0,0,.06)'},beginAtZero:true}
+  }
+};
+
+// ═══ MAIN CALC ════════════════════════════════════════════════
+let D={};
+function calc() {
+  const income  = +$('income').value||0;
+  const filing  = $('filing').value;
+  const selfEmp = $('selfEmp').checked;
+  const incLoc  = $('inclLocal').checked;
+  const itemize = $('itemize').checked;
+  const itemDed = +$('itemizeDed').value||0;
+  const inclPre = $('inclPre').checked;
+  const preAmt  = +$('preAmt').value||0;
+
+  const zip      = $('zipcode').value.trim();
+  const stOvr    = $('stateOvr').value;
+  const detSt    = zipToState(zip);
+  const stCode   = stOvr || detSt;
+  const detCity  = zipToCity(zip);
+
+  const stdDed   = STD_DED[filing];
+  const pretax   = inclPre ? Math.max(0,preAmt) : 0;
+  const usedDed  = Math.max(stdDed, itemize ? itemDed : 0) + pretax;
+  const dedLabel = (itemize && itemDed>stdDed ? 'itemized' : 'standard') + (pretax>0 ? ' + pre-tax' : '');
+
+  const taxableInc = Math.max(0, income-usedDed);
+  const {tax:fedTax, marginal:fedMarg, rows:fedRows} = calcTax(taxableInc, FED[filing]);
+  const fedAllRows = allRows(taxableInc, FED[filing]);
+
+  const stData   = stCode ? STATES[stCode] : null;
+  let stTax=0, stMarg=0, stRows=[];
+  if (stData) {
+    if (stData.flat) {
+      stTax=income*stData.flat; stMarg=stData.flat;
+      stRows=[{min:0,max:Infinity,rate:stData.flat,amount:income,bracketTax:stTax,active:true}];
+    } else if (stData.brackets) {
+      const r=calcTax(income, stData.brackets);
+      stTax=r.tax; stMarg=r.marginal; stRows=allRows(income, stData.brackets);
+    }
+    if (stCode==='MA' && income>1000000) { stTax+=(income-1000000)*0.04; stMarg=0.09; }
+  }
+
+  const cityKey  = incLoc ? detCity : null;
+  const cityDat  = cityKey ? CITY_TAX[cityKey] : null;
+  let localTax=0, localRate=0;
+  if (cityDat) { localRate=cityDat.rate; localTax=income*localRate; }
+
+  const fica     = calcFICA(income, filing, selfEmp);
+  const totalTax = fedTax+stTax+localTax+fica.total;
+  const takeHome = income-totalTax;
+  const effRate  = income>0 ? totalTax/income : 0;
+  const totMarg  = fedMarg+stMarg+localRate+fica.marginal;
+
+  D={income,filing,selfEmp,usedDed,dedLabel,stdDed,pretax,taxableInc,
+     fedTax,fedMarg,fedAllRows,stTax,stMarg,stRows,stCode,stData,
+     localTax,localRate,cityKey,cityDat,fica,totalTax,takeHome,effRate,totMarg,
+     detSt,detCity,zip};
+
+  render();
+
+  // Cross-field validation
+  clearAllErrs(); validateMinMax();
+  saveState();
+}
+
+// ═══ RENDER ═══════════════════════════════════════════════════
+function render() {
+  const d=D;
+
+  // Heroes
+  $('h-fedmarg').textContent  = pct(d.fedMarg);
+  $('h-totmarg').textContent  = pct(d.totMarg);
+  $('h-effrate').textContent  = pct(d.effRate);
+  $('h-takehome').textContent = fmt(d.takeHome);
+
+  // Sidebar calc box
+  $('cb-gross').textContent = fmt(d.income);
+  $('cb-taxes').textContent = fmt(d.totalTax);
+  $('cb-home').textContent  = fmt(d.takeHome);
+
+  renderLocPill(d);
+  renderSummary(d);
+  renderFederal(d);
+  renderState(d);
+  renderFica(d);
+  if ($('mp').classList.contains('open')) renderMath();
+}
+
+function renderLocPill(d) {
+  const pill=$('loc-pill');
+  if (d.zip.length>=3 && d.detSt) {
+    const nm=STATES[d.detSt]?.name||d.detSt;
+    const cy=d.detCity&&CITY_TAX[d.detCity]?' · '+CITY_TAX[d.detCity].label:'';
+    pill.innerHTML=`<strong>${nm}</strong>${cy}`;
+    pill.style.display='block';
+  } else if (d.zip.length>=3) {
+    pill.innerHTML='⚠️ Zip not recognized — select a state above';
+    pill.style.display='block';
+  } else {
+    pill.style.display='none';
+  }
+}
+
+function renderSummary(d) {
+  // Donut
+  mkChart('c-donut','doughnut',{
+    labels:['Federal Tax','State Tax','Local Tax','FICA','Take-Home'],
+    datasets:[{
+      data:[+d.fedTax.toFixed(0),+d.stTax.toFixed(0),+d.localTax.toFixed(0),+d.fica.total.toFixed(0),+Math.max(0,d.takeHome).toFixed(0)],
+      backgroundColor:['#f59e0b','#60a5fa','#34d399','#a78bfa','#d1d5db'],
+      borderColor:'#f1f5f9', borderWidth:2
+    }]
+  },{
+    plugins:{legend:{position:'bottom',labels:{color:'#475569',font:{size:11},padding:10,boxWidth:12}}},
+    cutout:'60%'
+  });
+
+  // Rates bar
+  mkChart('c-rates','bar',{
+    labels:['Federal','State','FICA','Local'],
+    datasets:[
+      {label:'Marginal %', data:[d.fedMarg*100,d.stMarg*100,d.fica.marginal*100,d.localRate*100], backgroundColor:'rgba(245,158,11,.7)',borderRadius:4},
+      {label:'Effective %',data:[d.income>0?d.fedTax/d.income*100:0,d.income>0?d.stTax/d.income*100:0,d.income>0?d.fica.total/d.income*100:0,d.income>0?d.localTax/d.income*100:0],backgroundColor:'rgba(99,102,241,.55)',borderRadius:4}
+    ]
+  },{
+    plugins:{legend:{labels:{color:'#475569',font:{size:11}}}},
+    scales:{
+      x:{ticks:{color:'#64748b'},grid:{color:'rgba(0,0,0,.04)'}},
+      y:{ticks:{color:'#64748b',callback:v=>v.toFixed(1)+'%'},grid:{color:'rgba(0,0,0,.06)'},beginAtZero:true}
+    }
+  });
+
+  // Marginal breakdown
+  const parts=[
+    {lbl:'Federal', rate:d.fedMarg,         color:'#f59e0b'},
+    {lbl:'State',   rate:d.stMarg,           color:'#60a5fa'},
+    {lbl:'FICA',    rate:d.fica.marginal,    color:'#a78bfa'},
+    {lbl:'Local',   rate:d.localRate,        color:'#34d399'},
+  ].filter(p=>p.rate>0);
+  const keepRate = Math.max(0,1-d.totMarg);
+  const maxR = Math.max(d.totMarg, 0.01);
+  const makeRow=(lbl,rate,color,isKeep)=>`
+    <div class="marg-row">
+      <span class="marg-lbl" style="color:${isKeep?'#059669':''};">${lbl}</span>
+      <div class="marg-bar-wrap"><div class="marg-bar" style="width:${(rate/maxR*100).toFixed(1)}%;background:${color}"></div></div>
+      <span class="marg-pct" style="color:${color};font-family:var(--mono);">${pct(rate)}</span>
+      <span class="marg-note">${(rate*100).toFixed(1)}¢ / $1</span>
+    </div>`;
+  $('marg-list').innerHTML=
+    parts.map(p=>makeRow(p.lbl,p.rate,p.color,false)).join('')+
+    makeRow('You Keep',keepRate,'#10b981',true);
+
+  // Summary stats
+  $('summary-stats').innerHTML=[
+    ['Federal Tax',     fmt(d.fedTax)+(d.income>0?' ('+pct1(d.fedTax/d.income)+')':''),'warn'],
+    ['State Tax',       d.stCode?(d.stData?.brackets||d.stData?.flat?fmt(d.stTax)+(d.income>0?' ('+pct1(d.stTax/d.income)+')':''):'$0 — no state tax'):'Unknown state','blu'],
+    ['Local Tax',       d.localTax>0?fmt(d.localTax)+'('+pct1(d.income>0?d.localTax/d.income:0)+')':'$0','pur'],
+    ['FICA',            fmt(d.fica.total)+(d.income>0?' ('+pct1(d.fica.total/d.income)+')':''),''],
+    ['Total Tax',       fmt(d.totalTax)+(d.income>0?' ('+pct(d.effRate)+')':''),'neg'],
+    ['Take-Home Pay',   fmt(d.takeHome),'pos'],
+  ].map(([l,v,c])=>`<div class="stat"><div class="sl">${l}</div><div class="sv ${c}">${v}</div></div>`).join('');
+
+  // Deduction stats
+  $('ded-stats').innerHTML=[
+    ['Deduction Applied', fmt(d.usedDed)+' ('+d.dedLabel+')',''],
+    ['Federal Taxable Income', fmt(d.taxableInc),''],
+    ['Federal Effective Rate', d.income>0?pct(d.fedTax/d.income):'0%','warn'],
+  ].map(([l,v,c])=>`<div class="stat"><div class="sl">${l}</div><div class="sv ${c}">${v}</div></div>`).join('');
+}
+
+function renderBracketTbl(tbodyId, rows, highlightIncome) {
+  const tbody=$(tbodyId);
+  const maxTax=Math.max(...rows.map(r=>r.bracketTax),1);
+  tbody.innerHTML=rows.map(r=>{
+    const maxLbl=r.max===Infinity?'∞':fmt(r.max);
+    const barW=Math.min(100,(r.bracketTax/maxTax*100)).toFixed(1);
+    const barClr=r.active?'#f59e0b':'#cbd5e1';
+    const rateClr=r.active?'var(--am6)':'var(--n700)';
+    return `<tr class="${r.active?'active-row':''}">
+      <td><strong style="color:${rateClr};font-family:var(--mono);">${(r.rate*100).toFixed(2)}%</strong>${r.active?' ◀':''}</td>
+      <td style="font-family:var(--mono);font-size:.73rem;">${fmt(r.min)} – ${maxLbl}</td>
+      <td class="r ${r.amount>0?'':'muted'}">${r.amount>0?fmt(r.amount):'—'}</td>
+      <td class="r ${r.bracketTax>0?'':'muted'}">${r.bracketTax>0?fmt(r.bracketTax):'—'}</td>
+      <td><div class="mini-bar"><div class="mini-fill" style="width:${barW}%;background:${barClr}"></div></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderFederal(d) {
+  renderBracketTbl('tbody-fed', d.fedAllRows, d.taxableInc);
+  $('fed-total').textContent=fmt(d.fedTax);
+
+  mkChart('c-brackets','bar',{
+    labels:d.fedAllRows.map(r=>(r.rate*100).toFixed(0)+'%'),
+    datasets:[{
+      label:'Tax ($)',
+      data:d.fedAllRows.map(r=>+r.bracketTax.toFixed(0)),
+      backgroundColor:d.fedAllRows.map(r=>r.active?'#f59e0b':'#e2e8f0'),
+      borderRadius:4
+    }]
+  },{
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{color:'#64748b'},grid:{display:false}},
+      y:{ticks:{color:'#64748b',callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(0,0,0,.06)'}}
+    }
+  });
+}
+
+function renderState(d) {
+  const stBanner=$('state-banner');
+  const locBanner=$('local-banner');
+
+  if (!d.stCode) {
+    stBanner.className='bn warn';
+    stBanner.innerHTML='⚠️ Could not detect state from zip code. Select a state override above.';
+    stBanner.style.display='block';
+    $('tbody-state').innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:20px;">No state selected</td></tr>';
+    $('state-total').textContent='$0';
+  } else if (!d.stData?.brackets && !d.stData?.flat) {
+    stBanner.className='bn ok';
+    stBanner.innerHTML=`🎉 <strong>${d.stData?.name||d.stCode}</strong> has <strong>no state income tax</strong> — you keep that money!`;
+    stBanner.style.display='block';
+    $('tbody-state').innerHTML='<tr><td colspan="5" style="text-align:center;color:#059669;font-weight:600;padding:20px;">No state income tax</td></tr>';
+    $('state-total').textContent='$0';
+  } else {
+    const typeStr=d.stData.flat?`flat rate <strong>${pct(d.stData.flat)}</strong>`:'progressive brackets';
+    stBanner.className='bn info';
+    stBanner.innerHTML=`📍 <strong>${d.stData.name}</strong> — ${typeStr} (applied to gross income; simplified estimate)`;
+    stBanner.style.display='block';
+    renderBracketTbl('tbody-state', d.stRows, d.income);
+    $('state-total').textContent=fmt(d.stTax);
+  }
+
+  if (d.cityDat) {
+    locBanner.className='bn warn';
+    locBanner.innerHTML=`🏙️ <strong>${d.cityDat.label} local tax:</strong> ${d.cityDat.desc}. Estimated: <strong>${fmt(d.localTax)}</strong> (${pct(d.localRate)} on gross income).`;
+    locBanner.style.display='block';
+  } else if ($('inclLocal').checked) {
+    locBanner.className='bn info';
+    locBanner.innerHTML='ℹ️ No major local income tax detected for this zip code.';
+    locBanner.style.display='block';
+  } else {
+    locBanner.style.display='none';
+  }
+}
+
+function renderFica(d) {
+  const f=d.fica;
+  $('fica-cards').innerHTML=[
+    ['Social Security', fmt(f.ssTax), `${(0.062*f.mult*100).toFixed(1)}% on wages up to ${fmt(SS_BASE)}`],
+    ['Medicare',        fmt(f.medTax),`${(0.0145*f.mult*100).toFixed(2)}% on all wages`],
+    ['Addl Medicare',   fmt(f.addlMed),'0.9% above threshold'],
+  ].map(([l,v,s])=>`<div class="fica-card"><div class="fc-lbl">${l}</div><div class="fc-val">${v}</div><div class="fc-sub">${s}</div></div>`).join('');
+
+  mkChart('c-fica','bar',{
+    labels:['Social Security','Medicare','Addl Medicare'],
+    datasets:[{
+      label:'FICA Tax',
+      data:[+f.ssTax.toFixed(0),+f.medTax.toFixed(0),+f.addlMed.toFixed(0)],
+      backgroundColor:['#a78bfa','#7c3aed','#4c1d95'],
+      borderRadius:4
+    }]
+  },{
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{color:'#64748b'},grid:{display:false}},
+      y:{ticks:{color:'#64748b',callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(0,0,0,.06)'}}
+    }
+  });
+
+  $('fica-stats').innerHTML=[
+    ['SS Rate (employee)',    pct(0.062*f.mult),''],
+    ['SS Wage Base',         fmt(SS_BASE),''],
+    ['SS Wages Taxed',       fmt(f.ssWages),''],
+    ['Social Security Tax',  fmt(f.ssTax),'pur'],
+    ['Medicare Rate',        pct(0.0145*f.mult),''],
+    ['Medicare Tax',         fmt(f.medTax),'pur'],
+    ['Addl Medicare Tax',    fmt(f.addlMed),'pur'],
+    ['Total FICA',           fmt(f.total),'neg'],
+    ['FICA Marginal Rate',   pct(f.marginal),'warn'],
+    ['FICA Effective Rate',  d.income>0?pct(f.total/d.income):'0%',''],
+  ].map(([l,v,c])=>`<div class="stat"><div class="sl">${l}</div><div class="sv ${c}">${v}</div></div>`).join('');
+}
+
+// ═══ MATH PANEL ═══════════════════════════════════════════════
+function renderMath() {
+  const d=D;
+  const sect=(title,rows)=>`
+    <div class="ms2">
+      <div class="ms2-hdr">${title}</div>
+      <div class="mfb">${rows.map(([l,v,c])=>
+        l==='---'?`<div class="mf-div"></div>`:
+        `<div class="mf"><span class="ml">${l}</span><span class="mv ${c||''}">${v}</span></div>`
+      ).join('')}</div>
+    </div>`;
+  $('mp-body').innerHTML=
+    sect('Income & Deductions',[
+      ['Gross Annual Income', fmt(d.income),'hi'],
+      ['Deduction Applied',   '– '+fmt(d.usedDed)+'  ('+d.dedLabel+')',''],
+      ['Federal Taxable Income', fmt(d.taxableInc),''],
+    ])+
+    sect('Federal Income Tax',[
+      ...d.fedAllRows.filter(r=>r.amount>0).map(r=>
+        [`  ${(r.rate*100).toFixed(0)}% × ${fmt(r.amount)}`, fmt(r.bracketTax), r.active?'hi':'']),
+      ['---','',''],
+      ['Federal Income Tax', fmt(d.fedTax),'hi'],
+      ['Federal Marginal Rate', pct(d.fedMarg),''],
+      ['Federal Effective Rate', d.income>0?pct(d.fedTax/d.income):'0%',''],
+    ])+
+    sect('State, Local & FICA',[
+      ['State Income Tax ('+( d.stCode||'N/A')+')', fmt(d.stTax),''],
+      ['State Marginal Rate', pct(d.stMarg),''],
+      ['---','',''],
+      ['Social Security Tax', fmt(d.fica.ssTax),''],
+      ['Medicare Tax',        fmt(d.fica.medTax),''],
+      ['Addl Medicare Tax',   fmt(d.fica.addlMed),''],
+      ['FICA Marginal Rate',  pct(d.fica.marginal),''],
+      ['---','',''],
+      ['Local Tax', fmt(d.localTax),''],
+    ])+
+    sect('Totals',[
+      ['Total Tax Burden',       fmt(d.totalTax),'neg'],
+      ['Take-Home Pay',          fmt(d.takeHome),'pos'],
+      ['---','',''],
+      ['Combined Marginal Rate', pct(d.totMarg),'hi'],
+      ['Overall Effective Rate', pct(d.effRate),''],
+    ]);
+}
+
+function toggleMath() {
+  const isOpen=$('mp').classList.contains('open');
+  if (isOpen) closeMath();
+  else openMath();
+}
+function openMath() {
+  $('mp').classList.add('open');
+  $('mp-overlay').classList.add('open');
+  document.querySelector('.math-btn').textContent='🔍 Hide Math';
+  renderMath();
+}
+function closeMath() {
+  $('mp').classList.remove('open');
+  $('mp-overlay').classList.remove('open');
+  document.querySelector('.math-btn').textContent='🔍 Show Math';
+}
+
+// ═══ TABS ═════════════════════════════════════════════════════
+function switchTab(btn, name) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  $('tp-'+name).classList.add('active');
+}
+
+// ═══ OPTION TOGGLES ═══════════════════════════════════════════
+function onItemizeToggle() {
+  $('itemize-row').style.display=$('itemize').checked?'block':'none';
+  calc();
+}
+function onPreToggle() {
+  $('pre-row').style.display=$('inclPre').checked?'block':'none';
+  calc();
+}
+
+// ═══ STATE / RESTORE ══════════════════════════════════════════
+function saveState() {
+  try {
+    const s={};
+    ['income','filing','zipcode','stateOvr','selfEmp','inclLocal','itemize','itemizeDed','inclPre','preAmt'].forEach(id=>{
+      const el=$(id); if(!el)return;
+      s[id]=el.type==='checkbox'?el.checked:el.value;
+    });
+    history.replaceState(null,'','#'+btoa(JSON.stringify(s)));
+  } catch(e){}
+}
+function loadState() {
+  try {
+    if(!location.hash||location.hash.length<4)return false;
+    const s=JSON.parse(atob(location.hash.slice(1)));
+    Object.entries(s).forEach(([id,val])=>{
+      const el=$(id); if(!el)return;
+      if(el.type==='checkbox') el.checked=(val===true||val==='true');
+      else el.value=val;
+    });
+    $('itemize-row').style.display=$('itemize').checked?'block':'none';
+    $('pre-row').style.display=$('inclPre').checked?'block':'none';
+    return true;
+  } catch(e){return false;}
+}
+
+// ═══ INIT ═════════════════════════════════════════════════════
+populateStates();
+loadState();
+calc();
+
+// ── Copy link ──
+function copyLink(){
+  const btn=document.getElementById('copyLinkBtn');
+  const url=location.href;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=url;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  if(btn){btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='🔗 Copy Link';btn.classList.remove('copied');},1800);}
+}
+// ── k/M shorthand ──
+document.addEventListener('keydown',function(e){
+  const el=e.target;
+  if(el.tagName!=='INPUT'||el.type!=='number') return;
+  const v=+el.value; if(!el.value||isNaN(v)||v<=0) return;
+  if((e.key==='k'||e.key==='K')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  } else if((e.key==='m'||e.key==='M')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+});
+
+
+// ── Reset to defaults ──
+function resetDefaults(){
+  if(!confirm('Reset all inputs to defaults?')) return;
+  history.replaceState(null,'',location.pathname);
+  location.reload();
+}
+// ── Input validation ──
+function showErr(id, msg){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.add('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  let em=ig.querySelector('.err-msg');
+  if(!em){em=document.createElement('span');em.className='err-msg';ig.appendChild(em);}
+  em.textContent=msg;
+}
+function clearErr(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.remove('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  const em=ig.querySelector('.err-msg'); if(em) em.remove();
+}
+function clearAllErrs(){
+  document.querySelectorAll('.input-err').forEach(el=>el.classList.remove('input-err'));
+  document.querySelectorAll('.err-msg').forEach(em=>em.remove());
+}
+function validateMinMax(){
+  document.querySelectorAll('input[type="number"]').forEach(el=>{
+    if(!el.id) return;
+    const v=+el.value, mn=el.min!==''?+el.min:null, mx=el.max!==''?+el.max:null;
+    if(mn!==null && v<mn){ showErr(el.id,`Min: ${mn}`); }
+    else if(mx!==null && v>mx){ showErr(el.id,`Max: ${mx}`); }
+    else { clearErr(el.id); }
+  });
+}
+
+</script>
+<div style="position:fixed;bottom:8px;right:12px;font-size:.61rem;color:var(--s400);pointer-events:none;z-index:10;font-family:var(--font);">Updated Apr 2026</div>
+</body>
+</html>

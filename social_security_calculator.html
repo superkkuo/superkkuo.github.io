@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔒 Social Security Optimizer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --n950:#060d1e;--n900:#0f172a;--n800:#1e293b;--n700:#334155;--n600:#475569;
+  --s400:#94a3b8;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc;
+  --white:#ffffff;
+  --bl6:#2563eb;--bl5:#3b82f6;--bl1:#dbeafe;--bl0:#eff6ff;
+  --pr6:#7c3aed;--pr5:#8b5cf6;--pr1:#ede9fe;--pr0:#faf5ff;
+  --em6:#059669;--em5:#10b981;--em1:#d1fae5;--em0:#ecfdf5;
+  --am6:#d97706;--am5:#f59e0b;--am1:#fef3c7;--am0:#fffbeb;
+  --ro6:#e11d48;--ro5:#f43f5e;--ro1:#ffe4e6;--ro0:#fff1f2;
+  --in6:#4f46e5;--in5:#6366f1;--in1:#e0e7ff;--in0:#eef2ff;
+  --cy6:#0891b2;--cy5:#06b6d4;--cy1:#cffafe;--cy0:#ecfeff;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Fira Code',monospace;
+  --rsm:8px;--rmd:12px;--rlg:16px;--rfl:9999px;
+  --sh1:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --sh2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── HEADER ──────────────────────────────────────────────── */
+.hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 80% at 15% 50%,rgba(6,182,212,.14),transparent),radial-gradient(ellipse 40% 60% at 85% 30%,rgba(8,145,178,.08),transparent);pointer-events:none;}
+.hdr-in{max-width:1300px;margin:0 auto;position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.hdr h1{font-size:1.4rem;font-weight:700;color:var(--white);letter-spacing:-.02em;}
+.hdr h1 span{color:var(--cy5);}
+.hdr-tags{display:none;}
+.nav-select{background:rgba(255,255,255,.07) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid rgba(255,255,255,.2);color:var(--s300);font-size:.73rem;font-weight:600;padding:7px 30px 7px 12px;border-radius:var(--rsm);cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;width:auto;max-width:160px;}
+.nav-select:hover{background-color:rgba(255,255,255,.12);color:var(--white);}
+.nav-select option{background:#1e293b;color:#e2e8f0;}
+.hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
+.math-btn{background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.4);color:#a5f3fc;font-size:.74rem;font-weight:600;padding:6px 14px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;letter-spacing:.01em;white-space:nowrap;}
+.math-btn:hover{background:rgba(6,182,212,.3);color:var(--white);}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 78px);}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 78px);}
+.sb::-webkit-scrollbar{width:3px;}
+.sb::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.sbh{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
+.sbh::after{content:'';flex:1;height:1px;background:var(--n800);}
+.sbh:first-child{margin-top:0;}
+
+.ig{margin-bottom:9px;}
+.ig:last-child{margin-bottom:0;}
+.ig label{display:block;font-size:.71rem;font-weight:500;color:var(--s400);margin-bottom:3px;}
+.ig label em{font-style:normal;color:var(--n600);font-size:.66rem;}
+.iw{position:relative;}
+.iw .pre,.iw .suf{position:absolute;top:50%;transform:translateY(-50%);font-size:.75rem;font-weight:600;color:var(--n600);pointer-events:none;z-index:1;}
+.iw .pre{left:9px;} .iw .suf{right:9px;}
+input[type="number"],select{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none;}
+input[type="number"]:focus,select:focus{outline:none;border-color:var(--cy5);box-shadow:0 0 0 3px rgba(6,182,212,.15);}
+input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;}
+.has-pre input{padding-left:19px;}
+.has-suf input{padding-right:21px;}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+select{cursor:pointer;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23475569'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:8px;}
+
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.tog-row:last-child{border-bottom:none;}
+.tog-lbl{font-size:.71rem;color:var(--s400);flex:1;padding-right:10px;line-height:1.4;}
+.tog-lbl em{display:block;font-style:normal;font-size:.63rem;color:var(--n600);margin-top:1px;}
+.ck-wrap{display:flex;align-items:center;flex-shrink:0;}
+input[type="checkbox"]{width:15px;height:15px;accent-color:var(--cy5);cursor:pointer;flex-shrink:0;}
+
+/* Detected FRA pill */
+.fra-pill{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:var(--rsm);padding:6px 10px;font-size:.69rem;color:#a5f3fc;margin-top:5px;line-height:1.4;}
+.fra-pill strong{color:var(--cy5);}
+
+/* Calc summary box */
+.cb{background:rgba(6,182,212,.07);border:1px solid rgba(6,182,212,.18);border-radius:var(--rsm);padding:9px 11px;margin-top:10px;}
+.cb-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0;font-size:.71rem;}
+.cb-lbl{color:var(--s400);}
+.cb-val{color:var(--white);font-weight:600;font-family:var(--mono);font-size:.72rem;}
+.cb-div{height:1px;background:rgba(6,182,212,.2);margin:5px 0;}
+.cb-tot{color:#a5f3fc;font-weight:700;}
+
+/* Range slider */
+.slider-row{margin-bottom:9px;}
+.slider-row label{display:block;font-size:.71rem;font-weight:500;color:var(--s400);margin-bottom:5px;}
+.slider-wrap{position:relative;}
+input[type="range"]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--n700);outline:none;cursor:pointer;touch-action:pan-y;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--cy5);cursor:pointer;border:2px solid var(--n900);}
+input[type="range"]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--cy5);cursor:pointer;border:2px solid var(--n900);}
+.slider-val{display:flex;justify-content:space-between;font-size:.66rem;color:var(--n600);margin-top:3px;}
+
+/* ── MAIN ────────────────────────────────────────────────── */
+.main{padding:18px 22px 40px;overflow-y:auto;}
+
+/* Tabs */
+.tabs{display:flex;gap:3px;background:var(--white);border:1px solid var(--s200);border-radius:var(--rfl);padding:4px;margin-bottom:18px;box-shadow:var(--sh1);}
+.tab{flex:1;padding:7px 12px;border:none;border-radius:var(--rfl);font-size:.76rem;font-weight:600;cursor:pointer;background:transparent;color:var(--n600);transition:all .16s;text-align:center;white-space:nowrap;}
+.tab:hover{color:var(--n900);}
+.tab.active{background:var(--n900);color:var(--white);box-shadow:var(--sh1);}
+.tab-panel{display:none;animation:fi .18s ease;}
+.tab-panel.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+
+/* Hero cards */
+.heroes{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px;margin-bottom:14px;}
+.heroes2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px;}
+.hero{border-radius:var(--rlg);padding:16px 14px;border:1px solid transparent;position:relative;overflow:hidden;}
+.hbl{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;}
+.hgr{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#a7f3d0;}
+.ham{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;}
+.hpu{background:linear-gradient(135deg,#faf5ff,#ede9fe);border-color:#ddd6fe;}
+.hin{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe;}
+.hro{background:linear-gradient(135deg,#fff1f2,#ffe4e6);border-color:#fda4af;}
+.hcy{background:linear-gradient(135deg,#ecfeff,#cffafe);border-color:#a5f3fc;}
+.hero .hl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:4px;}
+.hero .hv{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-bottom:3px;}
+.hbl .hv{color:var(--bl6);}
+.hgr .hv{color:var(--em6);}
+.ham .hv{color:var(--am6);}
+.hpu .hv{color:var(--pr6);}
+.hin .hv{color:var(--in6);}
+.hro .hv{color:var(--ro6);}
+.hcy .hv{color:var(--cy6);}
+.hero .hs{font-size:.7rem;color:var(--n600);}
+
+/* Section heading */
+.sh{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--n600);margin:16px 0 9px;display:flex;align-items:center;gap:8px;}
+.sh::after{content:'';flex:1;height:1px;background:var(--s200);}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:13px;}
+.stat{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:10px 12px;box-shadow:var(--sh1);}
+.stat .sl{font-size:.66rem;color:var(--n600);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.stat .sv{font-size:.92rem;font-weight:700;color:var(--n900);font-family:var(--mono);}
+.stat .sv.pos{color:var(--em6);}
+.stat .sv.neg{color:var(--ro6);}
+.stat .sv.warn{color:var(--am6);}
+.stat .sv.cy{color:var(--cy6);}
+
+/* Banners */
+.bn{padding:9px 13px;border-radius:var(--rmd);font-size:.8rem;font-weight:500;margin-bottom:12px;line-height:1.5;border:1px solid;}
+.bn strong{font-weight:700;}
+.bn.ok{background:var(--em0);border-color:var(--em1);color:#065f46;}
+.bn.warn{background:var(--am0);border-color:var(--am1);color:#78350f;}
+.bn.info{background:var(--cy0);border-color:var(--cy1);color:#155e75;}
+
+/* Info box */
+.ib{background:var(--s50);border-left:3px solid var(--cy5);border-radius:0 var(--rsm) var(--rsm) 0;padding:9px 12px;font-size:.76rem;color:var(--n600);margin-bottom:12px;line-height:1.6;}
+.ib strong{color:var(--n900);}
+
+/* Chart wrapper */
+.cw{position:relative;height:260px;margin-bottom:6px;}
+.cw2{position:relative;height:200px;margin-bottom:6px;}
+
+/* Bracket table */
+.btbl-wrap{overflow-x:auto;margin-bottom:13px;}
+table.btbl{width:100%;border-collapse:collapse;font-size:.77rem;}
+table.btbl th{background:var(--s50);padding:7px 10px;text-align:left;font-weight:700;color:var(--n600);font-size:.63rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--s200);}
+table.btbl th.r{text-align:right;}
+table.btbl td{padding:8px 10px;border-bottom:1px solid var(--s100);font-size:.76rem;}
+table.btbl td.r{text-align:right;font-family:var(--mono);}
+table.btbl td.muted{color:var(--n600);}
+table.btbl tr:last-child td{border-bottom:none;}
+table.btbl tr.active-row td{background:rgba(6,182,212,.06);}
+table.btbl tr.active-row td:first-child{border-left:3px solid var(--cy5);padding-left:7px;}
+table.btbl tr:hover:not(.active-row) td{background:var(--s50);}
+
+/* Age cards grid */
+.age-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-bottom:14px;}
+.age-card{background:var(--white);border:1px solid var(--s200);border-radius:var(--rmd);padding:12px 14px;box-shadow:var(--sh1);position:relative;}
+.age-card.highlight{border-color:var(--cy5);background:var(--cy0);}
+.age-card .ac-age{font-size:.75rem;font-weight:700;color:var(--n600);margin-bottom:4px;}
+.age-card .ac-pct{font-size:1.1rem;font-weight:800;font-family:var(--mono);}
+.age-card .ac-mo{font-size:.77rem;font-weight:700;font-family:var(--mono);color:var(--n700);}
+.age-card .ac-ann{font-size:.67rem;color:var(--n600);margin-top:2px;}
+.age-card .ac-tag{position:absolute;top:6px;right:6px;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:var(--rfl);background:var(--cy5);color:var(--white);}
+
+/* Breakeven timeline */
+.breakeven-row{display:flex;align-items:center;gap:12px;padding:9px 13px;border-bottom:1px solid var(--s100);font-size:.77rem;background:var(--white);border-radius:0;}
+.breakeven-row:first-child{border-radius:var(--rmd) var(--rmd) 0 0;}
+.breakeven-row:last-child{border-bottom:none;border-radius:0 0 var(--rmd) var(--rmd);}
+.be-lbl{width:160px;font-weight:600;color:var(--n700);flex-shrink:0;}
+.be-bar-wrap{flex:1;height:9px;background:var(--s200);border-radius:4px;overflow:hidden;}
+.be-bar{height:100%;border-radius:4px;}
+.be-val{width:90px;text-align:right;font-family:var(--mono);font-size:.73rem;font-weight:700;flex-shrink:0;}
+.breakeven-table{border:1px solid var(--s200);border-radius:var(--rmd);overflow:hidden;margin-bottom:13px;box-shadow:var(--sh1);}
+
+/* ── MATH INSPECTOR ──────────────────────────────────────── */
+.mp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;opacity:0;pointer-events:none;transition:opacity .25s;}
+.mp-overlay.open{opacity:1;pointer-events:auto;}
+.mp{position:fixed;top:0;right:0;height:100vh;width:580px;max-width:100vw;background:var(--n950);border-left:1px solid var(--n700);z-index:200;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,.4);}
+.mp.open{transform:translateX(0);}
+.mp-hdr{padding:16px 20px;border-bottom:1px solid var(--n700);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--n900);}
+.mp-hdr h2{font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-.01em;}
+.mp-hdr h2 span{color:var(--cy5);}
+.mp-close{background:var(--n800);border:1px solid var(--n700);color:var(--s400);font-size:.76rem;font-weight:600;padding:5px 12px;border-radius:var(--rsm);cursor:pointer;transition:all .15s;}
+.mp-close:hover{color:var(--white);border-color:var(--s400);}
+.mp-body{overflow-y:auto;flex:1;padding:16px 18px;}
+.mp-body::-webkit-scrollbar{width:4px;}
+.mp-body::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
+.ms2{margin-bottom:20px;}
+.ms2-hdr{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cy5);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--n800);}
+.mfb{background:var(--n900);border:1px solid var(--n800);border-radius:var(--rmd);padding:12px 15px;margin-bottom:8px;}
+.mfb .ft{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:7px;}
+.mf{display:flex;align-items:flex-start;gap:10px;margin-bottom:5px;font-size:.76rem;line-height:1.6;}
+.mf:last-child{margin-bottom:0;}
+.ml{color:var(--s400);white-space:nowrap;min-width:175px;flex-shrink:0;font-size:.73rem;}
+.mv{color:var(--white);font-family:var(--mono);font-size:.73rem;}
+.mv.hi{color:var(--cy5);}
+.mv.pos{color:var(--em5);}
+.mv.neg{color:#f87171;}
+.mf-div{height:1px;background:var(--n800);margin:7px 0;}
+
+/* ── MOBILE ──────────────────────────────────────────────── */
+@media(max-width:960px){
+  .layout{grid-template-columns:1fr;}
+  .heroes{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:700px){
+  .hdr{padding:13px 15px 11px;}
+  .hdr-in{flex-wrap:wrap;gap:8px;}
+  .hdr h1{font-size:1.05rem;}
+  .hdr-tags{display:none;}
+  .hdr-actions{margin-top:0;gap:6px;}
+  .nav-select{font-size:.67rem;padding:5px 24px 5px 9px;}
+  .layout{grid-template-columns:1fr;min-height:unset;}
+  .sb{position:static;height:auto;max-height:none;padding:15px 13px 22px;border-right:none;border-bottom:2px solid var(--n700);}
+  input[type="number"],select{font-size:1rem !important;padding:10px 10px;}
+  .has-pre input{padding-left:22px;}
+  .has-suf input{padding-right:21px;}
+  .ig label{font-size:.78rem;}
+  .sbh{font-size:.68rem;margin:16px 0 9px;}
+  .main{padding:13px 12px 30px;}
+  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 5px;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex:0 0 auto;padding:9px 14px;font-size:.75rem;min-height:38px;}
+  .heroes,.heroes2{grid-template-columns:1fr 1fr;gap:8px;}
+  .hero{padding:12px 11px;}
+  .hero .hv{font-size:1.1rem;}
+  .hero .hs{font-size:.66rem;}
+  .stats{grid-template-columns:1fr 1fr;gap:7px;}
+  .cw{height:200px;}
+  .btbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.btbl{min-width:420px;}
+  table.btbl th,table.btbl td{padding:6px 8px;font-size:.72rem;}
+  .age-grid{grid-template-columns:1fr 1fr;}
+  .be-lbl{width:110px;font-size:.72rem;}
+  .be-val{width:72px;font-size:.7rem;}
+  .slider-row label{font-size:.75rem;}
+  .mp{width:100vw;max-width:100vw;height:90vh;top:auto;bottom:0;right:0;border-left:none;border-top:1px solid var(--n700);border-radius:var(--rlg) var(--rlg) 0 0;transform:translateY(100%);}
+  .mp.open{transform:translateY(0);}
+  .mp-hdr{border-radius:var(--rlg) var(--rlg) 0 0;padding:14px 16px;}
+  .mp-body{padding:13px;}
+  .mf{flex-direction:column;gap:2px;}
+  .ml{min-width:unset;font-size:.72rem;}
+  .mv{font-size:.72rem;}
+}
+@media(max-width:399px){
+  .heroes,.heroes2{grid-template-columns:1fr 1fr;}
+  .hero .hv{font-size:1.2rem;}
+}
+
+/* ── Breadcrumb ── */
+.hdr-bc{font-size:.63rem;font-weight:600;margin-bottom:7px;}
+.hdr-bc a{color:var(--n600);text-decoration:none;letter-spacing:.02em;transition:color .15s;}
+.hdr-bc a:hover{color:var(--s300);}
+/* ── Copy-link button ── */
+.copy-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--s300);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+.copy-btn.copied{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);color:#6ee7b7;}
+/* ── Mobile scroll pill ── */
+.sb-scroll-hint{display:none;padding:12px 0 4px;text-align:center;}
+.sb-scroll-pill{background:linear-gradient(135deg,var(--cy5),var(--cy6));color:var(--n950);font-size:.8rem;font-weight:700;padding:10px 28px;border-radius:var(--rfl);border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 4px 14px rgba(6,182,212,.35);}
+@media(max-width:700px){.sb-scroll-hint{display:block;}}
+/* ── Smooth hero-value transitions ── */
+.hv{transition:all .35s cubic-bezier(.4,0,.2,1);}
+/* ── Print styles ── */
+.print-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.print-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+@media print{
+  .sb,.hdr-actions{display:none!important;}
+  .wrap{grid-template-columns:1fr!important;}
+  .main{padding:20px!important;}
+  body{background:white!important;color:black!important;}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;}
+  .math-panel{display:block!important;position:static!important;transform:none!important;}
+}
+
+
+/* ── Reset button ── */
+.reset-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.reset-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+/* ── Input validation ── */
+.input-err{border-color:var(--ro5) !important;box-shadow:0 0 0 3px rgba(244,63,94,.15) !important;}
+.err-msg{font-size:.66rem;color:#fca5a5;margin-top:3px;padding-left:2px;display:block;}
+
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+<header class="hdr">
+  <div class="hdr-in">
+    <div>
+      <div class="hdr-bc"><a href="index.html">← All Calculators</a></div>
+        <h1>🔒 <span>Social Security</span> Optimizer</h1>
+      <div class="hdr-tags" style="display:none"></div>
+    </div>
+    <div class="hdr-actions">
+      <select class="nav-select" onchange="if(this.value)window.location=this.value">
+        <option value="social_security_calculator.html" selected>🔒 Social Security</option>
+        <option value="tax_calculator.html">💸 Income Tax</option>
+        <option value="estate_calculator.html">🏛️ Estate Tax</option>
+        <option value="mortgage_calculator.html">🏡 Mortgage</option>
+        <option value="retirement_calculator.html">🔥 Retirement</option>
+        <option value="college_calculator.html">🎓 529 College</option>
+        <option value="interest_calculator.html">💰 Interest</option>
+        <option value="col_calculator.html">🌆 Cost of Living</option>
+      </select>
+      <button class="reset-btn" onclick="resetDefaults()" title="Reset all inputs to defaults">&#8635; Reset</button>
+        <button class="copy-btn" id="copyLinkBtn" onclick="copyLink()">🔗 Copy Link</button>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+        <button class="math-btn" onclick="toggleMath()">🔍 Show Math</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<!-- ═══ SIDEBAR ══════════════════════════════════════════════ -->
+<div class="sb">
+
+  <div class="sbh">Your Profile</div>
+  <div class="ig">
+    <label>Birth Year</label>
+    <input type="number" id="birthYear" value="1962" min="1943" max="2000" step="1" oninput="calc()">
+  </div>
+  <div class="fra-pill" id="fra-pill">Full Retirement Age: <strong id="fra-display">—</strong></div>
+
+  <div class="ig" style="margin-top:8px">
+    <label>Estimated Monthly Benefit at FRA</label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="fraMonthly" value="2500" min="100" max="20000" step="50" oninput="calc()">
+    </div>
+  </div>
+
+  <div class="sbh">Claiming Age</div>
+  <div class="slider-row">
+    <label>My Claiming Age: <strong id="claimAge-display" style="color:var(--cy5);">67</strong></label>
+    <input type="range" id="claimAge" min="62" max="70" step="1" value="67" oninput="calc()">
+    <div class="slider-val"><span>Age 62</span><span>FRA</span><span>Age 70</span></div>
+  </div>
+
+  <div class="sbh">Spouse (Optional)</div>
+  <div class="tog-row">
+    <span class="tog-lbl">Include Spouse</span>
+    <span class="ck-wrap"><input type="checkbox" id="hasSpouse" onchange="toggleSpouse()"></span>
+  </div>
+  <div id="spouse-section" style="display:none;margin-top:8px">
+    <div class="ig">
+      <label>Spouse Birth Year</label>
+      <input type="number" id="spouseBirthYear" value="1963" min="1943" max="2000" step="1" oninput="calc()">
+    </div>
+    <div class="ig">
+      <label>Spouse Monthly Benefit at FRA</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="spouseFraMonthly" value="1800" min="0" max="20000" step="50" oninput="calc()">
+      </div>
+    </div>
+    <div class="slider-row">
+      <label>Spouse Claiming Age: <strong id="spouseClaimAge-display" style="color:var(--cy5);">67</strong></label>
+      <input type="range" id="spouseClaimAge" min="62" max="70" step="1" value="67" oninput="calc()">
+      <div class="slider-val"><span>62</span><span>FRA</span><span>70</span></div>
+    </div>
+  </div>
+
+  <div class="sbh">WEP / GPO (Gov&#8217;t Pensions)</div>
+  <div class="tog-row">
+    <span class="tog-lbl">Has Non-Covered Pension <em>gov&#8217;t/foreign job not paying SS taxes</em></span>
+    <span class="ck-wrap"><input type="checkbox" id="hasWEP" onchange="toggleWEP()"></span>
+  </div>
+  <div id="wep-section" style="display:none;margin-top:8px">
+    <div class="ig">
+      <label>Monthly Pension Amount</label>
+      <div class="iw has-pre"><span class="pre">$</span>
+        <input type="number" id="wepPension" value="2000" min="0" max="20000" step="100" oninput="calc()">
+      </div>
+    </div>
+    <div class="ig">
+      <label>Years of SS-Covered Earnings <em>30+ years = no WEP reduction</em></label>
+      <input type="number" id="wepYears" value="20" min="0" max="40" step="1" oninput="calc()">
+    </div>
+  </div>
+
+  <div class="sbh">Medicare IRMAA</div>
+  <div class="ig">
+    <label>MAGI (2 years prior) <em>triggers IRMAA surcharge</em></label>
+    <div class="iw has-pre"><span class="pre">$</span>
+      <input type="number" id="magi" value="100000" min="0" max="2000000" step="5000" oninput="calc()">
+    </div>
+  </div>
+  <div class="ig">
+    <label>Filing Status</label>
+    <select id="irmaFiling" onchange="calc()">
+      <option value="single">Single / MFS</option>
+      <option value="mfj">Married Filing Jointly</option>
+    </select>
+  </div>
+
+  <div class="sbh">Assumptions</div>
+  <div class="ig">
+    <label>Annual COLA (Cost of Living Adj.) <em>historical avg ~2.5%</em></label>
+    <div class="iw has-suf">
+      <input type="number" id="cola" value="2.5" min="0" max="10" step="0.1" oninput="calc()">
+      <span class="suf">%</span>
+    </div>
+  </div>
+  <div class="ig">
+    <label>Life Expectancy (years) <em>for breakeven analysis</em></label>
+    <input type="number" id="lifeExp" value="87" min="65" max="100" step="1" oninput="calc()">
+  </div>
+
+  <div class="sbh">Summary</div>
+  <div class="cb">
+    <div class="cb-row"><span class="cb-lbl">My FRA</span><span class="cb-val" id="sb-fra">—</span></div>
+    <div class="cb-row"><span class="cb-lbl">My Benefit (claimed)</span><span class="cb-val" id="sb-benefit">—</span></div>
+    <div class="cb-row"><span class="cb-lbl">vs Claim at 70</span><span class="cb-val" id="sb-vs70">—</span></div>
+    <div class="cb-div"></div>
+    <div class="cb-row cb-tot"><span class="cb-lbl">Lifetime Total (to life exp.)</span><span class="cb-val cb-tot" id="sb-lifetime">—</span></div>
+  </div>
+
+<div class="sb-scroll-hint"><button class="sb-scroll-pill" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">See Results ↓</button></div>
+</div><!-- /sb -->
+
+<!-- ═══ MAIN ═════════════════════════════════════════════════ -->
+<div class="main">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('overview',event)">Overview</button>
+    <button class="tab" onclick="switchTab('byage',event)">Benefit by Age</button>
+    <button class="tab" onclick="switchTab('breakeven',event)">Breakeven</button>
+    <button class="tab" onclick="switchTab('cumulative',event)">Cumulative Chart</button>
+    <button class="tab" onclick="switchTab('spousal',event)">Spousal</button>
+    <button class="tab" onclick="switchTab('medicare',event)">Medicare IRMAA</button>
+  </div>
+
+  <!-- ── OVERVIEW TAB ─────────────────────────────── -->
+  <div class="tab-panel active" id="tp-overview">
+    <div class="heroes">
+      <div class="hero hcy"><div class="hl">Monthly Benefit</div><div class="hv" id="h-monthly">—</div><div class="hs" id="h-monthly-sub">at chosen age</div></div>
+      <div class="hero ham"><div class="hl">vs Max (Age 70)</div><div class="hv" id="h-vs70">—</div><div class="hs" id="h-vs70-sub">monthly difference</div></div>
+      <div class="hero hgr"><div class="hl">Lifetime Total</div><div class="hv" id="h-lifetime">—</div><div class="hs" id="h-lifetime-sub">to life expectancy</div></div>
+      <div class="hero hbl"><div class="hl">Breakeven Age</div><div class="hv" id="h-breakeven">—</div><div class="hs" id="h-breakeven-sub">vs claim at 62</div></div>
+    </div>
+
+    <div id="banner-overview"></div>
+
+    <div class="sh">Adjustment Factor</div>
+    <div class="stats" id="overviewStats"></div>
+
+    <div class="sh">What Affects Your Benefit</div>
+    <div class="ib">
+      <strong>Full Retirement Age (FRA)</strong> is based on your birth year. Claiming before FRA permanently reduces your benefit — up to 30% if you were born after 1959 and claim at 62. Waiting beyond FRA earns <strong>delayed retirement credits</strong> of 8% per year (2/3% per month), up to age 70.<br><br>
+      <strong>COLA adjustments</strong> apply annually to all recipients regardless of when they claimed. Benefits are based on your highest 35 years of indexed earnings (AIME) and applied to the Primary Insurance Amount (PIA) formula.
+    </div>
+
+    <div id="wep-overview"></div>
+    <div id="irmaa-overview"></div>
+
+    <div class="sh">Optimal Strategy Summary</div>
+    <div id="optimalSummary"></div>
+  </div>
+
+  <!-- ── BENEFIT BY AGE TAB ────────────────────────── -->
+  <div class="tab-panel" id="tp-byage">
+    <div class="sh">Monthly Benefit at Each Claiming Age</div>
+    <div class="age-grid" id="ageGrid"></div>
+
+    <div class="sh">Adjustment Factors Explained</div>
+    <div class="btbl-wrap">
+      <table class="btbl" id="adjTable">
+        <thead><tr>
+          <th>Claiming Age</th>
+          <th class="r">Months from FRA</th>
+          <th class="r">Adjustment</th>
+          <th class="r">Monthly Benefit</th>
+          <th class="r">Annual Benefit</th>
+        </tr></thead>
+        <tbody id="adjBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── BREAKEVEN TAB ─────────────────────────────── -->
+  <div class="tab-panel" id="tp-breakeven">
+    <div class="sh">Breakeven vs Claiming at Age 62</div>
+    <div class="bn info" id="breakeven-banner"></div>
+    <div class="breakeven-table" id="breakevenTable"></div>
+
+    <div class="sh">Breakeven Age Summary</div>
+    <div class="stats" id="breakevenStats"></div>
+
+    <div class="ib">
+      <strong>How to interpret:</strong> The breakeven age is when your cumulative lifetime benefits from waiting surpass what you'd have collected by claiming early. If you live past the breakeven age, delaying was financially beneficial. If you don't, claiming early paid off more. Health, need for income, and tax implications also matter.
+    </div>
+  </div>
+
+  <!-- ── CUMULATIVE CHART TAB ──────────────────────── -->
+  <div class="tab-panel" id="tp-cumulative">
+    <div class="sh">Cumulative Lifetime Benefits by Claiming Age</div>
+    <div class="cw"><canvas id="cumulChart"></canvas></div>
+    <div class="ib" style="margin-top:10px;">
+      This chart shows cumulative benefits (without COLA for clarity) collected from each claiming age through age 90. The lines cross at the "breakeven" point — after that age, later claimers have collected more total.
+    </div>
+  </div>
+
+  <!-- ── SPOUSAL TAB ───────────────────────────────── -->
+  <div class="tab-panel" id="tp-spousal">
+    <div id="spousal-content"></div>
+  </div>
+
+  <!-- MEDICARE IRMAA TAB -->
+  <div class="tab-panel" id="tp-medicare">
+    <div id="medicare-content"></div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ═══ MATH INSPECTOR ════════════════════════════════════ -->
+<div class="mp-overlay" id="mp-overlay" onclick="closeMath()"></div>
+<div class="mp" id="mp">
+  <div class="mp-hdr">
+    <h2>🔍 Social Security <span>Math</span></h2>
+    <button class="mp-close" onclick="closeMath()">✕ Close</button>
+  </div>
+  <div class="mp-body" id="mp-body"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+
+function fmt(n, decimals=0) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '$' + Math.abs(n).toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+function fmtPct(n, dec=1) { return (n >= 0 ? '+' : '') + (n * 100).toFixed(dec) + '%'; }
+function fmtPctAbs(n, dec=1) { return (n * 100).toFixed(dec) + '%'; }
+function fmtAge(yrs, mos) {
+  if (mos === 0) return `${yrs}`;
+  return `${yrs} + ${mos}mo`;
+}
+
+// Full Retirement Age by birth year
+function getFRA(birthYear) {
+  if (birthYear <= 1954) return { years: 66, months: 0 };
+  if (birthYear === 1955) return { years: 66, months: 2 };
+  if (birthYear === 1956) return { years: 66, months: 4 };
+  if (birthYear === 1957) return { years: 66, months: 6 };
+  if (birthYear === 1958) return { years: 66, months: 8 };
+  if (birthYear === 1959) return { years: 66, months: 10 };
+  return { years: 67, months: 0 }; // 1960+
+}
+
+function fraMonths(fra) {
+  return fra.years * 12 + fra.months;
+}
+
+// Benefit adjustment factor for claiming at a given age (in months from birth year)
+// claimMonths = (claimAge in months from birth) - FRA in months from birth
+// Early: -36 months → 5/9% per month; beyond -36 → 5/12% per month
+// Late: +months → 2/3% per month
+function adjustmentFactor(monthsFromFRA) {
+  if (monthsFromFRA === 0) return 1.0;
+  if (monthsFromFRA > 0) {
+    // Delayed credits: 2/3% per month
+    return 1 + (2/3/100) * monthsFromFRA;
+  }
+  // Early reduction
+  const earlyMonths = Math.abs(monthsFromFRA);
+  if (earlyMonths <= 36) {
+    return 1 - (5/9/100) * earlyMonths;
+  } else {
+    return 1 - (5/9/100) * 36 - (5/12/100) * (earlyMonths - 36);
+  }
+}
+
+function monthlyBenefitAtAge(fraBenefit, claimAgeYears, claimAgeMonths, fra) {
+  const claimTotalMonths = claimAgeYears * 12 + claimAgeMonths;
+  const fraTotalMonths = fra.years * 12 + fra.months;
+  const monthsFromFRA = claimTotalMonths - fraTotalMonths;
+  // Cap delayed credits at age 70
+  const cappedMonths = Math.min(monthsFromFRA, (70 * 12) - fraTotalMonths);
+  const factor = adjustmentFactor(Math.max(cappedMonths, -(fraTotalMonths - 62 * 12)));
+  return fraBenefit * factor;
+}
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+
+let cumulChart = null;
+let lastResult = {};
+
+// ═══════════════════════════════════════════════════════════
+// CALC
+// ═══════════════════════════════════════════════════════════
+
+function calc() {
+  const birthYear    = +document.getElementById('birthYear').value || 1962;
+  const fraMonthlyV  = +document.getElementById('fraMonthly').value || 2500;
+  const claimAge     = +document.getElementById('claimAge').value || 67;
+  const cola         = (+document.getElementById('cola').value || 2.5) / 100;
+  const lifeExp      = +document.getElementById('lifeExp').value || 87;
+
+  // Update slider display
+  document.getElementById('claimAge-display').textContent = claimAge;
+
+  const fra = getFRA(birthYear);
+  document.getElementById('fra-display').textContent = fmtAge(fra.years, fra.months);
+  document.getElementById('fra-pill').style.display = 'block';
+
+  const fraTotalMos = fraMonths(fra);
+  const claimTotalMos = claimAge * 12;
+  const monthsFromFRA = claimTotalMos - fraTotalMos;
+  const factor = adjustmentFactor(Math.min(Math.max(monthsFromFRA, -(fraTotalMos - 62*12)), 36));
+  // Proper factor accounting for 70 cap on delay credits
+  const actualFactor = adjustmentFactor(Math.min(Math.max(monthsFromFRA, -(fraTotalMos - 62*12)), (70*12 - fraTotalMos)));
+  const monthlyBenefit = fraMonthlyV * actualFactor;
+
+  // Age 70 benefit
+  const age70Factor = adjustmentFactor(70 * 12 - fraTotalMos);
+  const benefit70 = fraMonthlyV * age70Factor;
+
+  // Age 62 benefit
+  const age62Factor = adjustmentFactor(-(fraTotalMos - 62 * 12));
+  const benefit62 = fraMonthlyV * age62Factor;
+
+  // Lifetime total (simple, no COLA)
+  const yearsCollecting = Math.max(0, lifeExp - claimAge);
+  const lifetimeTotal = monthlyBenefit * 12 * yearsCollecting;
+
+  // Breakeven vs claiming at 62 (no COLA for simplicity)
+  let breakevenAge = null;
+  if (claimAge > 62) {
+    // Months where cumulative[claimAge] > cumulative[62]
+    for (let age = claimAge; age <= 100; age++) {
+      const cum62 = benefit62 * 12 * Math.max(0, age - 62);
+      const cumX  = monthlyBenefit * 12 * Math.max(0, age - claimAge);
+      if (cumX >= cum62) { breakevenAge = age; break; }
+    }
+  }
+
+  // Spouse
+  const hasSpouse = document.getElementById('hasSpouse').checked;
+  let spouseResult = null;
+  if (hasSpouse) {
+    const spouseBirthYear = +document.getElementById('spouseBirthYear').value || 1963;
+    const spouseFraMonthly = +document.getElementById('spouseFraMonthly').value || 1800;
+    const spouseClaimAge = +document.getElementById('spouseClaimAge').value || 67;
+    document.getElementById('spouseClaimAge-display').textContent = spouseClaimAge;
+
+    const spouseFRA = getFRA(spouseBirthYear);
+    const spouseFraTotalMos = fraMonths(spouseFRA);
+    const spouseClaimMos = spouseClaimAge * 12;
+    const spouseMonthsFromFRA = spouseClaimMos - spouseFraTotalMos;
+    const spouseActualFactor = adjustmentFactor(Math.min(Math.max(spouseMonthsFromFRA, -(spouseFraTotalMos - 62*12)), (70*12 - spouseFraTotalMos)));
+    const spouseMonthly = spouseFraMonthly * spouseActualFactor;
+
+    // Spousal benefit: 50% of higher-earner's FRA benefit, reduced if taken early
+    const spousalBase = fraMonthlyV * 0.5;
+    const spousalFactor = spouseMonthsFromFRA < 0
+      ? Math.max(0, 1 + spouseMonthsFromFRA * (25/3600))
+      : 1; // no delay credits for spousal
+    const spousalBenefit = spousalBase * spousalFactor;
+
+    const combinedMonthly = monthlyBenefit + Math.max(spouseMonthly, spousalBenefit);
+
+    spouseResult = {
+      spouseFRA, spouseFraMonthly, spouseClaimAge,
+      spouseActualFactor, spouseMonthly,
+      spousalBase, spousalFactor, spousalBenefit,
+      combinedMonthly,
+    };
+    document.getElementById('spouseClaimAge-display').textContent = spouseClaimAge;
+  }
+
+  // ── WEP ──
+  const hasWEP = document.getElementById('hasWEP').checked;
+  let wepResult = null;
+  let effectiveMonthlyBenefit = monthlyBenefit;
+  if (hasWEP) {
+    const wepPension = +document.getElementById('wepPension').value || 0;
+    const wepYears   = +document.getElementById('wepYears').value || 20;
+    const wepRed = calcWEPReduction(wepPension, wepYears) * actualFactor; // WEP applied at FRA then scaled
+    const wepRedFRA = calcWEPReduction(wepPension, wepYears);
+    effectiveMonthlyBenefit = Math.max(0, monthlyBenefit - wepRed);
+    // GPO on spousal
+    let gpoSpousalReduction = 0;
+    if (hasSpouse && spouseResult) {
+      gpoSpousalReduction = calcGPOReduction(wepPension);
+      spouseResult.spousalBenefit = Math.max(0, spouseResult.spousalBenefit - gpoSpousalReduction);
+      spouseResult.combinedMonthly = effectiveMonthlyBenefit + Math.max(spouseResult.spouseMonthly, spouseResult.spousalBenefit);
+    }
+    wepResult = { wepPension, wepYears, wepFactor: getWEPFactor(wepYears), wepRedFRA, wepRed, gpoSpousalReduction };
+  }
+
+  // ── IRMAA ──
+  const magi = +document.getElementById('magi').value || 100000;
+  const irmaFiling = document.getElementById('irmaFiling').value;
+  const irmaaMonthly = calcIRMAA(magi, irmaFiling);
+  const irmaaAnnual = irmaaMonthly * 12;
+  // Net SS after Medicare Part B (deducted from check)
+  const netMonthlyAfterMedicare = Math.max(0, effectiveMonthlyBenefit - irmaaMonthly);
+  const irmaaResult = { magi, irmaFiling, irmaaMonthly, irmaaAnnual, netMonthlyAfterMedicare };
+
+  // Recalc lifetime with effective benefit
+  const lifetimeTotalEffective = effectiveMonthlyBenefit * 12 * Math.max(0, lifeExp - claimAge);
+
+  lastResult = {
+    birthYear, fraMonthlyV, claimAge, cola, lifeExp,
+    fra, fraTotalMos, monthsFromFRA, actualFactor,
+    monthlyBenefit, effectiveMonthlyBenefit, benefit70, benefit62,
+    lifetimeTotal, lifetimeTotalEffective,
+    breakevenAge, hasSpouse, spouseResult,
+    hasWEP, wepResult, irmaaResult,
+  };
+
+  updateUI(lastResult);
+
+  // Cross-field validation
+  clearAllErrs(); validateMinMax();
+  const _le=+document.getElementById('lifeExp').value||87, _ca=+document.getElementById('claimAge').value||67;
+  if(_le<=_ca) showErr('lifeExp','Should exceed claiming age ('+_ca+')');
+  const _by=+document.getElementById('birthYear').value||1962;
+  if(_by>2006) showErr('birthYear','Birth year seems too recent for SS planning');
+  saveState();
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════════════════════
+
+function updateUI(r) {
+  // Hero cards
+  const dispMonthly = r.hasWEP ? r.effectiveMonthlyBenefit : r.monthlyBenefit;
+  document.getElementById('h-monthly').textContent = fmt(dispMonthly);
+  document.getElementById('h-monthly-sub').textContent = r.hasWEP
+    ? `age ${r.claimAge} · WEP-adjusted`
+    : `at age ${r.claimAge} (${fmtPctAbs(r.actualFactor)} of FRA benefit)`;
+  const diff70 = r.monthlyBenefit - r.benefit70;
+  document.getElementById('h-vs70').textContent = (diff70 <= 0 ? '+' : '−') + fmt(Math.abs(diff70));
+  document.getElementById('h-vs70-sub').textContent = diff70 < 0 ? 'less than max (age 70)' : 'you claimed at max age';
+  document.getElementById('h-lifetime').textContent = fmt(r.hasWEP ? r.lifetimeTotalEffective : r.lifetimeTotal);
+  document.getElementById('h-lifetime-sub').textContent = `to age ${r.lifeExp} (${Math.max(0,r.lifeExp-r.claimAge)} yrs collecting)`;
+  document.getElementById('h-breakeven').textContent = r.breakevenAge ? `Age ${r.breakevenAge}` : (r.claimAge === 62 ? 'N/A' : '—');
+  document.getElementById('h-breakeven-sub').textContent = r.breakevenAge ? `breakeven vs claiming at 62` : (r.claimAge === 62 ? 'earliest age' : 'beyond age 100');
+
+  // Sidebar
+  document.getElementById('sb-fra').textContent = fmtAge(r.fra.years, r.fra.months);
+  document.getElementById('sb-benefit').textContent = fmt(r.hasWEP ? r.effectiveMonthlyBenefit : r.monthlyBenefit) + '/mo';
+  document.getElementById('sb-vs70').textContent = fmt(r.benefit70) + '/mo';
+  document.getElementById('sb-lifetime').textContent = fmt(r.lifetimeTotal);
+
+  // Banner
+  const bo = document.getElementById('banner-overview');
+  if (r.claimAge === 70) {
+    bo.innerHTML = `<div class="bn ok">✓ <strong>Maximum benefit claimed.</strong> At age 70 you receive ${fmtPctAbs(r.actualFactor)} of your FRA benefit — the maximum possible. No further delay credits accrue after 70.</div>`;
+  } else if (r.claimAge < r.fra.years) {
+    bo.innerHTML = `<div class="bn warn">⚠️ <strong>Claiming ${r.fra.years - r.claimAge} year(s) before FRA</strong> permanently reduces your benefit to ${fmtPctAbs(r.actualFactor)} of your FRA amount. Breakeven vs age 70 is approximately age ${r.breakevenAge || '—'}.</div>`;
+  } else if (r.claimAge > r.fra.years) {
+    const extraPct = ((r.actualFactor - 1) * 100).toFixed(1);
+    bo.innerHTML = `<div class="bn info">ℹ️ Delaying ${r.claimAge - r.fra.years} year(s) beyond FRA gives you <strong>+${extraPct}%</strong> more per month (${fmt(r.monthlyBenefit)} vs ${fmt(r.fraMonthlyV)} at FRA).</div>`;
+  } else {
+    bo.innerHTML = `<div class="bn info">ℹ️ Claiming at your Full Retirement Age of ${fmtAge(r.fra.years, r.fra.months)} gives you 100% of your Primary Insurance Amount.</div>`;
+  }
+
+  // Stats
+  const stats = [
+    { l: 'FRA Benefit', v: fmt(r.fraMonthlyV) + '/mo', c: '' },
+    { l: `Benefit at ${r.claimAge}`, v: fmt(r.monthlyBenefit) + '/mo', c: 'cy' },
+    { l: 'Benefit at 62', v: fmt(r.benefit62) + '/mo', c: '' },
+    { l: 'Benefit at 70', v: fmt(r.benefit70) + '/mo', c: 'pos' },
+    { l: 'Adj. Factor', v: fmtPctAbs(r.actualFactor), c: r.actualFactor < 1 ? 'neg' : 'pos' },
+    { l: 'Annual (yr 1)', v: fmt(r.monthlyBenefit * 12), c: '' },
+  ];
+  document.getElementById('overviewStats').innerHTML = stats.map(s =>
+    `<div class="stat"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div></div>`
+  ).join('');
+
+  // WEP/GPO banner
+  const wepDiv = document.getElementById('wep-overview');
+  if (wepDiv) {
+    if (r.hasWEP && r.wepResult) {
+      const w = r.wepResult;
+      wepDiv.innerHTML = `
+        <div class="sh">WEP / GPO Impact</div>
+        <div class="stats" style="margin-bottom:10px">
+          <div class="stat"><div class="sl">Pre-WEP Benefit</div><div class="sv">${fmt(r.monthlyBenefit)}/mo</div></div>
+          <div class="stat"><div class="sl">WEP Reduction</div><div class="sv neg">−${fmt(w.wepRed)}/mo</div></div>
+          <div class="stat"><div class="sl">After-WEP Benefit</div><div class="sv cy">${fmt(r.effectiveMonthlyBenefit)}/mo</div></div>
+          <div class="stat"><div class="sl">WEP Factor (${w.wepYears} yrs)</div><div class="sv warn">${(w.wepFactor*100).toFixed(0)}%</div></div>
+          ${w.gpoSpousalReduction > 0 ? `<div class="stat"><div class="sl">GPO Spousal Reduction</div><div class="sv neg">−${fmt(w.gpoSpousalReduction)}/mo</div></div>` : ''}
+        </div>
+        <div class="bn warn">⚠️ <strong>WEP reduces your benefit</strong> because you have a pension from employment that didn't pay Social Security taxes. Your ${w.wepYears} year(s) of SS-covered earnings gives a first-bend factor of ${(w.wepFactor*100).toFixed(0)}% (vs normal 90%), reducing your benefit by ${fmt(w.wepRed)}/month. The WEP guarantee caps this at 50% of your pension (${fmt(w.wepPension/2)}/mo).
+        ${w.gpoSpousalReduction > 0 ? `<br><br><strong>GPO</strong> reduces any spousal benefit by 2/3 of your pension (${fmt(w.gpoSpousalReduction)}/mo).` : ''}</div>`;
+    } else {
+      wepDiv.innerHTML = '';
+    }
+  }
+  // IRMAA in overview
+  const irmaaDiv = document.getElementById('irmaa-overview');
+  if (irmaaDiv && r.irmaaResult) {
+    const ir = r.irmaaResult;
+    const isStandard = ir.irmaaMonthly <= 185;
+    irmaaDiv.innerHTML = `
+      <div class="sh">Medicare Part B Premium (IRMAA)</div>
+      <div class="stats" style="margin-bottom:10px">
+        <div class="stat"><div class="sl">Part B Premium</div><div class="sv ${isStandard?'':'warn'}">${fmt(ir.irmaaMonthly)}/mo</div></div>
+        <div class="stat"><div class="sl">Annual Cost</div><div class="sv">${fmt(ir.irmaaAnnual)}/yr</div></div>
+        <div class="stat"><div class="sl">Net SS Check</div><div class="sv cy">${fmt(ir.netMonthlyAfterMedicare)}/mo</div></div>
+        <div class="stat"><div class="sl">MAGI</div><div class="sv">${fmt(ir.magi)}</div></div>
+      </div>
+      ${!isStandard ? `<div class="bn warn">⚠️ <strong>IRMAA surcharge applies.</strong> Your MAGI of ${fmt(ir.magi)} (${ir.irmaFiling === 'mfj' ? 'MFJ' : 'Single'}) triggers a Medicare Part B surcharge — your premium is ${fmt(ir.irmaaMonthly)}/mo instead of the standard $185/mo. Strategies to reduce IRMAA include Roth conversions before Medicare eligibility, qualified charitable distributions, and IRMAA appeals if income dropped.</div>` :
+      `<div class="bn ok">✓ No IRMAA surcharge. Your MAGI of ${fmt(ir.magi)} is below the ${ir.irmaFiling === 'mfj' ? '$212,000 (MFJ)' : '$106,000 (Single)'} threshold. Standard Part B premium: ${fmt(ir.irmaaMonthly)}/mo.</div>`}`;
+  }
+
+  // Optimal summary
+  let best = { age: 62, lifetime: 0 };
+  for (let age = 62; age <= 70; age++) {
+    const fra = r.fra;
+    const fraMos = fraMonths(fra);
+    const mos = age * 12 - fraMos;
+    const capped = Math.min(Math.max(mos, -(fraMos - 62*12)), (70*12 - fraMos));
+    const f = adjustmentFactor(capped);
+    const mo = r.fraMonthlyV * f;
+    const lt = mo * 12 * Math.max(0, r.lifeExp - age);
+    if (lt > best.lifetime) best = { age, lifetime: lt };
+  }
+  document.getElementById('optimalSummary').innerHTML = `
+    <div class="bn ok">✅ <strong>Optimal claiming age for your life expectancy of ${r.lifeExp}:</strong> Age ${best.age}.
+    Expected lifetime total: ${fmt(best.lifetime)} (claiming at age ${r.claimAge} yields ${fmt(r.lifetimeTotal)}, a difference of ${fmt(best.lifetime - r.lifetimeTotal)}).
+    ${best.age > r.claimAge ? 'Waiting longer could yield more if you live to your life expectancy.' : best.age < r.claimAge ? 'You may have over-delayed based on your life expectancy.' : 'Your chosen age matches the optimal.'}</div>`;
+
+  renderByAge(r);
+  renderBreakeven(r);
+  renderCumulative(r);
+  renderSpousal(r);
+  renderMedicare(r);
+}
+
+function renderByAge(r) {
+  const ages = [62, 63, 64, 65, 66, 67, 68, 69, 70];
+  const fra = r.fra;
+  const fraMos = fraMonths(fra);
+
+  document.getElementById('ageGrid').innerHTML = ages.map(age => {
+    const mos = age * 12 - fraMos;
+    const capped = Math.min(Math.max(mos, -(fraMos - 62*12)), (70*12 - fraMos));
+    const f = adjustmentFactor(capped);
+    const mo = r.fraMonthlyV * f;
+    const isChosen = age === r.claimAge;
+    const isFRA = age === fra.years && fra.months === 0;
+    return `<div class="age-card${isChosen ? ' highlight' : ''}">
+      ${isChosen ? '<div class="ac-tag">CHOSEN</div>' : ''}
+      <div class="ac-age">Age ${age}${isFRA ? ' (FRA)' : ''}</div>
+      <div class="ac-pct" style="color:${f < 1 ? 'var(--ro6)' : f > 1 ? 'var(--em6)' : 'var(--cy6)'}">${fmtPctAbs(f)}</div>
+      <div class="ac-mo">${fmt(mo)}/mo</div>
+      <div class="ac-ann">${fmt(mo * 12)}/yr</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('adjBody').innerHTML = ages.map(age => {
+    const mos = age * 12 - fraMos;
+    const capped = Math.min(Math.max(mos, -(fraMos - 62*12)), (70*12 - fraMos));
+    const f = adjustmentFactor(capped);
+    const mo = r.fraMonthlyV * f;
+    const isChosen = age === r.claimAge;
+    return `<tr${isChosen ? ' class="active-row"' : ''}>
+      <td>Age ${age}${age === fra.years && fra.months === 0 ? ' (FRA)' : ''}</td>
+      <td class="r muted">${mos > 0 ? '+' : ''}${mos} mos</td>
+      <td class="r" style="color:${f<1?'var(--ro6)':f>1?'var(--em6)':'var(--cy6)'}">${fmtPctAbs(f)}</td>
+      <td class="r">${fmt(mo)}</td>
+      <td class="r muted">${fmt(mo * 12)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderBreakeven(r) {
+  const ages = [63, 64, 65, 66, 67, 68, 69, 70];
+  const fra = r.fra;
+  const fraMos = fraMonths(fra);
+
+  const benefit62 = r.benefit62;
+  const beRows = ages.map(age => {
+    const mos = age * 12 - fraMos;
+    const capped = Math.min(Math.max(mos, -(fraMos - 62*12)), (70*12 - fraMos));
+    const f = adjustmentFactor(capped);
+    const mo = r.fraMonthlyV * f;
+
+    // Find breakeven
+    let beAge = null;
+    for (let a = age; a <= 100; a++) {
+      const cum62 = benefit62 * 12 * Math.max(0, a - 62);
+      const cumX  = mo * 12 * Math.max(0, a - age);
+      if (cumX >= cum62) { beAge = a; break; }
+    }
+
+    const lt = mo * 12 * Math.max(0, r.lifeExp - age);
+    return { age, f, mo, beAge, lt };
+  });
+
+  document.getElementById('breakeven-banner').innerHTML =
+    r.claimAge === 62
+      ? `You're claiming at 62 (earliest possible). No breakeven analysis needed — compare to later ages below.`
+      : `Claiming at age ${r.claimAge}: breakeven vs age 62 is approximately <strong>age ${r.breakevenAge || 'beyond 100'}</strong>. Your life expectancy of ${r.lifeExp} is ${r.breakevenAge && r.lifeExp >= r.breakevenAge ? '<strong>past</strong> the breakeven — delaying pays off' : '<strong>before</strong> the breakeven — claiming earlier may have been better'}.`;
+
+  const maxLt = Math.max(...beRows.map(b => b.lt));
+  document.getElementById('breakevenTable').innerHTML = beRows.map(b =>
+    `<div class="breakeven-row">
+      <div class="be-lbl">Claim at Age ${b.age}${b.age === fra.years && fra.months === 0 ? ' (FRA)' : ''}</div>
+      <div class="be-bar-wrap"><div class="be-bar" style="width:${b.lt/maxLt*100}%;background:${b.beAge && b.beAge <= r.lifeExp ? '#10b981' : '#94a3b8'}"></div></div>
+      <div class="be-val">${b.beAge ? `Break at ${b.beAge}` : 'No breakeven'}</div>
+    </div>`
+  ).join('');
+
+  document.getElementById('breakevenStats').innerHTML = beRows.map(b =>
+    `<div class="stat"><div class="sl">Claim at ${b.age}</div><div class="sv ${b.beAge && b.beAge <= r.lifeExp ? 'pos' : 'neg'}">${b.beAge ? 'Age ' + b.beAge : '>100'}</div></div>`
+  ).join('');
+}
+
+function renderCumulative(r) {
+  const ages = [62, 64, 67, 70];
+  const fra = r.fra;
+  const fraMos = fraMonths(fra);
+  const labels = [];
+  for (let a = 62; a <= 90; a++) labels.push(`${a}`);
+
+  const colors = ['#f59e0b', '#06b6d4', '#10b981', '#8b5cf6'];
+  const datasets = ages.map((claimAge, i) => {
+    const mos = claimAge * 12 - fraMos;
+    const capped = Math.min(Math.max(mos, -(fraMos - 62*12)), (70*12 - fraMos));
+    const f = adjustmentFactor(capped);
+    const mo = r.fraMonthlyV * f;
+    const data = labels.map(lbl => {
+      const age = +lbl;
+      return age < claimAge ? 0 : mo * 12 * (age - claimAge);
+    });
+    return {
+      label: `Claim at ${claimAge}${claimAge === fra.years && fra.months === 0 ? ' (FRA)' : ''}`,
+      data, borderColor: colors[i], backgroundColor: 'transparent',
+      borderWidth: claimAge === r.claimAge ? 3 : 1.5,
+      tension: 0.1, pointRadius: 0,
+      borderDash: claimAge === r.claimAge ? [] : [4,2],
+    };
+  });
+
+  const ctx = document.getElementById('cumulChart').getContext('2d');
+  if (cumulChart) cumulChart.destroy();
+  cumulChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { ticks: { font: { size: 9 }, maxTicksLimit: 15 }, grid: { display: false }, title: { display: true, text: 'Age', font: { size: 10 } } },
+        y: { ticks: { font: { size: 9 }, callback: v => '$' + (v >= 1e6 ? (v/1e6).toFixed(1) + 'M' : (v/1e3).toFixed(0) + 'k') }, grid: { color: 'rgba(0,0,0,.04)' }, title: { display: true, text: 'Cumulative Benefits', font: { size: 10 } } }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.raw)}` } }
+      }
+    }
+  });
+}
+
+
+function renderMedicare(r) {
+  const div = document.getElementById('medicare-content');
+  if (!div || !r.irmaaResult) return;
+  const ir = r.irmaaResult;
+  const brackets = IRMAA[ir.irmaFiling] || IRMAA.single;
+  const limits2025 = ir.irmaFiling === 'mfj'
+    ? ['≤$212,000','$212,001–$266,000','$266,001–$334,000','$334,001–$400,000','$400,001–$750,000','>$750,000']
+    : ['≤$106,000','$106,001–$133,000','$133,001–$167,000','$167,001–$200,000','$200,001–$500,000','>$500,000'];
+  const prems = [185.00, 259.00, 370.00, 480.90, 591.90, 628.90];
+  const activeIdx = prems.indexOf(ir.irmaaMonthly);
+
+  div.innerHTML = `
+    <div class="heroes2" style="margin-bottom:14px">
+      <div class="hero hcy">
+        <div class="hl">Part B Premium</div>
+        <div class="hv">${fmt(ir.irmaaMonthly)}/mo</div>
+        <div class="hs">based on ${fmt(ir.magi)} MAGI</div>
+      </div>
+      <div class="hero ${ir.netMonthlyAfterMedicare < r.effectiveMonthlyBenefit * 0.9 ? 'hro' : 'hgr'}">
+        <div class="hl">Net SS After Part B</div>
+        <div class="hv">${fmt(ir.netMonthlyAfterMedicare)}/mo</div>
+        <div class="hs">SS check minus premium</div>
+      </div>
+    </div>
+
+    <div class="sh">2025 IRMAA Brackets</div>
+    <div class="btbl-wrap">
+      <table class="btbl">
+        <thead><tr>
+          <th>MAGI (${ir.irmaFiling === 'mfj' ? 'Married Filing Jointly' : 'Single / MFS'})</th>
+          <th class="r">Monthly Premium</th>
+          <th class="r">Annual Cost</th>
+          <th class="r">IRMAA Surcharge</th>
+        </tr></thead>
+        <tbody>
+          ${limits2025.map((lbl,i) => `<tr${i===activeIdx?' class="active-row"':''}>
+            <td>${lbl}${i===activeIdx?' ← your MAGI':''}</td>
+            <td class="r">${fmt(prems[i])}</td>
+            <td class="r muted">${fmt(prems[i]*12)}</td>
+            <td class="r" style="color:${i===0?'var(--em6)':'var(--ro6)'}">${i===0?'None':'+'+fmt(prems[i]-185)+'/mo'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sh">IRMAA Reduction Strategies</div>
+    <div class="ib">
+      <strong>Roth conversions before 65</strong> — converting traditional IRA funds before Medicare eligibility reduces future MAGI permanently.<br><br>
+      <strong>Qualified Charitable Distributions (QCDs)</strong> — if 70½+, donate up to $105,000/yr directly from IRA to charity; counts toward RMD but not MAGI.<br><br>
+      <strong>IRMAA Life-Change Appeal (SSA-44)</strong> — if income dropped due to retirement, marriage/divorce, or other life event, appeal the determination based on a more recent year's income.<br><br>
+      <strong>Tax-loss harvesting</strong> — offset capital gains to keep MAGI below the threshold.<br><br>
+      <strong>Medicare Savings Programs</strong> — available for those with very low income; covers Part B premium entirely.
+    </div>
+
+    ${r.hasWEP && r.wepResult ? `
+    <div class="sh">WEP Net Impact Summary</div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Gross SS Benefit</div><div class="sv">${fmt(r.monthlyBenefit)}/mo</div></div>
+      <div class="stat"><div class="sl">WEP Reduction</div><div class="sv neg">−${fmt(r.wepResult.wepRed)}/mo</div></div>
+      <div class="stat"><div class="sl">After WEP</div><div class="sv">${fmt(r.effectiveMonthlyBenefit)}/mo</div></div>
+      <div class="stat"><div class="sl">Part B Premium</div><div class="sv warn">−${fmt(ir.irmaaMonthly)}/mo</div></div>
+      <div class="stat"><div class="sl">Net Check</div><div class="sv cy">${fmt(ir.netMonthlyAfterMedicare)}/mo</div></div>
+      <div class="stat"><div class="sl">Annual Net</div><div class="sv pos">${fmt(ir.netMonthlyAfterMedicare*12)}/yr</div></div>
+    </div>` : ''}
+  `;
+}
+
+function renderSpousal(r) {
+  const div = document.getElementById('spousal-content');
+  if (!r.hasSpouse || !r.spouseResult) {
+    div.innerHTML = `<div class="bn info">ℹ️ Enable "Include Spouse" in the sidebar to see spousal benefit analysis.</div>
+      <div class="sh">How Spousal Benefits Work</div>
+      <div class="ib">
+        <strong>Spousal benefit maximum:</strong> 50% of the higher-earning spouse's Full Retirement Age (FRA) benefit (PIA).<br><br>
+        <strong>Early reduction:</strong> If the lower-earning spouse claims before their own FRA, their spousal benefit is reduced (but not below their own earned benefit).<br><br>
+        <strong>No delay credits for spousal:</strong> Unlike personal benefits, waiting past FRA earns no additional credits for the spousal benefit — the maximum is always 50% of the primary's PIA.<br><br>
+        <strong>Survivor benefits:</strong> When one spouse dies, the survivor can claim the deceased's full benefit if it's higher. Optimizing the higher earner's benefit (by delaying) maximizes the survivor's future income.
+      </div>`;
+    return;
+  }
+
+  const s = r.spouseResult;
+  div.innerHTML = `
+    <div class="heroes2">
+      <div class="hero hcy"><div class="hl">Spouse Own Benefit</div><div class="hv">${fmt(s.spouseMonthly)}/mo</div><div class="hs">at age ${s.spouseClaimAge}</div></div>
+      <div class="hero hgr"><div class="hl">Combined Monthly</div><div class="hv">${fmt(s.combinedMonthly)}/mo</div><div class="hs">household total</div></div>
+    </div>
+    <div class="sh">Spousal Benefit Analysis</div>
+    <div class="stats">
+      <div class="stat"><div class="sl">Your Benefit</div><div class="sv cy">${fmt(r.monthlyBenefit)}/mo</div></div>
+      <div class="stat"><div class="sl">50% of Your FRA</div><div class="sv">${fmt(r.fraMonthlyV * 0.5)}/mo</div></div>
+      <div class="stat"><div class="sl">Spouse Own Benefit</div><div class="sv">${fmt(s.spouseMonthly)}/mo</div></div>
+      <div class="stat"><div class="sl">Spousal Benefit</div><div class="sv warn">${fmt(s.spousalBenefit)}/mo</div></div>
+      <div class="stat"><div class="sl">Spouse Receives</div><div class="sv pos">${fmt(Math.max(s.spouseMonthly, s.spousalBenefit))}/mo</div></div>
+      <div class="stat"><div class="sl">Household Total</div><div class="sv pos">${fmt(s.combinedMonthly)}/mo</div></div>
+    </div>
+    ${s.spouseMonthly >= s.spousalBenefit
+      ? `<div class="bn ok">✓ Spouse's own earned benefit (${fmt(s.spouseMonthly)}/mo) exceeds spousal benefit (${fmt(s.spousalBenefit)}/mo). Spouse collects their own benefit.</div>`
+      : `<div class="bn warn">⚠️ Spousal benefit (${fmt(s.spousalBenefit)}/mo) exceeds spouse's own benefit (${fmt(s.spouseMonthly)}/mo). Spouse will receive the spousal benefit amount.</div>`}
+    <div class="sh">Survivor Benefit Consideration</div>
+    <div class="ib">
+      <strong>Survivor strategy:</strong> When one spouse dies, the survivor receives whichever benefit is higher — their own or the deceased spouse's. This means the <strong>higher-earning spouse should strongly consider delaying to 70</strong> to maximize the survivor's lifetime income, regardless of their own breakeven.
+      <br><br>Current higher earner at 70: <strong>${fmt(r.benefit70)}/mo</strong> (potential survivor benefit).
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// TABS & PANELS
+// ═══════════════════════════════════════════════════════════
+
+function switchTab(name, e) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tp-' + name).classList.add('active');
+  if (e) e.currentTarget.classList.add('active');
+}
+
+function toggleSpouse() {
+  const show = document.getElementById('hasSpouse').checked;
+  document.getElementById('spouse-section').style.display = show ? 'block' : 'none';
+  calc();
+}
+
+// ═══════════════════════════════════════════════════════════
+// MATH PANEL
+// ═══════════════════════════════════════════════════════════
+
+function toggleMath() {
+  const isOpen = document.getElementById('mp').classList.contains('open');
+  if (isOpen) closeMath(); else openMath();
+}
+function closeMath() {
+  document.getElementById('mp').classList.remove('open');
+  document.getElementById('mp-overlay').classList.remove('open');
+  document.querySelector('.math-btn').textContent = '🔍 Show Math';
+}
+function openMath() {
+  document.getElementById('mp').classList.add('open');
+  document.getElementById('mp-overlay').classList.add('open');
+  document.querySelector('.math-btn').textContent = '🔍 Hide Math';
+  renderMath();
+}
+
+function renderMath() {
+  const r = lastResult;
+  const fra = r.fra;
+  const fraMos = fraMonths(fra);
+  const body = document.getElementById('mp-body');
+  const row = (label, val, cls='') =>
+    `<div class="mf"><span class="ml">${label}</span><span class="mv ${cls}">${val}</span></div>`;
+  const div = () => `<div class="mf-div"></div>`;
+
+  const earlyMonths = Math.max(0, -(r.monthsFromFRA));
+  const lateMonths  = Math.max(0, r.monthsFromFRA);
+  const clampedLate = Math.min(lateMonths, 70*12 - fraMos);
+
+  let adjExplain = '';
+  if (r.monthsFromFRA === 0) {
+    adjExplain = 'Claiming at FRA = 100%';
+  } else if (r.monthsFromFRA < 0) {
+    const first36 = Math.min(earlyMonths, 36);
+    const beyond36 = Math.max(0, earlyMonths - 36);
+    adjExplain = `Early ${earlyMonths} mos: −(${first36}×5/9%)${beyond36>0?' −('+beyond36+'×5/12%)':''}`;
+  } else {
+    adjExplain = `Delayed ${clampedLate} mos: +(${clampedLate}×2/3%)`;
+  }
+
+  body.innerHTML = `
+  <div class="ms2"><div class="ms2-hdr">Full Retirement Age</div>
+    <div class="mfb">
+      ${row('Birth Year', r.birthYear)}
+      ${row('Full Retirement Age', fmtAge(fra.years, fra.months), 'hi')}
+      ${row('FRA in months from 62', fraMos - 62*12 + ' months')}
+    </div>
+  </div>
+  <div class="ms2"><div class="ms2-hdr">Benefit Adjustment</div>
+    <div class="mfb">
+      ${row('FRA Monthly Benefit', fmt(r.fraMonthlyV))}
+      ${row('Claiming Age', r.claimAge)}
+      ${row('Months from FRA', (r.monthsFromFRA >= 0 ? '+' : '') + r.monthsFromFRA)}
+      ${row('Adjustment Formula', adjExplain)}
+      ${row('Adjustment Factor', fmtPctAbs(r.actualFactor), r.actualFactor < 1 ? 'neg' : 'pos')}
+      ${div()}
+      ${row('= Monthly Benefit', fmt(r.monthlyBenefit), 'hi')}
+      ${row('= Annual Benefit', fmt(r.monthlyBenefit * 12))}
+    </div>
+  </div>
+  <div class="ms2"><div class="ms2-hdr">Lifetime Projection</div>
+    <div class="mfb">
+      ${row('Monthly Benefit', fmt(r.monthlyBenefit))}
+      ${row('× 12 months', '×12')}
+      ${row('× Years Collecting', Math.max(0, r.lifeExp - r.claimAge) + ' yrs')}
+      ${row('(Life exp − claim age)', r.lifeExp + ' − ' + r.claimAge)}
+      ${div()}
+      ${row('= Lifetime Total', fmt(r.lifetimeTotal), 'pos')}
+      ${row('Benefit at Age 62', fmt(r.benefit62) + '/mo')}
+      ${row('Benefit at Age 70', fmt(r.benefit70) + '/mo')}
+      ${row('Breakeven vs Age 62', r.breakevenAge ? 'Age ' + r.breakevenAge : 'N/A', r.breakevenAge && r.breakevenAge <= r.lifeExp ? 'pos' : 'neg')}
+    </div>
+  </div>
+  ${r.hasWEP && r.wepResult ? `
+  <div class="ms2"><div class="ms2-hdr">WEP / GPO Calculation</div>
+    <div class="mfb">
+      ${row('Monthly Pension', fmt(r.wepResult.wepPension))}
+      ${row('SS-Covered Earnings Yrs', r.wepResult.wepYears + ' years')}
+      ${row('WEP First-Bend Factor', (r.wepResult.wepFactor*100).toFixed(0) + '%  (normal 90%)')}
+      ${row('Max WEP Reduction', fmt((0.90-r.wepResult.wepFactor)*WEP_BEND) + '/mo')}
+      ${row('WEP Guarantee Cap', fmt(r.wepResult.wepPension/2) + '/mo (50% of pension)')}
+      ${div()}
+      ${row('= WEP Reduction Applied', '−'+fmt(r.wepResult.wepRed)+'/mo', 'neg')}
+      ${row('= After-WEP Benefit', fmt(r.effectiveMonthlyBenefit)+'/mo', 'hi')}
+      ${r.wepResult.gpoSpousalReduction>0 ? row('GPO Spousal Reduction', '−'+fmt(r.wepResult.gpoSpousalReduction)+'/mo (2/3 × pension)','neg') : ''}
+    </div>
+  </div>` : ''}
+  ${r.irmaaResult ? `
+  <div class="ms2"><div class="ms2-hdr">Medicare Part B / IRMAA</div>
+    <div class="mfb">
+      ${row('MAGI', fmt(r.irmaaResult.magi))}
+      ${row('Filing Status', r.irmaaResult.irmaFiling === 'mfj' ? 'Married Filing Jointly' : 'Single / MFS')}
+      ${row('Part B Premium', fmt(r.irmaaResult.irmaaMonthly)+'/mo', r.irmaaResult.irmaaMonthly>185?'neg':'')}
+      ${row('Annual Part B Cost', fmt(r.irmaaResult.irmaaAnnual)+'/yr')}
+      ${div()}
+      ${row('Gross SS Benefit', fmt(r.effectiveMonthlyBenefit)+'/mo')}
+      ${row('− Part B Deduction', '−'+fmt(r.irmaaResult.irmaaMonthly)+'/mo')}
+      ${row('= Net Monthly Check', fmt(r.irmaaResult.netMonthlyAfterMedicare)+'/mo', 'hi')}
+    </div>
+  </div>` : ''}
+`;
+
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// WEP / GPO / IRMAA DATA
+// ═══════════════════════════════════════════════════════════
+
+// WEP first-factor by years of SS-covered substantial earnings (≤20 → 40%)
+function getWEPFactor(yrs) {
+  const y = Math.max(0, Math.min(40, yrs));
+  if (y >= 30) return 0.90;
+  const tbl = {29:0.85,28:0.80,27:0.75,26:0.70,25:0.65,24:0.60,23:0.55,22:0.50,21:0.45};
+  return tbl[y] !== undefined ? tbl[y] : 0.40;
+}
+// WEP bend-point 1 (2024) = $1,174/mo
+const WEP_BEND = 1174;
+
+function calcWEPReduction(pension, yrs) {
+  if (pension <= 0) return 0;
+  const factor = getWEPFactor(yrs);
+  const maxRed = (0.90 - factor) * WEP_BEND;   // max WEP cut
+  return Math.min(maxRed, pension / 2);          // WEP guarantee: never > half pension
+}
+
+// GPO: reduces spousal/survivor benefit by 2/3 of gov't pension
+function calcGPOReduction(pension) { return pension * 2/3; }
+
+// IRMAA 2025 brackets (premium per person per month)
+const IRMAA = {
+  single: [[106000,185.00],[133000,259.00],[167000,370.00],[200000,480.90],[500000,591.90],[Infinity,628.90]],
+  mfj:    [[212000,185.00],[266000,259.00],[334000,370.00],[400000,480.90],[750000,591.90],[Infinity,628.90]],
+};
+function calcIRMAA(magi, filing) {
+  const brackets = IRMAA[filing] || IRMAA.single;
+  for (const [upper, prem] of brackets) { if (magi <= upper) return prem; }
+  return 628.90;
+}
+
+function toggleWEP() {
+  const show = document.getElementById('hasWEP').checked;
+  document.getElementById('wep-section').style.display = show ? 'block' : 'none';
+  calc();
+}
+
+// ═══════════════════════════════════════════════════════════
+// URL STATE PERSISTENCE
+// ═══════════════════════════════════════════════════════════
+
+function saveState(){
+  try{
+    const s={};
+    document.querySelectorAll('input[id],select[id]').forEach(el=>{
+      if(el.type==='checkbox') s[el.id]=el.checked;
+      else s[el.id]=el.value; // captures both number and range inputs
+    });
+    history.replaceState(null,'','#'+btoa(JSON.stringify(s)));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    if(!location.hash||location.hash.length<4) return false;
+    const s=JSON.parse(atob(location.hash.slice(1)));
+    Object.entries(s).forEach(([id,val])=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      if(el.type==='checkbox'){
+        el.checked=val;
+        if(id==='hasSpouse') toggleSpouse();
+      } else { el.value=val; }
+    });
+    return true;
+  }catch(e){return false;}
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', ()=>{ loadState(); calc(); });
+
+// ── Copy link ──
+function copyLink(){
+  const btn=document.getElementById('copyLinkBtn');
+  const url=location.href;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=url;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  if(btn){btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='🔗 Copy Link';btn.classList.remove('copied');},1800);}
+}
+// ── k/M shorthand ──
+document.addEventListener('keydown',function(e){
+  const el=e.target;
+  if(el.tagName!=='INPUT'||el.type!=='number') return;
+  const v=+el.value; if(!el.value||isNaN(v)||v<=0) return;
+  if((e.key==='k'||e.key==='K')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  } else if((e.key==='m'||e.key==='M')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+});
+
+
+// ── Reset to defaults ──
+function resetDefaults(){
+  if(!confirm('Reset all inputs to defaults?')) return;
+  history.replaceState(null,'',location.pathname);
+  location.reload();
+}
+// ── Input validation ──
+function showErr(id, msg){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.add('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  let em=ig.querySelector('.err-msg');
+  if(!em){em=document.createElement('span');em.className='err-msg';ig.appendChild(em);}
+  em.textContent=msg;
+}
+function clearErr(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.remove('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  const em=ig.querySelector('.err-msg'); if(em) em.remove();
+}
+function clearAllErrs(){
+  document.querySelectorAll('.input-err').forEach(el=>el.classList.remove('input-err'));
+  document.querySelectorAll('.err-msg').forEach(em=>em.remove());
+}
+function validateMinMax(){
+  document.querySelectorAll('input[type="number"]').forEach(el=>{
+    if(!el.id) return;
+    const v=+el.value, mn=el.min!==''?+el.min:null, mx=el.max!==''?+el.max:null;
+    if(mn!==null && v<mn){ showErr(el.id,`Min: ${mn}`); }
+    else if(mx!==null && v>mx){ showErr(el.id,`Max: ${mx}`); }
+    else { clearErr(el.id); }
+  });
+}
+
+</script>
+<div style="position:fixed;bottom:8px;right:12px;font-size:.61rem;color:var(--s400);pointer-events:none;z-index:10;font-family:var(--font);">Updated Apr 2026</div>
+</body>
+</html>

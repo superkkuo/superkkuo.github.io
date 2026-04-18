@@ -42,11 +42,11 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
 
 /* LAYOUT */
-.layout{display:grid;grid-template-columns:375px 1fr;min-height:calc(100vh - 82px);}
+.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 78px);}
 @media(max-width:960px){.layout{grid-template-columns:1fr;}}
 
 /* SIDEBAR */
-.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 82px);}
+.sb{background:var(--n900);padding:18px 18px 40px;border-right:1px solid var(--n800);overflow-y:auto;position:sticky;top:0;height:calc(100vh - 78px);}
 .sb::-webkit-scrollbar{width:3px;}
 .sb::-webkit-scrollbar-thumb{background:var(--n700);border-radius:2px;}
 .sbh{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin:14px 0 8px;display:flex;align-items:center;gap:8px;}
@@ -72,7 +72,7 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .iw .pre{left:9px;}
 .iw .suf{right:9px;}
 input[type="number"]{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;}
-input[type="number"]:focus{outline:none;border-color:var(--bl5);box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+input[type="number"]:focus{outline:none;border-color:var(--bl5);box-shadow:0 0 0 3px rgba(59,130,246,.15);}input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}input[type="number"]{-moz-appearance:textfield;}
 .has-pre input[type="number"]{padding-left:19px;}
 .has-suf input[type="number"]{padding-right:21px;}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -139,7 +139,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;hei
 .hpu{background:linear-gradient(135deg,#faf5ff,#ede9fe);border-color:#ddd6fe;}
 .hin{background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-color:#c7d2fe;}
 .hero .hl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--n600);margin-bottom:4px;}
-.hero .hv{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-bottom:3px;}
+.hero .hv{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--mono);margin-bottom:3px;}
 .hbl .hv{color:var(--bl6);}
 .hgr .hv{color:var(--em6);}
 .ham .hv{color:var(--am6);}
@@ -374,6 +374,41 @@ tr:hover td{background:var(--s50);}
   .hig{grid-template-columns:1fr;}
   .stats{grid-template-columns:1fr 1fr;}
 }
+
+/* ── Breadcrumb ── */
+.hdr-bc{font-size:.63rem;font-weight:600;margin-bottom:7px;}
+.hdr-bc a{color:var(--n600);text-decoration:none;letter-spacing:.02em;transition:color .15s;}
+.hdr-bc a:hover{color:var(--s300);}
+/* ── Copy-link button ── */
+.copy-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--s300);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+.copy-btn.copied{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);color:#6ee7b7;}
+/* ── Mobile scroll pill ── */
+.sb-scroll-hint{display:none;padding:12px 0 4px;text-align:center;}
+.sb-scroll-pill{background:linear-gradient(135deg,var(--cy5),var(--cy6));color:var(--n950);font-size:.8rem;font-weight:700;padding:10px 28px;border-radius:var(--rfl);border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 4px 14px rgba(6,182,212,.35);}
+@media(max-width:700px){.sb-scroll-hint{display:block;}}
+/* ── Smooth hero-value transitions ── */
+.hv{transition:all .35s cubic-bezier(.4,0,.2,1);}
+/* ── Print styles ── */
+.print-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.print-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+@media print{
+  .sb,.hdr-actions{display:none!important;}
+  .wrap{grid-template-columns:1fr!important;}
+  .main{padding:20px!important;}
+  body{background:white!important;color:black!important;}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;}
+  .math-panel{display:block!important;position:static!important;transform:none!important;}
+}
+
+
+/* ── Reset button ── */
+.reset-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.reset-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+/* ── Input validation ── */
+.input-err{border-color:var(--ro5) !important;box-shadow:0 0 0 3px rgba(244,63,94,.15) !important;}
+.err-msg{font-size:.66rem;color:#fca5a5;margin-top:3px;padding-left:2px;display:block;}
+
 </style>
 </head>
 <body>
@@ -381,7 +416,8 @@ tr:hover td{background:var(--s50);}
 <div class="hdr">
   <div class="hdr-in">
     <div>
-      <h1>🔥 Retirement &amp; <span>Coast FIRE</span> Calculator</h1>
+      <div class="hdr-bc"><a href="index.html">← All Calculators</a></div>
+        <h1>🔥 Retirement &amp; <span>Coast FIRE</span> Calculator</h1>
       <div class="hdr-tags" style="display:none">
         <span class="htag">Two Partners</span>
         <span class="htag">Post-Retirement Savings</span>
@@ -398,8 +434,15 @@ tr:hover td{background:var(--s50);}
         <option value="mortgage_calculator.html">🏡 Mortgage</option>
         <option value="college_calculator.html">🎓 529 College</option>
         <option value="interest_calculator.html">💰 Interest</option>
+        <option value="tax_calculator.html">💸 Tax</option>
+        <option value="estate_calculator.html">🏛️ Estate Tax</option>
+        <option value="social_security_calculator.html">🔒 Social Security</option>
+        <option value="col_calculator.html">🌆 Cost of Living</option>
       </select>
-      <button class="math-btn" onclick="toggleMath()" title="Show year-by-year math breakdown">🔍 Show Math</button>
+      <button class="reset-btn" onclick="resetDefaults()" title="Reset all inputs to defaults">&#8635; Reset</button>
+        <button class="copy-btn" id="copyLinkBtn" onclick="copyLink()">🔗 Copy Link</button>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+        <button class="math-btn" onclick="toggleMath()" title="Show year-by-year math breakdown">🔍 Show Math</button>
     </div>
   </div>
 </div>
@@ -575,6 +618,49 @@ tr:hover td{background:var(--s50);}
     </div>
   </div>
 
+  <!-- Monte Carlo -->
+  <div class="ts">
+    <div class="ts-hdr" onclick="toggleSec('mcBody','mcToggle')">
+      <span class="ts-title">&#127922; Monte Carlo Risk</span>
+      <label class="tpill" onclick="event.stopPropagation()">
+        <input type="checkbox" id="mcToggle" onchange="toggleSec('mcBody','mcToggle');calc()">
+        <span class="trk"></span>
+      </label>
+    </div>
+    <div class="ts-body" id="mcBody">
+      <div class="ts-inner">
+        <div class="ts-note">Runs thousands of randomized return paths to show a range of outcomes — not just the average case.</div>
+        <div class="ig">
+          <label>Portfolio Allocation</label>
+          <select id="mcAlloc" onchange="updateMCVol();calc()">
+            <option value="0.17">Aggressive 90/10 (&#963;=17%)</option>
+            <option value="0.12" selected>Moderate 60/40 (&#963;=12%)</option>
+            <option value="0.08">Conservative 40/60 (&#963;=8%)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="ig" id="mcVolRow" style="display:none">
+          <label>Annual Volatility (&#963;)</label>
+          <div class="iw has-suf">
+            <input type="number" id="mcVol" value="12" min="1" max="40" step="0.5" oninput="calc()">
+            <span class="suf">%</span>
+          </div>
+        </div>
+        <div class="ig">
+          <label>Simulations</label>
+          <select id="mcTrials" onchange="calc()">
+            <option value="500">500 (fast)</option>
+            <option value="1000" selected>1,000</option>
+            <option value="2500">2,500 (thorough)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="sb-scroll-hint">
+  <button class="sb-scroll-pill" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">See Results ↓</button>
+</div>
 </aside>
 
 <main class="main">
@@ -583,6 +669,7 @@ tr:hover td{background:var(--s50);}
     <button class="tab" onclick="switchTab(this,'fire')">🔥 Traditional FIRE</button>
     <button class="tab" onclick="switchTab(this,'barista')">☕ Barista FIRE</button>
     <button class="tab" onclick="switchTab(this,'swr')">📊 Withdrawal</button>
+    <button class="tab" id="mcTab" onclick="switchTab(this,'montecarlo')">&#127922; Monte Carlo</button>
   </div>
 
   <!-- COAST FIRE -->
@@ -667,6 +754,16 @@ tr:hover td{background:var(--s50);}
     <div class="ib" id="drawdownNote" style="margin-bottom:10px"></div>
     <div class="cw" style="height:220px"><canvas id="drawdownChart"></canvas></div>
   </div>
+
+  <!-- MONTE CARLO -->
+  <div id="tab-montecarlo" class="tab-panel">
+    <div class="ib">
+      <strong>Monte Carlo simulation</strong> models thousands of possible market return sequences to show the range of retirement outcomes, not just the deterministic average case.
+    </div>
+    <div id="mc-content">
+      <div style="text-align:center;padding:40px;color:var(--n600)">Enable <strong>Monte Carlo Risk</strong> in the sidebar to run simulations.</div>
+    </div>
+  </div>
 </main>
 
 <!-- Math Inspector overlay + drawer -->
@@ -728,7 +825,13 @@ function switchTab(btn,name){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
-  calc();
+  if (name === 'montecarlo') {
+    const i = window._lastCalcInputs;
+    const port = window._lastRealAtFull;
+    if (i && port) renderMonteCarlo(i, port);
+  } else {
+    calc();
+  }
 }
 
 // ── Financial math ────────────────────────────────────────────
@@ -956,6 +1059,20 @@ function calc(){
   doSWR(i,realAtFull);
   doSalary(i,fireNum,coastNum);
   renderMathPanel(i,fireNum,coastNum);
+  // Monte Carlo (only if tab is active or toggle is on)
+  window._lastCalcInputs = i;
+  window._lastRealAtFull = realAtFull;
+  const mcToggleEl = document.getElementById('mcToggle');
+  if (mcToggleEl && mcToggleEl.checked) {
+    setTimeout(() => renderMonteCarlo(i, realAtFull), 50);
+  }
+
+  // Cross-field validation
+  clearAllErrs(); validateMinMax();
+  const _rA=+document.getElementById('ageA').value||32, _retA=+document.getElementById('retireA').value||55;
+  const _rB=+document.getElementById('ageB').value||30, _retB=+document.getElementById('retireB').value||60;
+  if(_retA<=_rA) showErr('retireA','Must be older than current age ('+_rA+')');
+  if(_retB<=_rB) showErr('retireB','Must be older than current age ('+_rB+')');
   saveState();
 }
 
@@ -1443,6 +1560,253 @@ function renderMathPanel(i,fireNum,coastNum){
 }
 
 // ── URL state ─────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+// MONTE CARLO
+// ═══════════════════════════════════════════════════════════
+
+// Box-Muller standard normal RNG
+let _bmSpare = null;
+function randNorm() {
+  if (_bmSpare !== null) { const t = _bmSpare; _bmSpare = null; return t; }
+  let u, v, s;
+  do { u = Math.random() * 2 - 1; v = Math.random() * 2 - 1; s = u * u + v * v; }
+  while (s >= 1 || s === 0);
+  const mul = Math.sqrt(-2 * Math.log(s) / s);
+  _bmSpare = v * mul;
+  return u * mul;
+}
+
+function updateMCVol() {
+  const v = document.getElementById('mcAlloc').value;
+  const row = document.getElementById('mcVolRow');
+  if (row) row.style.display = v === 'custom' ? 'block' : 'none';
+}
+
+function getMCVol() {
+  const v = document.getElementById('mcAlloc') ? document.getElementById('mcAlloc').value : '0.12';
+  if (v === 'custom') return (+document.getElementById('mcVol').value || 12) / 100;
+  return +v;
+}
+
+function runMonteCarlo(port0, annSpend, realReturn, realVol, years, trials, ssAnnual, ssStartYr) {
+  // Log-normal parameters (geometric Brownian motion)
+  const mu = Math.log(1 + realReturn) - 0.5 * realVol * realVol;
+  // Store year-by-year portfolio values across all trials
+  const byYear = Array.from({length: years}, () => []);
+  let successCount = new Array(years).fill(0);
+
+  for (let t = 0; t < trials; t++) {
+    let bal = port0;
+    let depleted = false;
+    for (let y = 0; y < years; y++) {
+      if (depleted) { byYear[y].push(0); continue; }
+      const r = Math.exp(mu + realVol * randNorm()) - 1;
+      const ss = y >= ssStartYr ? ssAnnual : 0;
+      bal = bal * (1 + r) - Math.max(0, annSpend - ss);
+      if (bal <= 0) { bal = 0; depleted = true; }
+      else successCount[y]++;
+      byYear[y].push(bal);
+    }
+  }
+
+  // Percentile helper
+  function pct(arr, p) {
+    const s = arr.slice().sort((a, b) => a - b);
+    return s[Math.floor(p * s.length)] || 0;
+  }
+
+  const p10 = [], p25 = [], p50 = [], p75 = [], p90 = [];
+  for (let y = 0; y < years; y++) {
+    p10.push(pct(byYear[y], 0.10));
+    p25.push(pct(byYear[y], 0.25));
+    p50.push(pct(byYear[y], 0.50));
+    p75.push(pct(byYear[y], 0.75));
+    p90.push(pct(byYear[y], 0.90));
+  }
+
+  // Success rates at key horizons
+  const sr = yr => yr < years ? (successCount[yr - 1] / trials * 100) : null;
+
+  return { p10, p25, p50, p75, p90, successCount, trials, sr };
+}
+
+let mcChart = null;
+function renderMonteCarlo(i, realAtFull) {
+  const div = document.getElementById('mc-content');
+  if (!div) return;
+
+  const mcOn = document.getElementById('mcToggle') && document.getElementById('mcToggle').checked;
+  if (!mcOn) {
+    div.innerHTML = '<div style="text-align:center;padding:40px;color:var(--n600)">Enable <strong>Monte Carlo Risk</strong> in the sidebar to run simulations.</div>';
+    return;
+  }
+
+  const trials = +(document.getElementById('mcTrials').value) || 1000;
+  const realVol = getMCVol();
+  const years = 40;
+  const annSpend = i.expenses;
+  const ssAnnual = i.ssOn ? (i.ssAnnA + i.ssAnnB) : 0;
+  const retireAgeA = i.retA;
+  const ssStartYr = i.ssOn ? Math.max(0, i.ssAgeA - retireAgeA) : 9999;
+
+  const mc = runMonteCarlo(realAtFull, annSpend, i.realPost, realVol, years, trials, ssAnnual, ssStartYr);
+
+  const sr20 = mc.sr(20), sr30 = mc.sr(30), sr40 = mc.sr(40);
+
+  function srColor(pct) {
+    if (pct >= 90) return 'pos';
+    if (pct >= 75) return '';
+    if (pct >= 60) return 'warn';
+    return 'neg';
+  }
+
+  // Build fan chart data (years 1-40)
+  const labels = Array.from({length: years}, (_, i) => `Yr ${i + 1} (Age ${retireAgeA + i + 1})`);
+
+  div.innerHTML = `
+    <div class="heroes" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:14px">
+      <div class="hero hgr">
+        <div class="hl">Success at 20 yrs</div>
+        <div class="hv">${sr20 !== null ? sr20.toFixed(0) + '%' : '—'}</div>
+        <div class="hs">% of ${trials.toLocaleString()} paths survive</div>
+      </div>
+      <div class="hero hbl">
+        <div class="hl">Success at 30 yrs</div>
+        <div class="hv">${sr30 !== null ? sr30.toFixed(0) + '%' : '—'}</div>
+        <div class="hs">% of paths survive</div>
+      </div>
+      <div class="hero ham">
+        <div class="hl">Success at 40 yrs</div>
+        <div class="hv">${sr40 !== null ? sr40.toFixed(0) + '%' : '—'}</div>
+        <div class="hs">% of paths survive</div>
+      </div>
+      <div class="hero hcy">
+        <div class="hl">Median at 30 yrs</div>
+        <div class="hv">${fmt(mc.p50[29])}</div>
+        <div class="hs">50th percentile balance</div>
+      </div>
+    </div>
+
+    <div class="stats" style="margin-bottom:14px">
+      <div class="stat"><div class="sl">20-yr Success</div><div class="sv ${srColor(sr20)}">${sr20 !== null ? sr20.toFixed(1) + '%' : '—'}</div></div>
+      <div class="stat"><div class="sl">30-yr Success</div><div class="sv ${srColor(sr30)}">${sr30 !== null ? sr30.toFixed(1) + '%' : '—'}</div></div>
+      <div class="stat"><div class="sl">40-yr Success</div><div class="sv ${srColor(sr40)}">${sr40 !== null ? sr40.toFixed(1) + '%' : '—'}</div></div>
+      <div class="stat"><div class="sl">Simulations</div><div class="sv">${trials.toLocaleString()}</div></div>
+      <div class="stat"><div class="sl">Volatility (&#963;)</div><div class="sv">${(realVol * 100).toFixed(0)}%</div></div>
+      <div class="stat"><div class="sl">10th pct at 30yr</div><div class="sv ${mc.p10[29] > 0 ? 'pos' : 'neg'}">${fmt(mc.p10[29])}</div></div>
+    </div>
+
+    ${sr30 !== null && sr30 < 85 ? `<div class="bn warn">&#9888;&#65039; <strong>Sequence-of-returns risk:</strong> Only ${sr30.toFixed(0)}% of simulated paths survive 30 years. Early bad returns — especially in the first 5-10 years of retirement — can permanently impair the portfolio. Consider: (1) keeping 2-3 years of expenses in cash/bonds as a buffer, (2) flexible withdrawal rules (reduce spending by 10-15% in down years), (3) delaying Social Security to reduce portfolio dependence.</div>` :
+    `<div class="bn ok">&#10003; <strong>Strong survival probability.</strong> ${sr30 !== null ? sr30.toFixed(0) : '—'}% of simulated 30-year paths remain solvent at a ${(annSpend / realAtFull * 100).toFixed(1)}% effective withdrawal rate. Sequence-of-returns risk is manageable with your current inputs.</div>`}
+
+    <div class="sh">Portfolio Fan Chart (${trials.toLocaleString()} Simulations)</div>
+    <div class="cw" style="height:280px"><canvas id="mcFanChart"></canvas></div>
+    <div style="font-size:.68rem;color:var(--n600);margin-bottom:14px;text-align:center">
+      Dark band = 25th–75th percentile &nbsp;|&nbsp; Light band = 10th–90th percentile &nbsp;|&nbsp; Line = median
+    </div>
+
+    <div class="sh">Success Rate Over Time</div>
+    <div class="cw" style="height:180px"><canvas id="mcSuccessChart"></canvas></div>
+
+    <div class="sh">Key Percentile Balances at Year 30</div>
+    <div class="btbl-wrap">
+      <table class="btbl">
+        <thead><tr>
+          <th>Percentile</th><th class="r">Balance at Yr 20</th><th class="r">Balance at Yr 30</th><th class="r">Balance at Yr 40</th><th class="r">Interpretation</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>90th (best 10%)</td><td class="r">${fmt(mc.p90[19])}</td><td class="r">${fmt(mc.p90[29])}</td><td class="r">${fmt(mc.p90[39])}</td><td class="muted">Exceptional markets</td></tr>
+          <tr><td>75th</td><td class="r">${fmt(mc.p75[19])}</td><td class="r">${fmt(mc.p75[29])}</td><td class="r">${fmt(mc.p75[39])}</td><td class="muted">Good sequence</td></tr>
+          <tr class="active-row"><td>50th (median)</td><td class="r">${fmt(mc.p50[19])}</td><td class="r">${fmt(mc.p50[29])}</td><td class="r">${fmt(mc.p50[39])}</td><td class="muted">Average case</td></tr>
+          <tr><td>25th</td><td class="r">${fmt(mc.p25[19])}</td><td class="r">${fmt(mc.p25[29])}</td><td class="r">${fmt(mc.p25[39])}</td><td class="muted">Below-average</td></tr>
+          <tr><td>10th (worst 10%)</td><td class="r" style="color:var(--ro6)">${fmt(mc.p10[19])}</td><td class="r" style="color:var(--ro6)">${fmt(mc.p10[29])}</td><td class="r" style="color:var(--ro6)">${fmt(mc.p10[39])}</td><td class="muted">Poor sequence</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sh">Understanding Sequence-of-Returns Risk</div>
+    <div class="ib">
+      <strong>Why averages mislead:</strong> Two retirees with identical average returns can have completely different outcomes if the timing of good and bad years differs. The retiree who hits a bear market in years 1-5 is forced to sell more shares at low prices to cover expenses — permanently impairing recovery.<br><br>
+      <strong>Mitigation strategies:</strong> Bucket strategy (1-2 yrs cash, 3-7 yrs bonds, 8+ yrs equities) | Dynamic spending (reduce withdrawals 10-15% in down years) | Delay Social Security (reduces portfolio dependence in early years) | Part-time income in early retirement | Higher cash allocation in first 5 years.
+    </div>
+  `;
+
+  // Fan chart
+  if (mcChart) { mcChart.destroy(); mcChart = null; }
+  const ctxFan = document.getElementById('mcFanChart').getContext('2d');
+  mcChart = new Chart(ctxFan, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        // p90 (top of light band) - fill to p10
+        { label: '90th pct', data: mc.p90, borderColor: 'transparent', backgroundColor: 'rgba(59,130,246,0.10)', fill: '+3', pointRadius: 0, tension: 0.3 },
+        // p75 (top of dark band) - fill to p25
+        { label: '75th pct', data: mc.p75, borderColor: 'transparent', backgroundColor: 'rgba(59,130,246,0.18)', fill: '+1', pointRadius: 0, tension: 0.3 },
+        // p25
+        { label: '25th pct', data: mc.p25, borderColor: 'transparent', backgroundColor: 'rgba(59,130,246,0.18)', fill: false, pointRadius: 0, tension: 0.3 },
+        // p10
+        { label: '10th pct', data: mc.p10, borderColor: 'transparent', backgroundColor: 'rgba(59,130,246,0.10)', fill: false, pointRadius: 0, tension: 0.3 },
+        // Median
+        { label: 'Median (50th)', data: mc.p50, borderColor: '#2563eb', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 0, tension: 0.3, fill: false },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const labels = ['90th', '75th', '25th', '10th', 'Median'];
+              return ` ${labels[ctx.datasetIndex] || ctx.dataset.label}: ${fmt(ctx.raw)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 10, font: { size: 9 } } },
+        y: { min: 0, ticks: { callback: v => fmt(v), font: { size: 9.5 }, maxTicksLimit: 6 }, grid: { color: '#f1f5f9' } }
+      }
+    }
+  });
+
+  // Success rate chart
+  if (CH['mcSuccessChart']) { CH['mcSuccessChart'].destroy(); delete CH['mcSuccessChart']; }
+  const ctxS = document.getElementById('mcSuccessChart').getContext('2d');
+  const srData = mc.successCount.map(c => c / trials * 100);
+  CH['mcSuccessChart'] = new Chart(ctxS, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Success Rate',
+        data: srData,
+        borderColor: '#10b981',
+        backgroundColor: ctx => {
+          const v = srData[ctx.dataIndex] || 100;
+          return v >= 90 ? 'rgba(16,185,129,0.15)' : v >= 75 ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)';
+        },
+        fill: true,
+        tension: 0.3, pointRadius: 0, borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` Success rate: ${ctx.raw.toFixed(1)}%` } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 10, font: { size: 9 } } },
+        y: { min: 0, max: 100, ticks: { callback: v => v + '%', font: { size: 9.5 } }, grid: { color: '#f1f5f9' } }
+      }
+    }
+  });
+}
+
 function saveState(){
   try{
     const s={};
@@ -1569,6 +1933,67 @@ document.addEventListener('mousemove', e => {
   if (!tt.classList.contains('show')) return;
   ttPos(e.clientX, e.clientY);
 });
+
+// ── Copy link ──
+function copyLink(){
+  const btn=document.getElementById('copyLinkBtn');
+  const url=location.href;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=url;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  if(btn){btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='🔗 Copy Link';btn.classList.remove('copied');},1800);}
+}
+// ── k/M shorthand ──
+document.addEventListener('keydown',function(e){
+  const el=e.target;
+  if(el.tagName!=='INPUT'||el.type!=='number') return;
+  const v=+el.value; if(!el.value||isNaN(v)||v<=0) return;
+  if((e.key==='k'||e.key==='K')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  } else if((e.key==='m'||e.key==='M')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+});
+
+
+// ── Reset to defaults ──
+function resetDefaults(){
+  if(!confirm('Reset all inputs to defaults?')) return;
+  history.replaceState(null,'',location.pathname);
+  location.reload();
+}
+// ── Input validation ──
+function showErr(id, msg){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.add('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  let em=ig.querySelector('.err-msg');
+  if(!em){em=document.createElement('span');em.className='err-msg';ig.appendChild(em);}
+  em.textContent=msg;
+}
+function clearErr(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.remove('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  const em=ig.querySelector('.err-msg'); if(em) em.remove();
+}
+function clearAllErrs(){
+  document.querySelectorAll('.input-err').forEach(el=>el.classList.remove('input-err'));
+  document.querySelectorAll('.err-msg').forEach(em=>em.remove());
+}
+function validateMinMax(){
+  document.querySelectorAll('input[type="number"]').forEach(el=>{
+    if(!el.id) return;
+    const v=+el.value, mn=el.min!==''?+el.min:null, mx=el.max!==''?+el.max:null;
+    if(mn!==null && v<mn){ showErr(el.id,`Min: ${mn}`); }
+    else if(mx!==null && v>mx){ showErr(el.id,`Max: ${mx}`); }
+    else { clearErr(el.id); }
+  });
+}
+
 </script>
+<div style="position:fixed;bottom:8px;right:12px;font-size:.61rem;color:var(--s400);pointer-events:none;z-index:10;font-family:var(--font);">Updated Apr 2026</div>
 </body>
 </html>

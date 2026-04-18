@@ -42,7 +42,7 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .hdr-actions{display:flex;gap:8px;align-items:center;margin-top:3px;flex-shrink:0;flex-wrap:wrap;}
 
 /* LAYOUT */
-.layout{display:grid;grid-template-columns:370px 1fr;min-height:calc(100vh - 78px);}
+.layout{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 78px);}
 @media(max-width:960px){.layout{grid-template-columns:1fr;}}
 
 /* SIDEBAR */
@@ -74,7 +74,7 @@ body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height
 .iw .pre{left:9px;}
 .iw .suf{right:9px;}
 input[type="number"]{width:100%;background:var(--n800);border:1px solid var(--n700);border-radius:var(--rsm);color:var(--white);font-size:.83rem;font-weight:500;padding:7px 10px;font-family:var(--font);transition:border-color .15s,box-shadow .15s;}
-input[type="number"]:focus{outline:none;border-color:var(--em5);box-shadow:0 0 0 3px rgba(16,185,129,.15);}
+input[type="number"]:focus{outline:none;border-color:var(--em5);box-shadow:0 0 0 3px rgba(16,185,129,.15);}input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}input[type="number"]{-moz-appearance:textfield;}
 .has-pre input[type="number"]{padding-left:19px;}
 .has-suf input[type="number"]{padding-right:21px;}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -364,6 +364,41 @@ tr.ms-row td:first-child{font-weight:700;}
   .stats{grid-template-columns:1fr 1fr;}
 }
 
+
+/* ── Breadcrumb ── */
+.hdr-bc{font-size:.63rem;font-weight:600;margin-bottom:7px;}
+.hdr-bc a{color:var(--n600);text-decoration:none;letter-spacing:.02em;transition:color .15s;}
+.hdr-bc a:hover{color:var(--s300);}
+/* ── Copy-link button ── */
+.copy-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--s300);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+.copy-btn.copied{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);color:#6ee7b7;}
+/* ── Mobile scroll pill ── */
+.sb-scroll-hint{display:none;padding:12px 0 4px;text-align:center;}
+.sb-scroll-pill{background:linear-gradient(135deg,var(--cy5),var(--cy6));color:var(--n950);font-size:.8rem;font-weight:700;padding:10px 28px;border-radius:var(--rfl);border:none;cursor:pointer;letter-spacing:.02em;box-shadow:0 4px 14px rgba(6,182,212,.35);}
+@media(max-width:700px){.sb-scroll-hint{display:block;}}
+/* ── Smooth hero-value transitions ── */
+.hv{transition:all .35s cubic-bezier(.4,0,.2,1);}
+/* ── Print styles ── */
+.print-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.print-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+@media print{
+  .sb,.hdr-actions{display:none!important;}
+  .wrap{grid-template-columns:1fr!important;}
+  .main{padding:20px!important;}
+  body{background:white!important;color:black!important;}
+  .card{box-shadow:none!important;border:1px solid #ddd!important;}
+  .math-panel{display:block!important;position:static!important;transform:none!important;}
+}
+
+
+/* ── Reset button ── */
+.reset-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:var(--n600);font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:var(--rfl);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.reset-btn:hover{background:rgba(255,255,255,.14);color:var(--white);}
+/* ── Input validation ── */
+.input-err{border-color:var(--ro5) !important;box-shadow:0 0 0 3px rgba(244,63,94,.15) !important;}
+.err-msg{font-size:.66rem;color:#fca5a5;margin-top:3px;padding-left:2px;display:block;}
+
 </style>
 </head>
 <body>
@@ -371,7 +406,8 @@ tr.ms-row td:first-child{font-weight:700;}
 <div class="hdr">
   <div class="hdr-in">
     <div>
-      <h1>🏡 Mortgage &amp; <span>Home Affordability</span> Calculator</h1>
+      <div class="hdr-bc"><a href="index.html">← All Calculators</a></div>
+        <h1>🏡 Mortgage &amp; <span>Home Affordability</span> Calculator</h1>
       <div class="hdr-tags" style="display:none">
         <span class="htag">Two Partners</span>
         <span class="htag">Affordability Analysis</span>
@@ -383,11 +419,18 @@ tr.ms-row td:first-child{font-weight:700;}
     <div class="hdr-actions">
       <select class="nav-select" onchange="if(this.value)window.location=this.value">
         <option value="mortgage_calculator.html" selected>🏡 Mortgage</option>
-        <option value="index.html">🔥 Retirement</option>
+        <option value="retirement_calculator.html">🔥 Retirement</option>
         <option value="college_calculator.html">🎓 529 College</option>
         <option value="interest_calculator.html">💰 Interest</option>
+        <option value="tax_calculator.html">💸 Tax</option>
+        <option value="estate_calculator.html">🏛️ Estate Tax</option>
+        <option value="social_security_calculator.html">🔒 Social Security</option>
+        <option value="col_calculator.html">🌆 Cost of Living</option>
       </select>
-      <button class="math-btn" onclick="toggleMath()" title="Show step-by-step mortgage math">🔍 Show Math</button>
+      <button class="reset-btn" onclick="resetDefaults()" title="Reset all inputs to defaults">&#8635; Reset</button>
+        <button class="copy-btn" id="copyLinkBtn" onclick="copyLink()">🔗 Copy Link</button>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+        <button class="math-btn" onclick="toggleMath()" title="Show step-by-step mortgage math">🔍 Show Math</button>
     </div>
   </div>
 </div>
@@ -467,10 +510,19 @@ tr.ms-row td:first-child{font-weight:700;}
   <div class="r2">
     <div class="ig"><label>Rent Increase / yr</label>
       <div class="iw has-suf"><input type="number" id="rentInc" value="3" min="0" max="10" step="0.5" oninput="calc()"><span class="suf">%</span></div></div>
+    <div class="ig"><label>Home Appreciation / yr</label>
+      <div class="iw has-suf"><input type="number" id="homeApp" value="4" min="0" max="12" step="0.5" oninput="calc()"><span class="suf">%</span></div></div>
+  </div>
+  <div class="r2">
     <div class="ig"><label>Investment Return</label>
       <div class="iw has-suf"><input type="number" id="invReturn" value="7" min="1" max="15" step="0.5" oninput="calc()"><span class="suf">%</span></div></div>
+    <div class="ig"><label>Annual Maintenance</label>
+      <div class="iw has-suf"><input type="number" id="maintPct" value="1" min="0" max="3" step="0.1" oninput="calc()"><span class="suf">% of value</span></div></div>
   </div>
 
+<div class="sb-scroll-hint">
+  <button class="sb-scroll-pill" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">See Results ↓</button>
+</div>
 </aside>
 
 <main class="main">
@@ -502,6 +554,7 @@ tr.ms-row td:first-child{font-weight:700;}
     <div class="sh">Monthly Payment Components</div>
     <div class="pay-breakdown" id="payBreakdown"></div>
     <div class="stats" id="payStats"></div>
+    <div id="pmiSection"></div>
     <div class="sh">Principal vs. Interest Over Time</div>
     <div class="cw"><canvas id="payChart"></canvas></div>
   </div>
@@ -543,13 +596,17 @@ tr.ms-row td:first-child{font-weight:700;}
 
   <!-- RENT VS BUY -->
   <div id="tab-rvb" class="tab-panel">
-    <div class="ib"><strong>Rent vs. Buy</strong>: Compares the true cumulative cost of owning (mortgage, tax, insurance, maintenance, minus equity built) against renting (rent payments + the opportunity cost of the down payment invested).</div>
+    <div class="ib"><strong>Net wealth comparison</strong>: Buyer accumulates home equity; renter invests the down payment + any monthly savings from lower rent. This shows which path leaves you wealthier after N years under your assumptions.</div>
     <div id="rvbBanner" class="bn info"></div>
     <div class="heroes3" id="rvbHeroes"></div>
-    <div class="sh">Cumulative Net Cost Over Time</div>
+    <div class="sh">Net Wealth: Buying vs. Renting Over Time</div>
     <div class="cw" style="height:240px"><canvas id="rvbChart"></canvas></div>
-    <div class="sh">Year-by-Year Comparison</div>
-    <div class="stats" id="rvbStats"></div>
+    <div class="sh">Annual Cash Flow Breakdown</div>
+    <div style="overflow-x:auto;margin-bottom:13px"><table><thead><tr>
+      <th>Year</th><th class="r">Buy Monthly</th><th class="r">Rent Monthly</th>
+      <th class="r">Home Value</th><th class="r">Home Equity</th>
+      <th class="r">Renter Portfolio</th><th class="r">Buy Net Wealth</th><th class="r">Rent Net Wealth</th><th class="r">Winner</th>
+    </tr></thead><tbody id="rvbTable"></tbody></table></div>
   </div>
 </main>
 </div>
@@ -650,6 +707,58 @@ function maxHome(maxPITI, annRate, termYrs, taxRateAnn, insRateAnn, downAmt){
   return Math.max(0,H);
 }
 
+// ── PMI removal helper ─────────────────────────────────────────
+// Returns month PMI drops (balance reaches 80% LTV), total PMI paid, and
+// the extra monthly principal needed to drop PMI N months earlier.
+function calcPMIInfo(loan, homePrice, annRate, termYrs, pmiRate) {
+  if (!loan || !homePrice || loan / homePrice <= 0.80) return null;
+  const r = annRate / 12;
+  const pmt = moPmt(loan, annRate, termYrs);
+  const monthlyPMI = loan * pmiRate / 12;
+
+  // Standard payoff — find month where balance ≤ 80% of home price
+  function dropMonth(extraMo) {
+    let bal = loan;
+    for (let m = 1; m <= termYrs * 12; m++) {
+      if (bal <= 0) return m;
+      const interest = bal * r;
+      const principal = Math.min(pmt - interest + extraMo, bal);
+      bal = Math.max(0, bal - principal);
+      if (bal / homePrice <= 0.80) return m;
+    }
+    return termYrs * 12;
+  }
+
+  const normalDrop = dropMonth(0);
+  const totalPMI = monthlyPMI * normalDrop;
+
+  // Binary-search: extra principal to drop PMI exactly 2 yrs sooner
+  let lo = 0, hi = loan / 12;
+  for (let iter = 0; iter < 50; iter++) {
+    const mid = (lo + hi) / 2;
+    if (dropMonth(mid) < normalDrop - 23) hi = mid; else lo = mid;
+  }
+  const extra2yr = Math.ceil((lo + hi) / 2);
+
+  // Binary-search: extra principal to drop PMI exactly 5 yrs sooner
+  lo = 0; hi = loan / 12;
+  for (let iter = 0; iter < 50; iter++) {
+    const mid = (lo + hi) / 2;
+    if (dropMonth(mid) < normalDrop - 59) hi = mid; else lo = mid;
+  }
+  const extra5yr = Math.ceil((lo + hi) / 2);
+
+  return {
+    dropMonth: normalDrop,
+    dropYear:  Math.ceil(normalDrop / 12),
+    dropYearFrac: (normalDrop / 12).toFixed(1),
+    totalPMI,
+    monthlyPMI,
+    extra2yr: normalDrop > 24 ? extra2yr : null,
+    extra5yr: normalDrop > 60 ? extra5yr : null,
+  };
+}
+
 // Full amortization (annual summary), optional extra monthly principal payment
 function amortize(loan, annRate, termYrs, extraMo=0){
   const r=annRate/12, n=termYrs*12;
@@ -693,6 +802,7 @@ function getInputs(){
   const loan=Math.max(0,homePrice-downDollars);
   const ltv=homePrice>0?loan/homePrice:0;
   const pmi=pmiOverrideMo>0 ? pmiOverrideMo : (ltv>0.8?loan*pmiR/12:0);
+  const pmiInfo = pmiOverrideMo===0 ? calcPMIInfo(loan, homePrice, annRate, termYrs, pmiR) : null;
   const taxMo=homePrice*taxR/12;
   const insMo=homePrice*insR/12;
   const pi=moPmt(loan,annRate,termYrs);
@@ -730,7 +840,7 @@ function getInputs(){
   } else {
     document.getElementById('extraPmtBox').style.display='none';
   }
-  return {salA,salB,combined,grossMo,debts,downP,downDollars,annRate,termYrs,taxR,insR,hoaMo,pmiR,pmiOverrideMo,homePrice,loan,ltv,pmi,taxMo,insMo,pi,piti,extraPmt,rent,rentIncR,invReturn};
+  return {salA,salB,combined,grossMo,debts,downP,downDollars,annRate,termYrs,taxR,insR,hoaMo,pmiR,pmiOverrideMo,homePrice,loan,ltv,pmi,pmiInfo,taxMo,insMo,pi,piti,extraPmt,rent,rentIncR,invReturn};
 }
 
 // ── MAIN CALC ─────────────────────────────────────────────────
@@ -741,6 +851,9 @@ function calc(){
   doAmort(i);
   doRvB(i);
   doMath(i);
+
+  // Cross-field validation
+  clearAllErrs(); validateMinMax();
   saveState();
 }
 
@@ -865,6 +978,38 @@ function doPayment(i){
     <div class="stat" data-tip="Total of all principal and interest payments made over the life of the loan."><div class="sl">Total Payments</div><div class="sv">${fmt(totalPaid)}</div></div>
     <div class="stat" data-tip="Effective interest cost as a percentage of the original loan amount. Higher for shorter loans."><div class="sl">Interest / Loan</div><div class="sv neg">${i.loan>0?pct(totalInterest/i.loan):'—'}</div></div>
     <div class="stat" data-tip="Your annual income needed to keep PITI at or below 28% of gross income."><div class="sl">Income for 28% DTI</div><div class="sv">${fmt(i.piti/0.28*12)}/yr</div></div>`;
+
+  // ── PMI Removal Section ───────────────────────────────────
+  const pi = i.pmiInfo;
+  if (pi) {
+    const moNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const dropDate = (() => {
+      const now = new Date(); const m = now.getMonth(); const y = now.getFullYear();
+      const absMonth = m + pi.dropMonth; return moNames[absMonth % 12] + ' ' + (y + Math.floor(absMonth/12));
+    })();
+    const pitiAfter = fmtM(i.piti - pi.monthlyPMI);
+    document.getElementById('pmiSection').innerHTML = `
+      <div class="sh" style="margin-top:14px;">PMI Removal Analysis</div>
+      <div class="stats" style="margin-bottom:10px;">
+        <div class="stat" data-tip="Estimated month when your loan balance reaches 80% of the home price and PMI is automatically removed.">
+          <div class="sl">PMI Drops Off</div><div class="sv pos">Yr ${pi.dropYear} (${dropDate})</div></div>
+        <div class="stat" data-tip="Total PMI premiums paid before reaching 80% LTV.">
+          <div class="sl">Total PMI Paid</div><div class="sv warn">${fmt(pi.totalPMI)}</div></div>
+        <div class="stat" data-tip="Your new lower monthly payment after PMI is removed.">
+          <div class="sl">Payment After PMI</div><div class="sv pos">${pitiAfter}</div></div>
+        <div class="stat" data-tip="Monthly savings once PMI is removed.">
+          <div class="sl">Monthly Savings</div><div class="sv pos">+${fmtM(pi.monthlyPMI)}/mo</div></div>
+      </div>
+      ${pi.extra2yr || pi.extra5yr ? `
+      <div class="ib" style="margin-bottom:0;">
+        <strong>Eliminate PMI early with extra principal payments:</strong>
+        ${pi.extra2yr ? `<br>• Add <strong>${fmtM(pi.extra2yr)}/mo</strong> extra principal → drop PMI ~2 years sooner (save ${fmt(pi.monthlyPMI * 24)} in PMI)` : ''}
+        ${pi.extra5yr ? `<br>• Add <strong>${fmtM(pi.extra5yr)}/mo</strong> extra principal → drop PMI ~5 years sooner (save ${fmt(pi.monthlyPMI * 60)} in PMI)` : ''}
+      </div>` : ''}`;
+  } else {
+    document.getElementById('pmiSection').innerHTML = '';
+  }
+
   // P&I chart — cumulative principal vs interest paid
   const amRows=amortize(i.loan,i.annRate,i.termYrs);
   const lbls=amRows.map(r=>`Yr ${r.yr}`);
@@ -944,73 +1089,137 @@ function doAmort(i){
 
 // ── RENT vs BUY ───────────────────────────────────────────────
 function doRvB(i){
-  const yrs=Math.min(i.termYrs,30);
-  const maintR=i.taxR*0.5; // rough maintenance estimate
-  let buyNetArr=[], rentNetArr=[];
-  let buyNet=0, rentNet=0;
-  let rentMo=i.rent;
-  let invPortfolio=i.downDollars; // down payment invested instead
-  let homeEquity=i.downDollars;
-  let homePriceNow=i.homePrice;
-  const homePriceGrowth=0.04; // assume 4%/yr home appreciation
-  let breakEven=-1;
-  for(let yr=1;yr<=yrs;yr++){
-    // Buying: annual cost = 12*PITI + maintenance - home appreciation gain - principal paydown
-    const annMort=i.pi*12;
-    const annTaxIns=(i.taxMo+i.insMo)*12;
-    const annHOA=i.hoaMo*12;
-    const annPMI=i.pmi*12;
-    const annMaint=homePriceNow*maintR;
-    // Gain: home appreciation + principal paydown
-    const rows=amortize(i.loan,i.annRate,i.termYrs);
-    const yr1=rows[yr-1]||rows[rows.length-1];
-    homeEquity=i.downDollars+yr1.equity+i.homePrice*(Math.pow(1+homePriceGrowth,yr)-1);
-    const trueBuyCost=yr1.cumInt+annTaxIns*yr+annHOA*yr+annPMI*Math.min(yr,10)+annMaint*yr;
-    buyNet=trueBuyCost-homeEquity+i.homePrice; // net cost = paid out - equity gained
-    // Renting: cumulative rent + opportunity cost of down payment NOT invested
-    let cumRent=0, rentMoNow=i.rent;
-    for(let y=0;y<yr;y++){ cumRent+=rentMoNow*12; rentMoNow*=(1+i.rentIncR); }
-    invPortfolio=i.downDollars*Math.pow(1+i.invReturn,yr);
-    rentNet=cumRent; // gross renting cost (invested gains offset but renter doesn't own asset)
-    buyNetArr.push(+buyNet.toFixed(0));
-    rentNetArr.push(+rentNet.toFixed(0));
-    if(breakEven===-1 && buyNet<rentNet) breakEven=yr;
+  if(!i.rent){ // no rent entered
+    const bn=document.getElementById('rvbBanner');
+    bn.className='bn warn'; bn.innerHTML='Enter your current monthly rent in the sidebar to run the comparison.';
+    document.getElementById('rvbHeroes').innerHTML='';
+    document.getElementById('rvbTable').innerHTML='';
+    return;
   }
-  const beText=breakEven>0?`Year ${breakEven}`:'> '+yrs+' yrs';
+  const yrs=30;
+  const homeAppR  = (+document.getElementById('homeApp').value||4)/100;
+  const maintPctR = (+document.getElementById('maintPct').value||1)/100;
+  const appMo  = Math.pow(1+homeAppR,1/12)-1;
+  const invMo  = Math.pow(1+i.invReturn,1/12)-1;
+  const rentIncMo = Math.pow(1+i.rentIncR,1/12)-1;
+  const rMo = i.annRate/12;
+
+  // Track month-by-month
+  let homeVal=i.homePrice, mortBal=i.loan;
+  let renterPort=i.downDollars; // renter invests down payment
+  let rent=i.rent;
+  let cumBuyerNonEquity=0; // interest + tax + ins + HOA + PMI + maintenance (true cash burned)
+  let cumRent=0;
+
+  const yearData=[];
+
+  for(let m=1;m<=yrs*12;m++){
+    homeVal *= (1+appMo);
+    const interest=mortBal*rMo;
+    const principal=Math.min(i.pi-interest, mortBal);
+    mortBal=Math.max(0,mortBal-principal);
+
+    const pmiMo = (mortBal/homeVal>0.80 && i.pmi>0) ? i.pmi : 0;
+    const maintMo = i.homePrice*maintPctR/12;
+    const buyerTotalMo = i.pi + i.taxMo + i.insMo + i.hoaMo + pmiMo + maintMo;
+    const buyerBurnMo  = interest + i.taxMo + i.insMo + i.hoaMo + pmiMo + maintMo; // non-equity cash out
+    cumBuyerNonEquity += buyerBurnMo;
+
+    // Renter: invest down payment + monthly savings if buying is pricier
+    renterPort *= (1+invMo);
+    const monthlySaving = buyerTotalMo - rent; // >0 means renting is cheaper this month
+    if(monthlySaving>0) renterPort += monthlySaving; // renter invests the savings
+
+    cumRent += rent;
+    rent *= (1+rentIncMo);
+
+    if(m%12===0){
+      const yr=m/12;
+      const equity=homeVal-Math.max(0,mortBal);
+      // Buyer net wealth = equity (asset value minus debt) - non-equity cash burned
+      const buyerNW = equity - cumBuyerNonEquity;
+      // Renter net wealth = portfolio - cumulative rent paid
+      const renterNW = renterPort - cumRent;
+      const buyMo = i.pi+i.taxMo+i.insMo+i.hoaMo+(mortBal/homeVal>0.80?i.pmi:0)+maintMo;
+      yearData.push({yr, homeVal:Math.round(homeVal), mortBal:Math.round(mortBal),
+        equity:Math.round(equity), renterPort:Math.round(renterPort),
+        buyerNW:Math.round(buyerNW), renterNW:Math.round(renterNW),
+        buyMo:Math.round(buyMo), rentMo:Math.round(rent/(1+rentIncMo))});
+    }
+  }
+
+  // Break-even: first year where buyer net wealth > renter net wealth
+  const beYr = yearData.findIndex(d=>d.buyerNW>d.renterNW);
+  const beText = beYr>=0 ? `Year ${yearData[beYr].yr}` : `> ${yrs} yrs`;
+  const last=yearData[yrs-1]||yearData[yearData.length-1];
+  const buyWins = last.buyerNW>last.renterNW;
+
   const bn=document.getElementById('rvbBanner');
-  if(i.rent===0){bn.className='bn warn';bn.innerHTML='Enter your current monthly rent to compare buying vs. renting costs.';}
-  else if(breakEven>0){bn.className='bn ok';bn.innerHTML=`🏡 Buying becomes cheaper than renting at the <strong>${beText}</strong> mark, assuming 4% annual home appreciation and ${(i.invReturn*100).toFixed(1)}% investment returns on the down payment.`;}
-  else{bn.className='bn info';bn.innerHTML=`⚖️ Over a ${yrs}-year horizon, renting remains cheaper at these assumptions. Consider longer holding periods or a lower home price.`;}
+  if(beYr>=0){
+    bn.className='bn ok';
+    bn.innerHTML=`🏡 Buying builds more net wealth starting at <strong>${beText}</strong> under these assumptions (${(homeAppR*100).toFixed(1)}% home appreciation, ${(i.invReturn*100).toFixed(1)}% investment return). After that, every additional year the buyer pulls further ahead.`;
+  } else {
+    bn.className='bn info';
+    bn.innerHTML=`📈 Renting + investing remains ahead over the full ${yrs}-year window at these assumptions. The renter's portfolio (investing the down payment + monthly savings) outpaces home equity accumulation. Try higher appreciation or lower investment returns to flip the outcome.`;
+  }
+
   document.getElementById('rvbHeroes').innerHTML=`
-    <div class="hero hgr" data-tip="The year at which cumulative ownership costs (interest, tax, insurance, maintenance, minus equity) become less than cumulative rent paid. Holding the home longer than this break-even makes buying more advantageous.">
-      <div class="hl">Buy Break-Even</div><div class="hv">${beText}</div><div class="hs">When buying beats renting</div></div>
-    <div class="hero hbl" data-tip="Your down payment invested in the market at your expected return rate, compounded over 30 years. This is the opportunity cost of tying up capital in a home.">
-      <div class="hl">Down Pmt Invested (30yr)</div><div class="hv">${fmt(i.downDollars*Math.pow(1+i.invReturn,30))}</div><div class="hs">${(i.invReturn*100).toFixed(1)}%/yr return</div></div>
-    <div class="hero ham" data-tip="Estimated home equity after 30 years, assuming 4% annual home price appreciation. Includes your down payment, principal paydown, and appreciation.">
-      <div class="hl">Home Equity (30yr)</div><div class="hv">${fmt(i.downDollars+(amortize(i.loan,i.annRate,i.termYrs).slice(-1)[0]||{equity:0}).equity+i.homePrice*(Math.pow(1.04,30)-1))}</div><div class="hs">4%/yr appreciation assumed</div></div>`;
+    <div class="hero ${beYr>=0?'hgr':'hbl'}">
+      <div class="hl">Net Wealth Break-Even</div>
+      <div class="hv">${beText}</div>
+      <div class="hs">when buyer net wealth surpasses renter's</div>
+    </div>
+    <div class="hero ${buyWins?'hgr':'hbl'}">
+      <div class="hl">Buyer Net Wealth (Yr ${yrs})</div>
+      <div class="hv">${fmt(last.buyerNW)}</div>
+      <div class="hs">equity − cumulative non-equity costs</div>
+    </div>
+    <div class="hero ${!buyWins?'hgr':'hbl'}">
+      <div class="hl">Renter Net Wealth (Yr ${yrs})</div>
+      <div class="hv">${fmt(last.renterNW)}</div>
+      <div class="hs">portfolio − cumulative rent paid</div>
+    </div>`;
+
   dc('rvbChart');
   CH['rvbChart']=new Chart(document.getElementById('rvbChart').getContext('2d'),{
     type:'line',
-    data:{labels:Array.from({length:yrs},(_,y)=>`Yr ${y+1}`),datasets:[
-      {label:'Cumulative Cost of Buying',data:buyNetArr,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:.4,pointRadius:0,borderWidth:2},
-      {label:'Cumulative Cost of Renting',data:rentNetArr,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',fill:true,tension:.4,pointRadius:0,borderWidth:2},
-    ]},
+    data:{
+      labels:yearData.map(d=>`Yr ${d.yr}`),
+      datasets:[
+        {label:'Buyer Net Wealth (equity − costs)',data:yearData.map(d=>d.buyerNW),
+         borderColor:'#10b981',backgroundColor:'rgba(16,185,129,.08)',fill:true,tension:.4,pointRadius:0,borderWidth:2.5},
+        {label:'Renter Net Wealth (portfolio − rent)',data:yearData.map(d=>d.renterNW),
+         borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',fill:true,tension:.4,pointRadius:0,borderWidth:2.5},
+      ]
+    },
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}}},
-      scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
-              y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}}}
+      plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10}}},
+               tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmt(c.raw)}`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{maxTicksLimit:10,font:{size:9.5}}},
+        y:{ticks:{callback:v=>fmt(v),font:{size:9.5},maxTicksLimit:6},grid:{color:'#f1f5f9'}}
+      }
+    }
   });
-  // Year snapshots
-  const snaps=[1,3,5,10,15,20,30].filter(y=>y<=yrs);
-  document.getElementById('rvbStats').innerHTML=snaps.map(yr=>{
-    const bi=buyNetArr[yr-1]||0, ri=rentNetArr[yr-1]||0;
-    const better=bi<ri?'buy':'rent';
-    return`<div class="stat" data-tip="At year ${yr}: cumulative buying cost vs renting cost. ${better==='buy'?'Buying is cheaper.':'Renting is cheaper.'}">
-      <div class="sl">Year ${yr}</div>
-      <div class="sv ${better==='buy'?'pos':'neg'}">${better==='buy'?'Buy':' Rent'} ahead</div>
-      <div style="font-size:.67rem;color:var(--n600);margin-top:2px">Own: ${fmt(bi)} · Rent: ${fmt(ri)}</div>
-    </div>`;
-  }).join('');
+
+  // Table rows at key years
+  const snapYrs=[1,3,5,10,15,20,25,30];
+  document.getElementById('rvbTable').innerHTML=snapYrs
+    .map(y=>yearData.find(d=>d.yr===y)).filter(Boolean)
+    .map(d=>{
+      const w=d.buyerNW>d.renterNW?'buy':'rent';
+      return `<tr>
+        <td><strong>${d.yr}</strong></td>
+        <td class="r">${fmtM(d.buyMo)}</td>
+        <td class="r">${fmtM(d.rentMo)}</td>
+        <td class="r muted">${fmt(d.homeVal)}</td>
+        <td class="r">${fmt(d.equity)}</td>
+        <td class="r">${fmt(d.renterPort)}</td>
+        <td class="r" style="color:${w==='buy'?'var(--em6)':'var(--n700)'}">${fmt(d.buyerNW)}</td>
+        <td class="r" style="color:${w==='rent'?'var(--bl6)':'var(--n700)'}">${fmt(d.renterNW)}</td>
+        <td style="font-weight:700;color:${w==='buy'?'var(--em6)':'var(--bl6)'}">${w==='buy'?'Buy':'Rent'}</td>
+      </tr>`;
+    }).join('');
 }
 
 // ── REFINANCE ────────────────────────────────────────────────
@@ -1206,8 +1415,9 @@ function doMath(i){
 
   // ── Section 4: Key Milestones ──
   h += `<div class="sh">Key Loan Milestones</div>`;
-  if(i.pmi>0 && pmiDropYr>0){
-    h+=`<div class="milestone-row ms-ok"><span class="milestone-label">🛡️ PMI drops off (LTV hits 80%)</span><span class="milestone-val">Year ${pmiDropYr} · saves ${fd(i.pmi)}/mo</span></div>`;
+  if(i.pmi>0 && i.pmiInfo){
+    const pi2=i.pmiInfo;
+    h+=`<div class="milestone-row ms-ok"><span class="milestone-label">🛡️ PMI drops off (LTV hits 80%)</span><span class="milestone-val">Month ${pi2.dropMonth} · Year ${pi2.dropYear} · Total PMI: ${fd(pi2.totalPMI)} · saves ${fd(pi2.monthlyPMI)}/mo</span></div>`;
   } else if(i.pmi===0){
     h+=`<div class="milestone-row ms-ok"><span class="milestone-label">✅ No PMI required</span><span class="milestone-val">LTV = ${(i.ltv*100).toFixed(1)}% ≤ 80%</span></div>`;
   }
@@ -1320,6 +1530,67 @@ document.addEventListener('mousemove',e=>{
   if(!tt.classList.contains('show')) return;
   ttPos(e.clientX,e.clientY);
 });
+
+// ── Copy link ──
+function copyLink(){
+  const btn=document.getElementById('copyLinkBtn');
+  const url=location.href;
+  (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=url;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  if(btn){btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='🔗 Copy Link';btn.classList.remove('copied');},1800);}
+}
+// ── k/M shorthand ──
+document.addEventListener('keydown',function(e){
+  const el=e.target;
+  if(el.tagName!=='INPUT'||el.type!=='number') return;
+  const v=+el.value; if(!el.value||isNaN(v)||v<=0) return;
+  if((e.key==='k'||e.key==='K')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  } else if((e.key==='m'||e.key==='M')&&v<10000){
+    e.preventDefault();el.value=Math.round(v*1000000);el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+});
+
+
+// ── Reset to defaults ──
+function resetDefaults(){
+  if(!confirm('Reset all inputs to defaults?')) return;
+  history.replaceState(null,'',location.pathname);
+  location.reload();
+}
+// ── Input validation ──
+function showErr(id, msg){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.add('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  let em=ig.querySelector('.err-msg');
+  if(!em){em=document.createElement('span');em.className='err-msg';ig.appendChild(em);}
+  em.textContent=msg;
+}
+function clearErr(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.remove('input-err');
+  const ig=el.closest('.ig'); if(!ig) return;
+  const em=ig.querySelector('.err-msg'); if(em) em.remove();
+}
+function clearAllErrs(){
+  document.querySelectorAll('.input-err').forEach(el=>el.classList.remove('input-err'));
+  document.querySelectorAll('.err-msg').forEach(em=>em.remove());
+}
+function validateMinMax(){
+  document.querySelectorAll('input[type="number"]').forEach(el=>{
+    if(!el.id) return;
+    const v=+el.value, mn=el.min!==''?+el.min:null, mx=el.max!==''?+el.max:null;
+    if(mn!==null && v<mn){ showErr(el.id,`Min: ${mn}`); }
+    else if(mx!==null && v>mx){ showErr(el.id,`Max: ${mx}`); }
+    else { clearErr(el.id); }
+  });
+}
+
 </script>
+<div style="position:fixed;bottom:8px;right:12px;font-size:.61rem;color:var(--s400);pointer-events:none;z-index:10;font-family:var(--font);">Updated Apr 2026</div>
 </body>
 </html>
