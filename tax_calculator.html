@@ -24,7 +24,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;}
+body{font-family:var(--font);background:var(--s100);color:var(--n900);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 
 /* ── HEADER ──────────────────────────────────────────────── */
 .hdr{background:var(--n900);padding:20px 28px 18px;border-bottom:1px solid var(--n800);position:relative;overflow:hidden;}
@@ -253,9 +253,9 @@ table.btbl tr:hover:not(.active-row) td{background:var(--s50);}
   .main{padding:13px 12px 30px;}
 
   /* Tabs — horizontal scroll */
-  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 5px;}
+  .tabs{overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;border-radius:var(--rmd);-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:3px 4px;width:100%;box-sizing:border-box;}
   .tabs::-webkit-scrollbar{display:none;}
-  .tab{flex:0 0 auto;padding:9px 14px;font-size:.75rem;min-height:38px;}
+  .tab{flex:0 0 auto;padding:7px 11px;font-size:.71rem;min-height:36px;white-space:nowrap;}
 
   /* Heroes — 2 col */
   .heroes,.heroes2{grid-template-columns:1fr 1fr;gap:8px;}
